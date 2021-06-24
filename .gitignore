@@ -1,0 +1,11 @@
+# Ignore bundler config.
+.bundle/
+
+# Ignore generated gems
+*.gem
+
+# Ignore Gemfile.lock (bundler in dev is too recent from CI)
+Gemfile.lock
+
+# Ignore coverage files
+coverage/

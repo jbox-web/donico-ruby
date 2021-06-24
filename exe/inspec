@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# See: https://kvz.io/bash-best-practices.html
+set -o errexit
+set -o nounset
+set -o pipefail
+
+########
+# MAIN #
+########
+
+# Load donico.sh lib
+ORIGIN="$( cd "$( echo "${BASH_SOURCE[0]%/*}" )" && pwd )"
+source ${ORIGIN}/../bash/donico.lib.sh
+
+# Bind Linux signals to the cleanup function
+trap "container_clean" INT ERR EXIT
+
+# test_mode is first arg
+test_mode="${1}"
+shift
+
+# image is second arg
+image="${1}"
+shift
+
+# the rest are test inputs
+# See: https://docs.chef.io/inspec/inputs/
+test_inputs="${@}"
+
+# Display something
+echo "Running Inspec on ${image} (test_mode: '${test_mode}', pwd: '$(pwd)', test_inputs: '${test_inputs}')"
+
+# Load test_inputs key=value so we can access them if we need to (see php image)
+load_env "${test_inputs}"
+
+# In kaniko mode, fetch Docker image before starting it.
+if [ "${test_mode}" = "kaniko" ]; then
+  pull_image ${image}
+fi
+
+# Start container to run tests
+container_id=$(container_spin "${test_mode}" "${image}" "${test_inputs}")
+
+# Run tests
+run_spec "${test_mode}" "${container_id}" "${test_inputs}"
