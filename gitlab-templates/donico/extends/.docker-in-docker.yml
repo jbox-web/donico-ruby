@@ -1,0 +1,29 @@
+---
+.docker-in-docker:
+  # Use custom Docker image with Docker installed inside
+  image: registry.digitick.net/images/base/$DOCKER_ARCH/$DOCKER_DISTRO/donico:latest
+
+  # Only use Gitlab runners with "dind" (Docker in Docker) tag
+  tags:
+    - dind
+
+  # Prepare build context
+  before_script:
+    # Login to Docker registry to push Docker image
+    - mkdir ~/.docker && echo $REGISTRY_DOCKER_TOKEN > ~/.docker/config.json && chmod 600 ~/.docker/config.json
+
+  # Build Debian images
+  script: |
+    # CI_JOB_NAME looks like : 'build: [buster]', here we only need the first part (before ':')
+    JOB_NAME=$(echo $CI_JOB_NAME | cut -d ':' -f 1)
+
+    # Job name that extends this job should match Makefile recipe name.
+    if [ -z "${VERSION+x}" ]; then
+      echo "No VERSION detected, running classic rake"
+      echo "CMD: rake $DOCKER_ARCH:$DOCKER_DISTRO:$JOB_NAME"
+      rake "$DOCKER_ARCH:$DOCKER_DISTRO:$JOB_NAME"
+    else
+      echo "VERSION detected, running versioned rake"
+      echo "CMD: rake $DOCKER_ARCH:$DOCKER_DISTRO:$VERSION:$JOB_NAME"
+      rake "$DOCKER_ARCH:$DOCKER_DISTRO:$VERSION:$JOB_NAME"
+    fi

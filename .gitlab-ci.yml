@@ -1,0 +1,56 @@
+---
+.default:
+  image: harbor.jbox-cloud.fr/jbox/base/amd64/buster/donico:latest
+
+  # Only use Gitlab runners with "dind" (Docker in Docker) tag
+  tags:
+    - dind
+
+  script:
+    - make deps
+    - make $CI_JOB_NAME
+
+stages:
+  - lint
+  - test
+  - build
+  - release
+
+lint-commits:
+  extends: .default
+  stage: lint
+  script:
+    - make $CI_JOB_NAME
+
+lint-project:
+  extends: .default
+  stage: lint
+
+test:
+  extends: .default
+  stage: test
+
+build:
+  extends: .default
+  stage: build
+  needs:
+    - test
+  # Save the generated gem as a job artifact
+  artifacts:
+    expire_in: 6 mos
+    paths:
+      - "pkg/*.gem"
+
+release:
+  extends: .default
+  stage: release
+  before_script:
+    - |
+      mkdir -p ~/.gem
+      echo -e "---\n${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/rubygems: '${CI_JOB_TOKEN}'" > ~/.gem/credentials
+      chmod 600 ~/.gem/credentials
+  needs:
+    - build
+  # Run this job only when pushing a new tag
+  only:
+    - tags
