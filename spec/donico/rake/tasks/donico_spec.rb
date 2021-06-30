@@ -54,6 +54,17 @@ RSpec.describe "donico.rake", type: :task do
     end
   end
 
+  describe "amd64:buster:1.0.0:clean" do
+    it "clean amd64:buster:1.0.0" do
+      # setup test
+      args = [hash_including, "docker", "rmi", "amd64/buster/foo-1.0.0:#{timestamp}", { unsetenv_others: true }]
+      expect(Kernel).to receive(:exec).with(*args).and_return(true)
+
+      # run the test
+      Rake::Task["amd64:buster:1.0.0:clean"].invoke
+    end
+  end
+
   describe "amd64:buster:1.0.0:login" do
     it "login amd64:buster:1.0.0" do
       # setup test

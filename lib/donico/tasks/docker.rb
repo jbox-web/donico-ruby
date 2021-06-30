@@ -28,6 +28,12 @@ module Donico
       end
 
 
+      def clean
+        cmd = ["docker", "rmi", image.build_tag]
+        Donico.exec(*cmd)
+      end
+
+
       def login
         cmd = ["docker", "run", "-it", "--rm", image.build_tag, "/bin/bash"]
         Donico.exec(*cmd)

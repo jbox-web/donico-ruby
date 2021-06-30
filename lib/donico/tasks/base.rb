@@ -8,10 +8,6 @@ module Donico
           new(image).build
         end
 
-        def login(image)
-          new(image).login
-        end
-
         def test(image)
           new(image).test
         end
@@ -22,6 +18,14 @@ module Donico
 
         def push(image)
           new(image).push
+        end
+
+        def clean(image)
+          new(image).clean
+        end
+
+        def login(image)
+          new(image).login
         end
       end
 

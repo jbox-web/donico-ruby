@@ -54,6 +54,14 @@ matrix.each do |m|
             Donico::Tasks::Docker.push(image)
           end
 
+          desc "Clean docker image for #{arch}/#{distro}/#{version}"
+          task :clean do
+            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tag: image_tag }
+            image = Donico::Images::Docker.new(**opts)
+
+            Donico::Tasks::Docker.clean(image)
+          end
+
           desc "Login into docker image for #{arch}/#{distro}/#{version}"
           task :login do
             opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tag: image_tag }
