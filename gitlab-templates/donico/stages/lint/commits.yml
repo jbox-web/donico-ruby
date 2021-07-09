@@ -4,7 +4,7 @@ lint-commits:
   # the GitlabCI matrix is not loaded
   # Anyway we don't care since it's just about mouting the current dir
   # inside commitlint container and run commitlint
-  image: harbor.jbox-cloud.fr/jbox/base/amd64/buster/donico:latest
+  image: harbor.jbox-cloud.fr/jbox/base/donico:latest
 
   # Only use Gitlab runners with "dind" (Docker in Docker) tag
   tags:
