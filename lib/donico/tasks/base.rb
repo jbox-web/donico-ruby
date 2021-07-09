@@ -30,8 +30,9 @@ module Donico
 
         def syscall(*cmd)
           begin
-            stdout, _stderr, status = Open3.capture3(*cmd)
-            status.success? && stdout.slice!(0..-(1 + $INPUT_RECORD_SEPARATOR.size)) # strip trailing eol
+            stdout, stderr, status = Open3.capture3(*cmd)
+            out = status.success? ? stdout : stderr
+            puts out
           rescue StandardError => e
             puts e
           end
