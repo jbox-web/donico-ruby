@@ -1,8 +1,11 @@
 ---
 registry: registry.example.net/images/base
 image_name: foo
-tag: latest
 matrix:
   - version: 1.0.0
     distro: buster
     archs: [amd64]
+    tags:
+      - latest
+      - "%<version>s"
+      - "%<version>s-%<distro>s"

@@ -35,8 +35,12 @@ RSpec.describe "donico.rake", type: :task do
   describe "amd64:buster:1.0.0:tag" do
     it "tag amd64:buster:1.0.0" do
       # setup test
-      args = [hash_including, "docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/amd64/buster/foo:latest", { unsetenv_others: true }]
-      expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      args1 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:latest"]
+      args2 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:1.0.0"]
+      args3 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:1.0.0-buster"]
+      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args1).and_return(true)
+      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args2).and_return(true)
+      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args3).and_return(true)
 
       # run the test
       Rake::Task["amd64:buster:1.0.0:tag"].invoke
@@ -46,8 +50,12 @@ RSpec.describe "donico.rake", type: :task do
   describe "amd64:buster:1.0.0:push" do
     it "push amd64:buster:1.0.0" do
       # setup test
-      args = [hash_including, "docker", "push", "registry.example.net/images/base/amd64/buster/foo:latest", { unsetenv_others: true }]
-      expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      args1 = ["docker", "push", "registry.example.net/images/base/foo:latest"]
+      args2 = ["docker", "push", "registry.example.net/images/base/foo:1.0.0"]
+      args3 = ["docker", "push", "registry.example.net/images/base/foo:1.0.0-buster"]
+      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args1).and_return(true)
+      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args2).and_return(true)
+      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args3).and_return(true)
 
       # run the test
       Rake::Task["amd64:buster:1.0.0:push"].invoke

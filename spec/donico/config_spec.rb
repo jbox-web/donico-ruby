@@ -40,21 +40,6 @@ RSpec.describe Donico::Config do
     end
   end
 
-  describe "#docker_image_tag" do
-    context "when value is set" do
-      it "returns Donico docker_image_tag" do
-        expect(subject.docker_image_tag).to eq "latest"
-      end
-    end
-
-    context "when value is not set" do
-      let(:config) { super().reject { |k, _v| k == "tag" } }
-      it "returns a default value" do
-        expect(subject.docker_image_tag).to eq nil
-      end
-    end
-  end
-
   describe "#image_builder" do
     context "when value is set" do
       it "returns Donico image_builder" do
@@ -73,7 +58,7 @@ RSpec.describe Donico::Config do
   describe "#matrix" do
     context "when value is set" do
       it "returns Donico matrix" do
-        expect(subject.matrix).to eq [{ "archs" => ["amd64"], "distro" => "buster", "version" => "1.0.0" }]
+        expect(subject.matrix).to eq [{ "archs" => ["amd64"], "distro" => "buster", "version" => "1.0.0", "tags" => ["latest", "%<version>s", "%<version>s-%<distro>s"] }]
       end
     end
 

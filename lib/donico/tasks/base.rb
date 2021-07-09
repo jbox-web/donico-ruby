@@ -27,6 +27,15 @@ module Donico
         def login(image)
           new(image).login
         end
+
+        def syscall(*cmd)
+          begin
+            stdout, _stderr, status = Open3.capture3(*cmd)
+            status.success? && stdout.slice!(0..-(1 + $INPUT_RECORD_SEPARATOR.size)) # strip trailing eol
+          rescue StandardError => e
+            puts e
+          end
+        end
       end
 
       attr_reader :image

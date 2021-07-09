@@ -17,14 +17,18 @@ module Donico
 
 
       def tag
-        cmd = ["docker", "tag", image.build_tag, image.prod_tag]
-        Donico.exec(*cmd)
+        image.tags.each do |tag|
+          cmd = ["docker", "tag", image.build_tag, image.prod_tag(tag)]
+          self.class.syscall(*cmd)
+        end
       end
 
 
       def push
-        cmd = ["docker", "push", image.prod_tag]
-        Donico.exec(*cmd)
+        image.tags.each do |tag|
+          cmd = ["docker", "push", image.prod_tag(tag)]
+          self.class.syscall(*cmd)
+        end
       end
 
 
