@@ -2,6 +2,7 @@
 
 # Load std libs
 require "fileutils"
+require "open3"
 require "pathname"
 require "yaml"
 require "time"
