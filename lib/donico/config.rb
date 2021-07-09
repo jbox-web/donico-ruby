@@ -11,8 +11,8 @@ module Donico
       @image_builder     = config.fetch("image_builder", "donico")
       @matrix            = config.fetch("matrix", [])
 
-      @commit_linter     = config.fetch("commit_linter", "harbor.jbox-cloud.fr/jbox/base/amd64/buster/commitlint:latest")
-      @docker_linter     = config.fetch("docker_linter", "harbor.jbox-cloud.fr/jbox/base/amd64/buster/hadolint:latest")
+      @commit_linter     = config.fetch("commit_linter", "harbor.jbox-cloud.fr/jbox/base/commitlint:latest")
+      @docker_linter     = config.fetch("docker_linter", "harbor.jbox-cloud.fr/jbox/base/hadolint:latest")
     end
 
     # When running in CI, use CI_COMMIT_TIMESTAMP as a timestamp to name the build image.

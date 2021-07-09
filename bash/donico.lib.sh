@@ -2,7 +2,7 @@
 # CONFIG #
 ##########
 
-INSPEC_IMAGE=harbor.jbox-cloud.fr/jbox/base/amd64/buster/inspec:latest
+INSPEC_IMAGE=harbor.jbox-cloud.fr/jbox/base/inspec:latest
 
 #############
 # FUNCTIONS #

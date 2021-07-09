@@ -6,7 +6,7 @@ SHELL := /usr/bin/env bash
 GITLAB_PACKAGE_REGISTRY = https://gitlab.thetuxhouse.org/api/v4/projects/63/packages/rubygems
 
 # Dev tools config
-COMMIT_LINTER = harbor.jbox-cloud.fr/jbox/base/amd64/buster/commitlint:latest
+COMMIT_LINTER = harbor.jbox-cloud.fr/jbox/base/commitlint:latest
 
 ################
 # Public tasks #
