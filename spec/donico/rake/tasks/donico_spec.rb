@@ -38,9 +38,12 @@ RSpec.describe "donico.rake", type: :task do
       args1 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:latest"]
       args2 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:1.0.0"]
       args3 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:1.0.0-buster"]
-      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args1).and_return(true)
-      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args2).and_return(true)
-      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args3).and_return(true)
+
+      result = double("result")
+      expect(result).to receive(:success?).thrice.and_return(true)
+      expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
 
       # run the test
       Rake::Task["amd64:buster:1.0.0:tag"].invoke
@@ -53,9 +56,12 @@ RSpec.describe "donico.rake", type: :task do
       args1 = ["docker", "push", "registry.example.net/images/base/foo:latest"]
       args2 = ["docker", "push", "registry.example.net/images/base/foo:1.0.0"]
       args3 = ["docker", "push", "registry.example.net/images/base/foo:1.0.0-buster"]
-      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args1).and_return(true)
-      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args2).and_return(true)
-      expect(Donico::Tasks::Docker).to receive(:syscall).with(*args3).and_return(true)
+
+      result = double("result")
+      expect(result).to receive(:success?).thrice.and_return(true)
+      expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
 
       # run the test
       Rake::Task["amd64:buster:1.0.0:push"].invoke

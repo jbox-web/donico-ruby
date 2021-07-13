@@ -93,6 +93,17 @@ module Donico
     env = Bundler.original_env
     Kernel.exec(env, *args, unsetenv_others: true)
   end
+
+  def run_cmd(*args)
+    puts args.join(" ")
+    begin
+      stdout, stderr, status = Open3.capture3(*args)
+      out = status.success? ? stdout : stderr
+      puts out
+    rescue StandardError => e
+      puts e
+    end
+  end
 end
 
 # Load our hooks in Rake DSL

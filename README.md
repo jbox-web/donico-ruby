@@ -18,9 +18,9 @@ ainsi que sur des actions prédéfinies par Donico :
 
 * `build`
 * `test`
-* `inspect`
 * `tag`
 * `push`
+* `login`
 
 
 Ainsi, le fichier de configuration Donico suivant :
@@ -52,46 +52,46 @@ générera la matrice d'actions Rake suivante :
 
 ```sh
   rake amd64:bullseye:3.0.1:build    # Build docker image for amd64/bullseye/3.0.1
-  rake amd64:bullseye:3.0.1:inspect  # Inspect docker image for amd64/bullseye/3.0.1
+  rake amd64:bullseye:3.0.1:login    # Inspect docker image for amd64/bullseye/3.0.1
   rake amd64:bullseye:3.0.1:push     # Push docker image for amd64/bullseye/3.0.1
   rake amd64:bullseye:3.0.1:tag      # Tag docker image for amd64/bullseye/3.0.1
   rake amd64:bullseye:3.0.1:test     # Test docker image for amd64/bullseye/3.0.1
   rake amd64:buster:2.7.3:build      # Build docker image for amd64/buster/2.7.3
-  rake amd64:buster:2.7.3:inspect    # Inspect docker image for amd64/buster/2.7.3
+  rake amd64:buster:2.7.3:login      # Inspect docker image for amd64/buster/2.7.3
   rake amd64:buster:2.7.3:push       # Push docker image for amd64/buster/2.7.3
   rake amd64:buster:2.7.3:tag        # Tag docker image for amd64/buster/2.7.3
   rake amd64:buster:2.7.3:test       # Test docker image for amd64/buster/2.7.3
   rake amd64:buster:3.0.1:build      # Build docker image for amd64/buster/3.0.1
-  rake amd64:buster:3.0.1:inspect    # Inspect docker image for amd64/buster/3.0.1
+  rake amd64:buster:3.0.1:login      # Inspect docker image for amd64/buster/3.0.1
   rake amd64:buster:3.0.1:push       # Push docker image for amd64/buster/3.0.1
   rake amd64:buster:3.0.1:tag        # Tag docker image for amd64/buster/3.0.1
   rake amd64:buster:3.0.1:test       # Test docker image for amd64/buster/3.0.1
   rake arm64:bullseye:3.0.1:build    # Build docker image for arm64/bullseye/3.0.1
-  rake arm64:bullseye:3.0.1:inspect  # Inspect docker image for arm64/bullseye/3.0.1
+  rake arm64:bullseye:3.0.1:login    # Inspect docker image for arm64/bullseye/3.0.1
   rake arm64:bullseye:3.0.1:push     # Push docker image for arm64/bullseye/3.0.1
   rake arm64:bullseye:3.0.1:tag      # Tag docker image for arm64/bullseye/3.0.1
   rake arm64:bullseye:3.0.1:test     # Test docker image for arm64/bullseye/3.0.1
   rake arm64:buster:3.0.1:build      # Build docker image for arm64/buster/3.0.1
-  rake arm64:buster:3.0.1:inspect    # Inspect docker image for arm64/buster/3.0.1
+  rake arm64:buster:3.0.1:login      # Inspect docker image for arm64/buster/3.0.1
   rake arm64:buster:3.0.1:push       # Push docker image for arm64/buster/3.0.1
   rake arm64:buster:3.0.1:tag        # Tag docker image for arm64/buster/3.0.1
   rake arm64:buster:3.0.1:test       # Test docker image for arm64/buster/3.0.1
   rake i386:stretch:2.6.8:build      # Build docker image for i386/stretch/2.6.8
-  rake i386:stretch:2.6.8:inspect    # Inspect docker image for i386/stretch/2.6.8
+  rake i386:stretch:2.6.8:login      # Inspect docker image for i386/stretch/2.6.8
   rake i386:stretch:2.6.8:push       # Push docker image for i386/stretch/2.6.8
   rake i386:stretch:2.6.8:tag        # Tag docker image for i386/stretch/2.6.8
   rake i386:stretch:2.6.8:test       # Test docker image for i386/stretch/2.6.8
 ```
 
-Les actions prédéfinies par Donico (`build`, `test`, `inspect`, `tag`, `push`) ne sont en fait que des wrappers autour de différentes commandes `docker` :
+Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`) ne sont en fait que des wrappers autour de différentes commandes `docker` :
 
 | Commande                            | Traduction |
 |-------------------------------------|------------|
 | `rake amd64:bullseye:3.0.1:build`   | `docker build -f Dockerfile --tag amd64/bullseye/foo-3.0.1:20210603 --build-arg ARCH=amd64 --build-arg DISTRO_NAME=bullseye --build-arg FOO_VERSION=3.0.1 .`
 | `rake amd64:bullseye:3.0.1:test`    | `bin/inspec amd64/bullseye/foo-3.0.1:20210603 3.0.1`
-| `rake amd64:bullseye:3.0.1:inspect` | `docker run -it --rm amd64/bullseye/foo-3.0.1:20210603 /bin/bash`
 | `rake amd64:bullseye:3.0.1:tag`     | `docker tag amd64/bullseye/foo-3.0.1:20210603 registry.digitick.net/images/base/amd64/bullseye/foo:3.0.1`
 | `rake amd64:bullseye:3.0.1:push`    | `docker push registry.digitick.net/images/base/amd64/bullseye/foo:3.0.1`
+| `rake amd64:bullseye:3.0.1:login`   | `docker run -it --rm amd64/bullseye/foo-3.0.1:20210603 /bin/bash`
 
 Donico ajoute également des commandes utilitaires :
 
@@ -149,7 +149,7 @@ matrix:
 ```sh
 bin/rake amd64:buster:latest:build
 bin/rake amd64:buster:latest:test
-bin/rake amd64:buster:latest:inspect
+bin/rake amd64:buster:latest:login
 bin/rake amd64:buster:latest:tag
 bin/rake amd64:buster:latest:push
 ```
