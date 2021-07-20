@@ -18,8 +18,10 @@ module Donico
 
       def tag
         image.tags.each do |tag|
-          cmd = ["docker", "tag", image.build_tag, image.prod_tag(tag)]
+          new_tag = image.prod_tag(tag)
+          cmd = ["docker", "tag", image.build_tag, new_tag]
           self.class.syscall(*cmd)
+          puts "Docker tag created: #{new_tag}"
         end
       end
 

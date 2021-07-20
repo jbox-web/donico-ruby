@@ -32,7 +32,7 @@ module Donico
           begin
             stdout, stderr, status = Open3.capture3(*cmd)
             out = status.success? ? stdout : stderr
-            puts out
+            puts out unless out.empty?
           rescue StandardError => e
             puts e
           end
