@@ -36,7 +36,18 @@ RSpec.describe "donico.rake", type: :task do
   describe "amd64:buster:1.0.0:test" do
     it "test amd64:buster:1.0.0" do
       # setup test
-      args = [hash_including, "bin/inspec", "donico", "amd64/buster/foo-1.0.0:#{timestamp}", "foo_version=1.0.0", { unsetenv_others: true }]
+      args = [
+        hash_including,
+        "bin/inspec",
+        "donico",
+        "amd64/buster/foo-1.0.0:#{timestamp}",
+        "arch=amd64",
+        "distro_name=buster",
+        "foo_version=1.0.0",
+        "nodejs_version=14.17.3",
+        "rubygem_version=3.2.24",
+        { unsetenv_others: true }
+      ]
       expect(Kernel).to receive(:exec).with(*args).and_return(true)
 
       # run the test

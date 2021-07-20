@@ -7,7 +7,7 @@ module Donico
       attr_reader :name, :registry, :arch, :distro, :version, :timestamp, :tags
 
       # rubocop:disable Metrics/ParameterLists:
-      def initialize(name:, registry:, arch:, distro:, version:, timestamp:, tags:, build_args:)
+      def initialize(name:, registry:, arch:, distro:, version:, timestamp:, tags:, build_args:, test_args:)
         @name       = name
         @registry   = registry
         @arch       = arch
@@ -16,6 +16,7 @@ module Donico
         @timestamp  = timestamp
         @tags       = tags
         @build_args = build_args
+        @test_args  = test_args
       end
       # rubocop:enable Metrics/ParameterLists:
 

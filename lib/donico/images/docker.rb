@@ -19,7 +19,7 @@ module Donico
       end
 
       def test_args
-        ["#{version_env_var.downcase}=#{version}"]
+        (@build_args + @test_args + ["ARCH=#{arch}", "DISTRO_NAME=#{distro}", "#{version_env_var}=#{version}"]).sort.map(&:downcase)
       end
     end
   end

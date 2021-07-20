@@ -17,13 +17,14 @@ matrix.each do |m|
   archs      = m["archs"]
   tags       = m["tags"] || []
   build_args = m["build_args"] || []
+  test_args  = m["test_args"] || []
 
   archs.each do |arch|
     namespace arch do
       namespace distro do
         namespace version do
 
-          opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags, build_args: build_args }
+          opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags, build_args: build_args, test_args: test_args }
           image = Donico::Images::Docker.new(**opts)
 
           desc "Build docker image for #{arch}/#{distro}/#{version}"
