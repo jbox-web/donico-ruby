@@ -13,7 +13,19 @@ RSpec.describe "donico.rake", type: :task do
   describe "amd64:buster:1.0.0:build" do
     it "build amd64:buster:1.0.0" do
       # setup test
-      args = [hash_including, "docker", "build", "-f", "Dockerfile", "--pull", "--tag", "amd64/buster/foo-1.0.0:#{timestamp}", "--build-arg", "ARCH=amd64", "--build-arg", "DISTRO_NAME=buster", "--build-arg", "FOO_VERSION=1.0.0", ".", { unsetenv_others: true }]
+      args = [
+        hash_including,
+        "docker", "build",
+        "-f", "Dockerfile",
+        "--pull",
+        "--tag", "amd64/buster/foo-1.0.0:#{timestamp}",
+        "--build-arg", "ARCH=amd64",
+        "--build-arg", "DISTRO_NAME=buster",
+        "--build-arg", "FOO_VERSION=1.0.0",
+        "--build-arg", "NODEJS_VERSION=14.17.3",
+        ".",
+        { unsetenv_others: true }
+      ]
       expect(Kernel).to receive(:exec).with(*args).and_return(true)
 
       # run the test

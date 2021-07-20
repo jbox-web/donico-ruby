@@ -14,7 +14,8 @@ module Donico
       end
 
       def build_args
-        ["--build-arg", "ARCH=#{arch}", "--build-arg", "DISTRO_NAME=#{distro}", "--build-arg", "#{version_env_var}=#{version}"]
+        args = (@build_args + ["ARCH=#{arch}", "DISTRO_NAME=#{distro}", "#{version_env_var}=#{version}"]).sort
+        args.map { |_| "--build-arg" }.zip(args).flatten
       end
 
       def test_args

@@ -5,6 +5,8 @@ matrix:
   - version: 1.0.0
     distro: buster
     archs: [amd64]
+    build_args:
+      - NODEJS_VERSION=14.17.3
     tags:
       - latest
       - "%<version>s"

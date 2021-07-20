@@ -12,10 +12,11 @@ timestamp  = Donico.config.timestamp
 
 # Build rake commands
 matrix.each do |m|
-  version = m["version"].to_s
-  distro  = m["distro"]
-  archs   = m["archs"]
-  tags    = m["tags"] || []
+  version    = m["version"].to_s
+  distro     = m["distro"]
+  archs      = m["archs"]
+  tags       = m["tags"] || []
+  build_args = m["build_args"] || []
 
   archs.each do |arch|
     namespace arch do
@@ -24,7 +25,7 @@ matrix.each do |m|
 
           desc "Build docker image for #{arch}/#{distro}/#{version}"
           task :build do
-            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags }
+            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags, build_args: build_args }
             image = Donico::Images::Docker.new(**opts)
 
             Donico::Tasks::Docker.build(image)
@@ -32,7 +33,7 @@ matrix.each do |m|
 
           desc "Test docker image for #{arch}/#{distro}/#{version}"
           task :test do
-            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags }
+            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags, build_args: build_args }
             image = Donico::Images::Docker.new(**opts)
 
             Donico::Tasks::Docker.test(image)
@@ -40,7 +41,7 @@ matrix.each do |m|
 
           desc "Tag docker image for #{arch}/#{distro}/#{version}"
           task :tag do
-            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags }
+            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags, build_args: build_args }
             image = Donico::Images::Docker.new(**opts)
 
             Donico::Tasks::Docker.tag(image)
@@ -48,7 +49,7 @@ matrix.each do |m|
 
           desc "Push docker image for #{arch}/#{distro}/#{version}"
           task :push do
-            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags }
+            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags, build_args: build_args }
             image = Donico::Images::Docker.new(**opts)
 
             Donico::Tasks::Docker.push(image)
@@ -56,7 +57,7 @@ matrix.each do |m|
 
           desc "Clean docker image for #{arch}/#{distro}/#{version}"
           task :clean do
-            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags }
+            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags, build_args: build_args }
             image = Donico::Images::Docker.new(**opts)
 
             Donico::Tasks::Docker.clean(image)
@@ -64,7 +65,7 @@ matrix.each do |m|
 
           desc "Login into docker image for #{arch}/#{distro}/#{version}"
           task :login do
-            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags }
+            opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags, build_args: build_args }
             image = Donico::Images::Docker.new(**opts)
 
             Donico::Tasks::Docker.login(image)
