@@ -6,6 +6,7 @@ require "open3"
 require "pathname"
 require "yaml"
 require "time"
+require "erb"
 
 # Load external libs
 require "bundler"
