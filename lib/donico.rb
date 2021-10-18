@@ -33,7 +33,11 @@ module Donico
     # Check config file presence
     raise "\nFile not found: donico.yml\nPlease create donico.yml at the project root.\n\n" unless File.exist?(file)
 
-    @config = Config.new(YAML.safe_load(File.read(file)))
+    @config = Config.new(load_config_file(file))
+  end
+
+  def load_config_file(file)
+    YAML.load(ERB.new(File.read(file)).result)
   end
 
   def config_file

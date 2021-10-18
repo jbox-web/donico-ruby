@@ -27,5 +27,16 @@ module Donico
       end
     end
 
+    def to_h
+      {
+        docker_registry:   docker_registry,
+        docker_image_name: docker_image_name,
+        docker_image_tag:  docker_image_tag,
+        image_builder:     image_builder,
+        commit_linter:     commit_linter,
+        docker_linter:     docker_linter,
+        matrix:            matrix.map(&:to_h),
+      }
+    end
   end
 end

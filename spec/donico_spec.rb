@@ -20,4 +20,44 @@ RSpec.describe Donico do
       expect(Donico.config_file).to eq "#{Dir.pwd}/donico.yml"
     end
   end
+
+  describe ".load_config" do
+    before { ENV['FOO'] = 'BAR' }
+    after  { ENV.delete('FOO') }
+
+    it "returns Donico config file path" do
+      expect(Donico.load_config(get_fixture_path('donico_erb.yml')).to_h).to eq({
+        docker_registry:   'registry.example.net/images/base',
+        docker_image_name: 'foo',
+        docker_image_tag:  nil,
+        image_builder:     'donico',
+        commit_linter:     'harbor.jbox-cloud.fr/jbox/base/commitlint:latest',
+        docker_linter:     'harbor.jbox-cloud.fr/jbox/base/hadolint:latest',
+        matrix: [
+          {
+            distro:  'buster',
+            version: '1.0.0',
+            archs: [
+              'amd64'
+            ],
+            build_args: [
+              "NODEJS_VERSION=14.17.3",
+              "FOO=BAR"
+            ],
+            test_args: [
+              "RUBYGEM_VERSION=3.2.24"
+            ],
+            tags: [
+              "latest",
+              "%<version>s",
+              "%<version>s-%<distro>s",
+              "%<timestamp>s-%<distro>s",
+              "%<version>s-%<timestamp>s-%<distro>s",
+              "%<version>s-%<timestamp>s-%<distro>s-%<arch>s",
+            ]
+          }
+        ]
+      })
+    end
+  end
 end
