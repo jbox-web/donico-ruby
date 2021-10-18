@@ -8,7 +8,7 @@ module Donico
       end
 
       def prod_tag(tag)
-        new_tag = format(tag, version: version, distro: distro)
+        new_tag = format(tag, version: version, distro: distro, timestamp: timestamp, arch: arch)
         image_name = format("%<name>s:%<tag>s", name: name, tag: new_tag)
         "#{registry}/#{image_name}"
       end

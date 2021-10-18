@@ -61,12 +61,18 @@ RSpec.describe "donico.rake", type: :task do
       args1 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:latest"]
       args2 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:1.0.0"]
       args3 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:1.0.0-buster"]
+      args4 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:#{timestamp}-buster"]
+      args5 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:1.0.0-#{timestamp}-buster"]
+      args6 = ["docker", "tag", "amd64/buster/foo-1.0.0:#{timestamp}", "registry.example.net/images/base/foo:1.0.0-#{timestamp}-buster-amd64"]
 
       result = double("result")
-      expect(result).to receive(:success?).thrice.and_return(true)
+      expect(result).to receive(:success?).exactly(6).times.and_return(true)
       expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
       expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
       expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
 
       # run the test
       Rake::Task["amd64:buster:1.0.0:tag"].invoke
@@ -79,12 +85,18 @@ RSpec.describe "donico.rake", type: :task do
       args1 = ["docker", "push", "registry.example.net/images/base/foo:latest"]
       args2 = ["docker", "push", "registry.example.net/images/base/foo:1.0.0"]
       args3 = ["docker", "push", "registry.example.net/images/base/foo:1.0.0-buster"]
+      args4 = ["docker", "push", "registry.example.net/images/base/foo:#{timestamp}-buster"]
+      args5 = ["docker", "push", "registry.example.net/images/base/foo:1.0.0-#{timestamp}-buster"]
+      args6 = ["docker", "push", "registry.example.net/images/base/foo:1.0.0-#{timestamp}-buster-amd64"]
 
       result = double("result")
-      expect(result).to receive(:success?).thrice.and_return(true)
+      expect(result).to receive(:success?).exactly(6).times.and_return(true)
       expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
       expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
       expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
+      expect(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
 
       # run the test
       Rake::Task["amd64:buster:1.0.0:push"].invoke

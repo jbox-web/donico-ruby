@@ -58,7 +58,23 @@ RSpec.describe Donico::Config do
   describe "#matrix" do
     context "when value is set" do
       it "returns Donico matrix" do
-        expect(subject.matrix).to eq [{ "archs" => ["amd64"], "distro" => "buster", "version" => "1.0.0", "build_args" => ["NODEJS_VERSION=14.17.3"], "test_args" => ["RUBYGEM_VERSION=3.2.24"], "tags" => ["latest", "%<version>s", "%<version>s-%<distro>s"] }]
+        expect(subject.matrix).to eq [
+          {
+            "archs" => ["amd64"],
+            "distro" => "buster",
+            "version" => "1.0.0",
+            "build_args" => ["NODEJS_VERSION=14.17.3"],
+            "test_args" => ["RUBYGEM_VERSION=3.2.24"],
+            "tags" => [
+              "latest",
+              "%<version>s",
+              "%<version>s-%<distro>s",
+              "%<timestamp>s-%<distro>s",
+              "%<version>s-%<timestamp>s-%<distro>s",
+              "%<version>s-%<timestamp>s-%<distro>s-%<arch>s",
+            ]
+          }
+        ]
       end
     end
 

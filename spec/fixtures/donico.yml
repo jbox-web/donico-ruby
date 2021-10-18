@@ -13,3 +13,6 @@ matrix:
       - latest
       - "%<version>s"
       - "%<version>s-%<distro>s"
+      - "%<timestamp>s-%<distro>s"
+      - "%<version>s-%<timestamp>s-%<distro>s"
+      - "%<version>s-%<timestamp>s-%<distro>s-%<arch>s"
