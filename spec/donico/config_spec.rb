@@ -3,7 +3,7 @@
 require "spec_helper"
 
 RSpec.describe Donico::Config do
-  let(:config)  { YAML.load_file(get_fixture_path("donico.yml")) }
+  let(:config)  { YAML.load_file(get_fixture_path("donico_custom.yml")) }
   let(:subject) { described_class.new(config) }
 
   describe "#docker_image_name" do
@@ -81,7 +81,15 @@ RSpec.describe Donico::Config do
     context "when value is not set" do
       let(:config) { super().except("matrix") }
       it "returns a default value" do
-        expect(subject.matrix).to eq []
+        expect(subject.matrix.first).to be_a(Donico::Matrix)
+
+        matrix = subject.matrix.first
+        expect(matrix.version).to eq "latest"
+        expect(matrix.distro).to eq "buster"
+        expect(matrix.archs).to eq ["amd64"]
+        expect(matrix.build_args).to eq []
+        expect(matrix.test_args).to eq []
+        expect(matrix.tags).to eq ["%<version>s-%<distro>s"]
       end
     end
   end

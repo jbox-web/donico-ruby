@@ -4,7 +4,7 @@ require "spec_helper"
 
 RSpec.describe "donico.rake", type: :task do
   before { ENV.delete("CI_COMMIT_TIMESTAMP") }
-  before { Donico.load_config(get_fixture_path("donico.yml")) }
+  before { Donico.load_config(get_fixture_path("donico_custom.yml")) }
   before { Donico.load_tasks }
   after  { Rake::Task.clear }
 
