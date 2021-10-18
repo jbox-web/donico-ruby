@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.description = "A gem to easily build Docker Images (like Kaniko)"
   s.license     = "MIT"
 
-  s.required_ruby_version = ">= 2.5.0"
+  s.required_ruby_version = ">= 3.0.0"
 
   s.files = ["donico.gemspec", "README.md"] + %x(git ls-files | grep -E '^(bash|lib|exe)').split("\n")
 

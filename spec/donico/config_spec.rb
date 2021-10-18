@@ -14,7 +14,7 @@ RSpec.describe Donico::Config do
     end
 
     context "when value is not set" do
-      let(:config) { super().reject { |k, _v| k == "image_name" } }
+      let(:config) { super().except("image_name") }
       it "raises an error" do
         expect do
           subject.docker_image_name
@@ -31,7 +31,7 @@ RSpec.describe Donico::Config do
     end
 
     context "when value is not set" do
-      let(:config) { super().reject { |k, _v| k == "registry" } }
+      let(:config) { super().except("registry") }
       it "raises an error" do
         expect do
           subject.docker_registry
@@ -48,7 +48,7 @@ RSpec.describe Donico::Config do
     end
 
     context "when value is not set" do
-      let(:config) { super().reject { |k, _v| k == "image_builder" } }
+      let(:config) { super().except("image_builder") }
       it "returns a default value" do
         expect(subject.image_builder).to eq "donico"
       end
@@ -63,7 +63,7 @@ RSpec.describe Donico::Config do
     end
 
     context "when value is not set" do
-      let(:config) { super().reject { |k, _v| k == "matrix" } }
+      let(:config) { super().except("matrix") }
       it "returns a default value" do
         expect(subject.matrix).to eq []
       end
@@ -78,7 +78,7 @@ RSpec.describe Donico::Config do
     end
 
     context "when value is not set" do
-      let(:config) { super().reject { |k, _v| k == "commit_linter" } }
+      let(:config) { super().except("commit_linter") }
       it "returns a default value" do
         expect(subject.commit_linter).to eq "harbor.jbox-cloud.fr/jbox/base/commitlint:latest"
       end
@@ -93,7 +93,7 @@ RSpec.describe Donico::Config do
     end
 
     context "when value is not set" do
-      let(:config) { super().reject { |k, _v| k == "docker_linter" } }
+      let(:config) { super().except("docker_linter") }
       it "returns a default value" do
         expect(subject.docker_linter).to eq "harbor.jbox-cloud.fr/jbox/base/hadolint:latest"
       end
