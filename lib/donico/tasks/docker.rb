@@ -17,20 +17,24 @@ module Donico
 
 
       def tag
+        result = []
         image.tags.each do |tag|
-          new_tag = image.prod_tag(tag)
-          cmd = ["docker", "tag", image.build_tag, new_tag]
-          self.class.syscall(*cmd)
-          puts "Docker tag created: #{new_tag}"
+          cmd = ["docker", "tag", image.build_tag, image.prod_tag(tag)]
+          result << Donico.run_cmd(*cmd)
         end
+        exit_code = result.include?(false) ? 1 : 0
+        Kernel.exit(exit_code)
       end
 
 
       def push
+        result = []
         image.tags.each do |tag|
           cmd = ["docker", "push", image.prod_tag(tag)]
-          self.class.syscall(*cmd)
+          result << Donico.run_cmd(*cmd)
         end
+        exit_code = result.include?(false) ? 1 : 0
+        Kernel.exit(exit_code)
       end
 
 

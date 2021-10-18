@@ -100,8 +100,10 @@ module Donico
       stdout, stderr, status = Open3.capture3(*args)
       out = status.success? ? stdout : stderr
       puts out
+      status.success?
     rescue StandardError => e
       puts e
+      false
     end
   end
 end
