@@ -37,7 +37,7 @@ module Donico
   end
 
   def load_config_file(file)
-    YAML.load(ERB.new(File.read(file)).result)
+    YAML.safe_load(ERB.new(File.read(file)).result)
   end
 
   def config_file
