@@ -29,13 +29,11 @@ module Donico
         end
 
         def syscall(*cmd)
-          begin
-            stdout, stderr, status = Open3.capture3(*cmd)
-            out = status.success? ? stdout : stderr
-            puts out unless out.empty?
-          rescue StandardError => e
-            puts e
-          end
+          stdout, stderr, status = Open3.capture3(*cmd)
+          out = status.success? ? stdout : stderr
+          puts out unless out.empty?
+        rescue StandardError => e
+          puts e
         end
       end
 

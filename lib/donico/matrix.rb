@@ -19,9 +19,9 @@ module Donico
         config  = {
           ".matrix" => {
             "parallel" => {
-              "matrix" => matrix
-            }
-          }
+              "matrix" => matrix,
+            },
+          },
         }
 
         FileUtils.mkdir_p(".gitlab-ci/extends")

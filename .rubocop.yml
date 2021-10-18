@@ -28,6 +28,9 @@ Layout/EmptyLineBetweenDefs:
 Layout/EmptyLinesAroundBlockBody:
   Enabled: false
 
+Layout/HashAlignment:
+  EnforcedColonStyle: table
+
 #########
 # Style #
 #########
@@ -41,8 +44,8 @@ Style/StringLiterals:
 Style/CommandLiteral:
   EnforcedStyle: percent_x
 
-Style/RedundantBegin:
-  Enabled: false
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
 
 ###########
 # Metrics #
