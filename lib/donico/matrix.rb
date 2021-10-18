@@ -7,11 +7,7 @@ module Donico
         global_matrix = []
 
         matrix.each do |m|
-          version       = m["version"].to_s
-          distro_name   = m["distro"]
-          architectures = m["archs"]
-
-          global_matrix << { "VERSION" => version, "DOCKER_DISTRO" => distro_name, "DOCKER_ARCH" => architectures }
+          global_matrix << { "VERSION" => m.version, "DOCKER_DISTRO" => m.distro, "DOCKER_ARCH" => m.archs }
         end
 
         write_matrix(global_matrix)
@@ -37,6 +33,28 @@ module Donico
         puts "GitlabCI Matrix file generated"
       end
       # rubocop:enable Metrics/MethodLength
+    end
+
+    attr_reader :version, :distro, :archs, :build_args, :test_args, :tags
+
+    def initialize(opts = {})
+      @version    = opts.fetch("version", "latest").to_s
+      @distro     = opts.fetch("distro", "buster")
+      @archs      = opts.fetch("archs", ["amd64"])
+      @build_args = opts.fetch("build_args", [])
+      @test_args  = opts.fetch("test_args", [])
+      @tags       = opts.fetch("tags", ["%<version>s-%<distro>s"])
+    end
+
+    def to_h
+      {
+        archs:      archs,
+        distro:     distro,
+        version:    version,
+        build_args: build_args,
+        test_args:  test_args,
+        tags:       tags,
+      }
     end
   end
 end

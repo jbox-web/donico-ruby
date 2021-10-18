@@ -12,19 +12,16 @@ timestamp  = Donico.config.timestamp
 
 # Build rake commands
 matrix.each do |m|
-  version    = m["version"].to_s
-  distro     = m["distro"]
-  archs      = m["archs"]
-  tags       = m["tags"] || []
-  build_args = m["build_args"] || []
-  test_args  = m["test_args"] || []
+  version    = m.version
+  distro     = m.distro
+  archs      = m.archs
 
   archs.each do |arch|
     namespace arch do
       namespace distro do
         namespace version do
 
-          opts = { name: image_name, registry: registry, arch: arch, distro: distro, version: version, timestamp: timestamp, tags: tags, build_args: build_args, test_args: test_args }
+          opts  = m.to_h.except(:archs).merge(name: image_name, registry: registry, arch: arch, timestamp: timestamp)
           image = Donico::Images::Docker.new(**opts)
 
           desc "Build docker image for #{arch}/#{distro}/#{version}"
