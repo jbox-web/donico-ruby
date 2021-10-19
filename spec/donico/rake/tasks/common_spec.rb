@@ -3,8 +3,8 @@
 require "spec_helper"
 
 RSpec.describe "common.rake", type: :task do
-  context "when image_builder is donico" do
-    before { Donico.load_config(get_fixture_path("donico_custom.yml")) }
+  context "when image_builder is docker" do
+    before { Donico.load_config(get_fixture_path("docker/minimal.yml")) }
     before { Donico.load_tasks }
     after  { Rake::Task.clear }
 

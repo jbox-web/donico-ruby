@@ -3,7 +3,7 @@
 require "spec_helper"
 
 RSpec.describe Donico::Config do
-  let(:config)  { YAML.load_file(get_fixture_path("donico_custom.yml")) }
+  let(:config)  { YAML.load_file(get_fixture_path("docker/custom.yml")) }
   let(:subject) { described_class.new(config) }
 
   describe "#docker_image_name" do

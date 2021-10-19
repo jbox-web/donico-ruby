@@ -26,7 +26,7 @@ RSpec.describe Donico do
     after  { ENV.delete("FOO") }
 
     it "returns Donico config file path" do
-      expect(Donico.load_config(get_fixture_path("donico_erb.yml")).to_h).to eq({
+      expect(Donico.load_config(get_fixture_path("docker/erb.yml")).to_h).to eq({
                                                                                   docker_registry:   "registry.example.net/images/base",
                                                                                   docker_image_name: "foo",
                                                                                   docker_image_tag:  nil,

@@ -12,7 +12,7 @@ RSpec.describe "docker.rake", type: :task do
 
   context "with default configuration" do
     let(:version) { "latest" }
-    let(:fixture_file) { "donico_minimal.yml" }
+    let(:fixture_file) { "docker/minimal.yml" }
 
     describe "amd64:buster:latest:build" do
       it "build amd64:buster:latest" do
@@ -147,7 +147,7 @@ RSpec.describe "docker.rake", type: :task do
 
   context "with custom configuration" do
     let(:version) { "1.0.0" }
-    let(:fixture_file) { "donico_custom.yml" }
+    let(:fixture_file) { "docker/custom.yml" }
 
     describe "amd64:buster:1.0.0:build" do
       it "build amd64:buster:1.0.0" do
@@ -325,7 +325,7 @@ RSpec.describe "docker.rake", type: :task do
 
   context "with old arch syntax" do
     let(:version) { "1.0.0" }
-    let(:fixture_file) { "donico_docker.yml" }
+    let(:fixture_file) { "docker/deprecated_archs.yml" }
 
     describe "amd64:buster:latest:build" do
       it "build amd64:buster:latest" do
