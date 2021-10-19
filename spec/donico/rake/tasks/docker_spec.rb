@@ -63,7 +63,7 @@ RSpec.describe "docker.rake", type: :task do
           args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
 
           result = double("result")
-          expect(result).to receive(:success?).exactly(2).times.and_return(true)
+          expect(result).to receive(:success?).exactly(1).times.and_return(true)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
@@ -78,8 +78,7 @@ RSpec.describe "docker.rake", type: :task do
           args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
 
           result = double("result")
-          expect(result).to receive(:success?).at_most(1).times.and_return(true)
-          expect(result).to receive(:success?).at_most(1).times.and_return(false)
+          expect(result).to receive(:success?).exactly(1).times.and_return(false)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
@@ -96,7 +95,7 @@ RSpec.describe "docker.rake", type: :task do
           args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
 
           result = double("result")
-          expect(result).to receive(:success?).exactly(2).times.and_return(true)
+          expect(result).to receive(:success?).exactly(1).times.and_return(true)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
@@ -111,8 +110,7 @@ RSpec.describe "docker.rake", type: :task do
           args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
 
           result = double("result")
-          expect(result).to receive(:success?).at_most(1).times.and_return(true)
-          expect(result).to receive(:success?).at_most(1).times.and_return(false)
+          expect(result).to receive(:success?).exactly(1).times.and_return(false)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
@@ -206,7 +204,7 @@ RSpec.describe "docker.rake", type: :task do
           args6 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"]
 
           result = double("result")
-          expect(result).to receive(:success?).exactly(12).times.and_return(true)
+          expect(result).to receive(:success?).exactly(6).times.and_return(true)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
           expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
@@ -231,7 +229,7 @@ RSpec.describe "docker.rake", type: :task do
           args6 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"]
 
           result = double("result")
-          expect(result).to receive(:success?).exactly(11).times.and_return(true)
+          expect(result).to receive(:success?).exactly(5).times.and_return(true)
           expect(result).to receive(:success?).at_most(1).times.and_return(false)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
@@ -259,7 +257,7 @@ RSpec.describe "docker.rake", type: :task do
           args6 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"]
 
           result = double("result")
-          expect(result).to receive(:success?).exactly(12).times.and_return(true)
+          expect(result).to receive(:success?).exactly(6).times.and_return(true)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
           expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
@@ -284,7 +282,7 @@ RSpec.describe "docker.rake", type: :task do
           args6 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"]
 
           result = double("result")
-          expect(result).to receive(:success?).exactly(11).times.and_return(true)
+          expect(result).to receive(:success?).exactly(5).times.and_return(true)
           expect(result).to receive(:success?).at_most(1).times.and_return(false)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
@@ -376,7 +374,7 @@ RSpec.describe "docker.rake", type: :task do
           args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
 
           result = double("result")
-          expect(result).to receive(:success?).exactly(2).times.and_return(true)
+          expect(result).to receive(:success?).exactly(1).times.and_return(true)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
@@ -391,8 +389,7 @@ RSpec.describe "docker.rake", type: :task do
           args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
 
           result = double("result")
-          expect(result).to receive(:success?).at_most(1).times.and_return(true)
-          expect(result).to receive(:success?).at_most(1).times.and_return(false)
+          expect(result).to receive(:success?).exactly(1).times.and_return(false)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
@@ -409,7 +406,7 @@ RSpec.describe "docker.rake", type: :task do
           args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
 
           result = double("result")
-          expect(result).to receive(:success?).exactly(2).times.and_return(true)
+          expect(result).to receive(:success?).exactly(1).times.and_return(true)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
@@ -424,8 +421,7 @@ RSpec.describe "docker.rake", type: :task do
           args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
 
           result = double("result")
-          expect(result).to receive(:success?).at_most(1).times.and_return(true)
-          expect(result).to receive(:success?).at_most(1).times.and_return(false)
+          expect(result).to receive(:success?).exactly(1).times.and_return(false)
           expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 

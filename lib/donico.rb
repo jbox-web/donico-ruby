@@ -103,9 +103,11 @@ module Donico
     puts args.join(" ")
     begin
       stdout, stderr, status = Open3.capture3(*args)
-      out = status.success? ? stdout : stderr
+      success = status.success?
+
+      out = success ? stdout : stderr
       puts out
-      status.success?
+      success
     rescue StandardError => e
       puts e
       false
