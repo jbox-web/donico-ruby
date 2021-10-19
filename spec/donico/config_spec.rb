@@ -43,14 +43,14 @@ RSpec.describe Donico::Config do
   describe "#image_builder" do
     context "when value is set" do
       it "returns Donico image_builder" do
-        expect(subject.image_builder).to eq "donico"
+        expect(subject.image_builder).to eq "docker"
       end
     end
 
     context "when value is not set" do
       let(:config) { super().except("image_builder") }
       it "returns a default value" do
-        expect(subject.image_builder).to eq "donico"
+        expect(subject.image_builder).to eq "docker"
       end
     end
   end

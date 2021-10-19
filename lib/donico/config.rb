@@ -8,7 +8,7 @@ module Donico
       @docker_image_name = config.fetch("image_name")
       @docker_registry   = config.fetch("registry")
       @docker_image_tag  = config.fetch("tag", nil)
-      @image_builder     = config.fetch("image_builder", "donico")
+      @image_builder     = config.fetch("image_builder", "docker")
       @matrix            = config.fetch("matrix", [{}]).map { |m| Matrix.new(m) }
 
       @commit_linter     = config.fetch("commit_linter", "harbor.jbox-cloud.fr/jbox/base/commitlint:latest")

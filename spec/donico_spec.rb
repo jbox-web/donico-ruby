@@ -30,7 +30,7 @@ RSpec.describe Donico do
                                                                                   docker_registry:   "registry.example.net/images/base",
                                                                                   docker_image_name: "foo",
                                                                                   docker_image_tag:  nil,
-                                                                                  image_builder:     "donico",
+                                                                                  image_builder:     "docker",
                                                                                   commit_linter:     "harbor.jbox-cloud.fr/jbox/base/commitlint:latest",
                                                                                   docker_linter:     "harbor.jbox-cloud.fr/jbox/base/hadolint:latest",
                                                                                   matrix:            [
