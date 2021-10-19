@@ -3,11 +3,11 @@
 module Donico
   class Matrix
     class << self
-      def generate(matrix)
+      def generate(config)
         global_matrix = []
 
-        matrix.each do |m|
-          global_matrix << { "VERSION" => m.version, "DOCKER_DISTRO" => m.distro, "DOCKER_ARCH" => m.archs }
+        config.matrix.each do |m|
+          global_matrix << m.matrix_for(config.image_builder)
         end
 
         write_matrix(global_matrix)
@@ -44,6 +44,17 @@ module Donico
       @build_args = opts.fetch("build_args", [])
       @test_args  = opts.fetch("test_args", [])
       @tags       = opts.fetch("tags", ["%<version>s-%<distro>s"])
+    end
+
+    def matrix_for(image_builder)
+      case image_builder
+      when "docker"
+        { "VERSION" => version, "DOCKER_DISTRO" => distro, "DOCKER_ARCH" => archs }
+      when "earthly"
+        { "VERSION" => version, "DOCKER_DISTRO" => distro }
+      else
+        raise "Unknown image_builder: #{image_builder}"
+      end
     end
 
     def to_h

@@ -25,7 +25,7 @@ end
 
 desc "Generate GitlabCI matix"
 task :"generate-matrix" do
-  Donico::Matrix.generate(Donico.config.matrix)
+  Donico::Matrix.generate(Donico.config)
 end
 
 

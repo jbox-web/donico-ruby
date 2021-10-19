@@ -1,0 +1,32 @@
+<%- images.each do |image| -%>
+<%= image.distro %>-<%= image.version %>-build-all:
+  BUILD \
+    <%= image.archs.map { |a| "--platform \"#{a}\"" }.join(' ') %> \
+    +<%= image.distro %>-<%= image.version %>-build
+
+<%= image.distro %>-<%= image.version %>-build:
+  ARG TARGETPLATFORM
+<% image.build_args.each do |arg| -%>
+  ARG <%= arg.split('=').first %>
+<% end %>
+  # Fetch platform specific Crystal image to build stacker
+  <%-
+    build_args = image.build_args.map do |a|
+      arg = a.split('=').first
+      "--build-arg #{arg}=\"$#{arg}\""
+    end.join(' ')
+  -%>
+  FROM DOCKERFILE -f Dockerfile <%= build_args %> --platform "$TARGETPLATFORM" .
+  SAVE IMAGE <%= image.name %>/"$<%= image.name.upcase %>_VERSION"/"$DISTRO_NAME":"$TIMESTAMP"
+
+<%= image.distro %>-<%= image.version %>-push-all:
+  BUILD \
+    <%= image.archs.map { |a| "--platform \"#{a}\"" }.join(' ') %> \
+    +<%= image.distro %>-<%= image.version %>-push
+
+<%= image.distro %>-<%= image.version %>-push:
+  FROM +<%= image.distro %>-<%= image.version %>-build
+<%- image.prod_tags.each do |t| -%>
+  SAVE IMAGE --push <%= t %>
+<% end -%>
+<%- end -%>

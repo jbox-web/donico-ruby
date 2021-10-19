@@ -4,13 +4,12 @@ module Donico
   module Images
     class Base
 
-      attr_reader :name, :registry, :arch, :distro, :version, :timestamp, :tags
+      attr_reader :name, :registry, :distro, :version, :timestamp, :tags
 
-      # rubocop:disable Metrics/ParameterLists:
-      def initialize(name:, registry:, arch:, distro:, version:, timestamp:, tags:, build_args:, test_args:)
+      # rubocop:disable Metrics/ParameterLists
+      def initialize(name:, registry:, distro:, version:, timestamp:, tags:, build_args:, test_args:)
         @name       = name
         @registry   = registry
-        @arch       = arch
         @distro     = distro
         @version    = version
         @timestamp  = timestamp
@@ -18,7 +17,7 @@ module Donico
         @build_args = build_args
         @test_args  = test_args
       end
-      # rubocop:enable Metrics/ParameterLists:
+      # rubocop:enable Metrics/ParameterLists
 
 
       private
