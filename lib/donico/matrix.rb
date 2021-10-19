@@ -40,7 +40,7 @@ module Donico
     def initialize(opts = {})
       @version    = opts.fetch("version", "latest").to_s
       @distro     = opts.fetch("distro", "buster")
-      @archs      = opts.fetch("archs", ["amd64"])
+      @archs      = opts.fetch("archs", ["linux/amd64"])
       @build_args = opts.fetch("build_args", [])
       @test_args  = opts.fetch("test_args", [])
       @tags       = opts.fetch("tags", ["%<version>s-%<distro>s"])

@@ -17,7 +17,7 @@ matrix.each do |m|
   archs      = m.archs
 
   archs.each do |arch|
-    namespace arch do
+    namespace arch.split("/").last do
       namespace distro do
         namespace version do
 

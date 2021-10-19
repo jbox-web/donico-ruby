@@ -322,4 +322,139 @@ RSpec.describe "docker.rake", type: :task do
       end
     end
   end
+
+  context "with old arch syntax" do
+    let(:version) { "1.0.0" }
+    let(:fixture_file) { "donico_docker.yml" }
+
+    describe "amd64:buster:latest:build" do
+      it "build amd64:buster:latest" do
+        # setup test
+        args = [
+          hash_including,
+          "docker", "build",
+          "-f", "Dockerfile",
+          "--pull",
+          "--tag", "amd64/buster/foo-#{version}:#{timestamp}",
+          "--build-arg", "ARCH=amd64",
+          "--build-arg", "DISTRO_NAME=buster",
+          "--build-arg", "FOO_VERSION=#{version}",
+          ".",
+          { unsetenv_others: true }
+        ]
+        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+
+        # run the test
+        Rake::Task["amd64:buster:#{version}:build"].invoke
+      end
+    end
+
+    describe "amd64:buster:1.0.0:test" do
+      it "test amd64:buster:1.0.0" do
+        # setup test
+        args = [
+          hash_including,
+          "bin/inspec",
+          "donico",
+          "amd64/buster/foo-#{version}:#{timestamp}",
+          "arch=amd64",
+          "distro_name=buster",
+          "foo_version=#{version}",
+          { unsetenv_others: true }
+        ]
+        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+
+        # run the test
+        Rake::Task["amd64:buster:#{version}:test"].invoke
+      end
+    end
+
+    describe "amd64:buster:1.0.0:tag" do
+      context "when command is success" do
+        it "tag amd64:buster:1.0.0" do
+          # setup test
+          args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
+
+          result = double("result")
+          expect(result).to receive(:success?).exactly(2).times.and_return(true)
+          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(Kernel).to receive(:exit).with(0)
+
+          # run the test
+          Rake::Task["amd64:buster:#{version}:tag"].invoke
+        end
+      end
+
+      context "when command is failure" do
+        it "doesn't tag amd64:buster:1.0.0" do
+          # setup test
+          args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
+
+          result = double("result")
+          expect(result).to receive(:success?).at_most(1).times.and_return(true)
+          expect(result).to receive(:success?).at_most(1).times.and_return(false)
+          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(Kernel).to receive(:exit).with(1)
+
+          # run the test
+          Rake::Task["amd64:buster:#{version}:tag"].invoke
+        end
+      end
+    end
+
+    describe "amd64:buster:1.0.0:push" do
+      context "when command is success" do
+        it "push amd64:buster:1.0.0" do
+          # setup test
+          args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
+
+          result = double("result")
+          expect(result).to receive(:success?).exactly(2).times.and_return(true)
+          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(Kernel).to receive(:exit).with(0)
+
+          # run the test
+          Rake::Task["amd64:buster:#{version}:push"].invoke
+        end
+      end
+
+      context "when command is failure" do
+        it "doesn't push amd64:buster:1.0.0" do
+          # setup test
+          args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
+
+          result = double("result")
+          expect(result).to receive(:success?).at_most(1).times.and_return(true)
+          expect(result).to receive(:success?).at_most(1).times.and_return(false)
+          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(Kernel).to receive(:exit).with(1)
+
+          # run the test
+          Rake::Task["amd64:buster:#{version}:push"].invoke
+        end
+      end
+    end
+
+    describe "amd64:buster:1.0.0:clean" do
+      it "clean amd64:buster:1.0.0" do
+        # setup test
+        args = [hash_including, "docker", "rmi", "amd64/buster/foo-#{version}:#{timestamp}", { unsetenv_others: true }]
+        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+
+        # run the test
+        Rake::Task["amd64:buster:#{version}:clean"].invoke
+      end
+    end
+
+    describe "amd64:buster:1.0.0:login" do
+      it "login amd64:buster:1.0.0" do
+        # setup test
+        args = [hash_including, "docker", "run", "-it", "--rm", "amd64/buster/foo-#{version}:#{timestamp}", "/bin/bash", { unsetenv_others: true }]
+        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+
+        # run the test
+        Rake::Task["amd64:buster:#{version}:login"].invoke
+      end
+    end
+  end
 end

@@ -60,7 +60,7 @@ RSpec.describe Donico::Config do
       it "returns Donico matrix" do
         expect(subject.matrix.map(&:to_h)).to eq [
           {
-            archs:      ["amd64"],
+            archs:      ["linux/amd64"],
             distro:     "buster",
             version:    "1.0.0",
             build_args: ["NODEJS_VERSION=14.17.3"],
@@ -86,7 +86,7 @@ RSpec.describe Donico::Config do
         matrix = subject.matrix.first
         expect(matrix.version).to eq "latest"
         expect(matrix.distro).to eq "buster"
-        expect(matrix.archs).to eq ["amd64"]
+        expect(matrix.archs).to eq ["linux/amd64"]
         expect(matrix.build_args).to eq []
         expect(matrix.test_args).to eq []
         expect(matrix.tags).to eq ["%<version>s-%<distro>s"]

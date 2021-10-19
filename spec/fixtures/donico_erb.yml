@@ -4,7 +4,7 @@ image_name: foo
 matrix:
   - version: 1.0.0
     distro: buster
-    archs: [amd64]
+    archs: ["linux/amd64"]
     build_args:
       - NODEJS_VERSION=14.17.3
       - FOO=<%= ENV.fetch('FOO') %>

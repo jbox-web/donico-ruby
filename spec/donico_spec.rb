@@ -38,7 +38,7 @@ RSpec.describe Donico do
                                                                                       distro:     "buster",
                                                                                       version:    "1.0.0",
                                                                                       archs:      [
-                                                                                        "amd64"
+                                                                                        "linux/amd64"
                                                                                       ],
                                                                                       build_args: [
                                                                                         "NODEJS_VERSION=14.17.3",
