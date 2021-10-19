@@ -99,6 +99,7 @@ module Donico
     Kernel.exec(env, *args, unsetenv_others: true)
   end
 
+  # rubocop:disable Metrics/MethodLength
   def run_cmd(*args)
     puts args.join(" ")
     begin
@@ -113,6 +114,7 @@ module Donico
       false
     end
   end
+  # rubocop:enable Metrics/MethodLength
 end
 
 # Load our hooks in Rake DSL
