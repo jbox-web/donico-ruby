@@ -6,6 +6,9 @@ AllCops:
     - bin/*
     - test/**/*
 
+Gemspec/RequireMFA:
+  Enabled: false
+
 ##########
 # Layout #
 ##########
