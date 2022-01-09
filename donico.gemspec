@@ -20,10 +20,10 @@ Gem::Specification.new do |s|
   s.bindir      = "exe"
   s.executables = ["inspec"]
 
-  s.add_runtime_dependency "bundler", ">= 2.2"
-  s.add_runtime_dependency "dotenv"
-  s.add_runtime_dependency "rake", ">= 13.0"
-  s.add_runtime_dependency "zeitwerk"
+  s.add_runtime_dependency "bundler",  ">= 2.2"
+  s.add_runtime_dependency "dotenv",   "2.7.6"
+  s.add_runtime_dependency "rake",     "13.0.6"
+  s.add_runtime_dependency "zeitwerk", "2.5.3"
 
   unless ENV["DONICO_RELEASE"] == "true"
     s.add_development_dependency "guard-rspec"

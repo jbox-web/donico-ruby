@@ -3,9 +3,9 @@ PATH
   specs:
     donico (1.6.2)
       bundler (>= 2.2)
-      dotenv
-      rake (>= 13.0)
-      zeitwerk
+      dotenv (= 2.7.6)
+      rake (= 13.0.6)
+      zeitwerk (= 2.5.3)
 
 GEM
   remote: https://rubygems.org/
