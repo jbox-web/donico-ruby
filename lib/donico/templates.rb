@@ -20,9 +20,7 @@ module Donico
 
 
     def write
-      File.open("Earthfile", "w") do |f|
-        f.write render_template(template)
-      end
+      File.write("Earthfile", render_template(template))
     end
 
 
