@@ -153,7 +153,7 @@ RSpec.describe "docker.rake", type: :task do
         args = [
           hash_including,
           "docker", "build",
-          "-f", "Dockerfile",
+          "-f", "foo/Dockerfile",
           "--pull",
           "--tag", "amd64/buster/foo-#{version}:#{timestamp}",
           "--build-arg", "ARCH=amd64",

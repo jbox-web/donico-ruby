@@ -36,6 +36,7 @@ RSpec.describe Donico do
                                                                                   matrix:            [
                                                                                     {
                                                                                       distro:     "buster",
+                                                                                      dockerfile: "Dockerfile",
                                                                                       version:    "1.0.0",
                                                                                       archs:      [
                                                                                         "linux/amd64"

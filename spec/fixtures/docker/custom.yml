@@ -5,6 +5,7 @@ matrix:
   - version: 1.0.0
     distro: buster
     archs: ["linux/amd64"]
+    dockerfile: foo/Dockerfile
     build_args:
       - NODEJS_VERSION=14.17.3
     test_args:
