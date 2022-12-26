@@ -17,23 +17,29 @@ module Donico
 
 
       def tag
-        result = []
+        results = []
+        logs    = []
         image.tags.each do |tag|
           cmd = ["docker", "tag", image.build_tag, image.prod_tag(tag)]
-          result << Donico.run_cmd(*cmd)
+          result, log = Donico.run_cmd(*cmd)
+          results << result
+          logs << log
         end
-        exit_code = result.include?(false) ? 1 : 0
+        exit_code = results.include?(false) ? 1 : 0
         Kernel.exit(exit_code)
       end
 
 
       def push
-        result = []
+        results = []
+        logs    = []
         image.tags.each do |tag|
           cmd = ["docker", "push", image.prod_tag(tag)]
-          result << Donico.run_cmd(*cmd)
+          result, log = Donico.run_cmd(*cmd)
+          results << result
+          logs << log
         end
-        exit_code = result.include?(false) ? 1 : 0
+        exit_code = results.include?(false) ? 1 : 0
         Kernel.exit(exit_code)
       end
 

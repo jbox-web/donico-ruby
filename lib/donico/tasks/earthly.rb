@@ -23,21 +23,26 @@ module Donico
 
 
       def clean
-        result = []
+        results = []
+        logs    = []
 
         # Delete main image
         cmd = ["docker", "rmi", image.build_tag]
-        result << Donico.run_cmd(*cmd)
+        result, log = Donico.run_cmd(*cmd)
+        results << result
+        logs << log
 
         # Delete arch specific image
         image.archs.each do |arch|
           arch = arch.sub("/", "_")
           cmd = ["docker", "rmi", "#{image.build_tag}_#{arch}"]
-          result << Donico.run_cmd(*cmd)
+          result, log = Donico.run_cmd(*cmd)
+          results << result
+          logs << log
         end
 
         # Exit properly
-        exit_code = result.include?(false) ? 1 : 0
+        exit_code = results.include?(false) ? 1 : 0
         Kernel.exit(exit_code)
       end
 

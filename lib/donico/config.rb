@@ -27,6 +27,10 @@ module Donico
       end
     end
 
+    def dockerfiles
+      matrix.collect { |m| "/app/#{m.dockerfile}" }
+    end
+
     def to_h
       {
         docker_registry:   docker_registry,

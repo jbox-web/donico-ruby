@@ -102,13 +102,16 @@ module Donico
   # rubocop:disable Metrics/MethodLength
   def run_cmd(*args)
     puts args.join(" ")
+
     begin
       stdout, stderr, status = Open3.capture3(*args)
       success = status.success?
 
+      yield success if block_given?
+
       out = success ? stdout : stderr
-      puts out
-      success
+
+      [success, out]
     rescue StandardError => e
       puts e
       false

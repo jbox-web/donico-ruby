@@ -6,8 +6,10 @@
 
 desc "Lint Dockerfile"
 task :"lint-dockerfile" do
-  Donico.with_exit_status("docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico.config.docker_linter, "hadolint", "/app/Dockerfile") do |success|
-    puts("Dockerfile is OK!") if success
+  Donico.config.dockerfiles.each do |f|
+    Donico.run_cmd("docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico.config.docker_linter, "hadolint", f) do |success|
+      puts("Dockerfile is OK!") if success
+    end
   end
 end
 

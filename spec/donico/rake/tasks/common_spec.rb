@@ -4,19 +4,43 @@ require "spec_helper"
 
 RSpec.describe "common.rake", type: :task do
   context "when image_builder is docker" do
-    before { Donico.load_config(get_fixture_path("docker/minimal.yml")) }
-    before { Donico.load_tasks }
-    after  { Rake::Task.clear }
+    context "when single Dockerfile is used" do
+      before { Donico.load_config(get_fixture_path("docker/minimal.yml")) }
+      before { Donico.load_tasks }
+      after  { Rake::Task.clear }
 
-    describe "lint-dockerfile" do
-      it "lint dockerfile" do
-        args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", "harbor.jbox-cloud.fr/jbox/base/hadolint:latest", "hadolint", "/app/Dockerfile"]
-        expect(Donico).to receive(:with_exit_status).with(*args).and_yield(true)
-        Rake::Task["lint-dockerfile"].invoke
+      describe "lint-dockerfile" do
+        it "lint dockerfile" do
+          args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", "harbor.jbox-cloud.fr/jbox/base/hadolint:latest", "hadolint", "/app/Dockerfile"]
+          expect(Donico).to receive(:run_cmd).with(*args).and_yield(true)
+          Rake::Task["lint-dockerfile"].invoke
+        end
+      end
+    end
+
+    context "when multiple Dockerfiles are used" do
+      before { Donico.load_config(get_fixture_path("docker/multiple_dockerfiles.yml")) }
+      before { Donico.load_tasks }
+      after  { Rake::Task.clear }
+
+      describe "lint-dockerfile" do
+        it "lint dockerfile" do
+          args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", "harbor.jbox-cloud.fr/jbox/base/hadolint:latest", "hadolint", "/app/dockerfiles/3.1/Dockerfile"]
+          expect(Donico).to receive(:run_cmd).with(*args).and_yield(true)
+
+          args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", "harbor.jbox-cloud.fr/jbox/base/hadolint:latest", "hadolint", "/app/dockerfiles/3.2/Dockerfile"]
+          expect(Donico).to receive(:run_cmd).with(*args).and_yield(true)
+
+          Rake::Task["lint-dockerfile"].invoke
+        end
       end
     end
 
     describe "lint-commits" do
+      before { Donico.load_config(get_fixture_path("docker/minimal.yml")) }
+      before { Donico.load_tasks }
+      after  { Rake::Task.clear }
+
       it "lint commits" do
         args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", "harbor.jbox-cloud.fr/jbox/base/commitlint:latest", "commitlint", "/app"]
         expect(Donico).to receive(:with_exit_status).with(*args).and_yield(true)
