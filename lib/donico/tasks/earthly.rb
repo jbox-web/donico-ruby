@@ -22,6 +22,7 @@ module Donico
       end
 
 
+      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       def clean
         results = []
         logs    = []
@@ -45,6 +46,7 @@ module Donico
         exit_code = results.include?(false) ? 1 : 0
         Kernel.exit(exit_code)
       end
+      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
 
       def login
