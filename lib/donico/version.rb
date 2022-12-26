@@ -8,7 +8,7 @@ module Donico
 
   module VERSION
     MAJOR = 1
-    MINOR = 7
+    MINOR = 8
     TINY  = 0
     PRE   = nil
 
