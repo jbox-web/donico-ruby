@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    donico (1.8.0)
+    donico (1.9.0)
       bundler (>= 2.3)
       dotenv (= 2.8.1)
       rake (= 13.0.6)
