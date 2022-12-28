@@ -17,30 +17,16 @@ module Donico
 
 
       def tag
-        results = []
-        logs    = []
-        image.tags.each do |tag|
-          cmd = ["docker", "tag", image.build_tag, image.prod_tag(tag)]
-          result, log = Donico.run_cmd(*cmd)
-          results << result
-          logs << log
+        run_cmd_with_tag do |tag|
+          ["docker", "tag", image.build_tag, image.prod_tag(tag)]
         end
-        exit_code = results.include?(false) ? 1 : 0
-        Kernel.exit(exit_code)
       end
 
 
       def push
-        results = []
-        logs    = []
-        image.tags.each do |tag|
-          cmd = ["docker", "push", image.prod_tag(tag)]
-          result, log = Donico.run_cmd(*cmd)
-          results << result
-          logs << log
+        run_cmd_with_tag do |tag|
+          ["docker", "push", image.prod_tag(tag)]
         end
-        exit_code = results.include?(false) ? 1 : 0
-        Kernel.exit(exit_code)
       end
 
 
@@ -54,6 +40,38 @@ module Donico
         cmd = ["docker", "run", "-it", "--rm", image.build_tag, "/bin/bash"]
         Donico.exec(*cmd)
       end
+
+
+      private
+
+
+      def run_cmd_with_tag
+        results = []
+        logs    = []
+
+        image.tags.each do |tag|
+          cmd = yield tag
+          result, log = Donico.run_cmd(*cmd)
+          results << result
+          logs << log
+        end
+
+        render_logs(logs)
+        exit_code(results)
+      end
+
+
+      def render_logs(logs)
+        logs = logs.reject(&:empty?)
+        puts logs.join("\n") unless logs.empty?
+      end
+
+
+      def exit_code(results)
+        exit_code = results.include?(false) ? 1 : 0
+        Kernel.exit(exit_code)
+      end
+
 
     end
   end
