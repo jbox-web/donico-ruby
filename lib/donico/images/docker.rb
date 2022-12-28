@@ -27,13 +27,13 @@ module Donico
 
 
       def build_args
-        args = (@build_args + ["ARCH=#{deprecated_arch}", "DISTRO_NAME=#{distro}", "#{version_env_var}=#{version}"]).sort
+        args = (@build_args + ["ARCH=#{deprecated_arch}", "DISTRO_NAME=#{distro}", "BUILD_DATE=#{timestamp}", "#{version_env_var}=#{version}"]).sort
         args.map { |_| "--build-arg" }.zip(args).flatten
       end
 
 
       def test_args
-        (@build_args + @test_args + ["ARCH=#{deprecated_arch}", "DISTRO_NAME=#{distro}", "#{version_env_var}=#{version}"]).sort.map(&:downcase)
+        (@build_args + @test_args + ["ARCH=#{deprecated_arch}", "DISTRO_NAME=#{distro}", "BUILD_DATE=#{timestamp}", "#{version_env_var}=#{version}"]).sort.map(&:downcase)
       end
 
     end

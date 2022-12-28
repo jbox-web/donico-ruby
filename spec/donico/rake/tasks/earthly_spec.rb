@@ -20,9 +20,9 @@ RSpec.describe "earthly.rake", type: :task do
         args = [
           hash_including,
           "earthly",
+          "--build-arg", "BUILD_DATE=#{timestamp}",
           "--build-arg", "DISTRO_NAME=buster",
           "--build-arg", "FOO_VERSION=#{version}",
-          "--build-arg", "TIMESTAMP=#{timestamp}",
           "+buster-#{version}-build-all",
           { unsetenv_others: true }
         ]
@@ -41,6 +41,7 @@ RSpec.describe "earthly.rake", type: :task do
           "bin/inspec",
           "donico",
           "foo/#{version}/buster:#{timestamp}",
+          "build_date=#{timestamp}",
           "distro_name=buster",
           "foo_version=#{version}",
           { unsetenv_others: true }
@@ -59,9 +60,9 @@ RSpec.describe "earthly.rake", type: :task do
           hash_including,
           "earthly",
           "--push",
+          "--build-arg", "BUILD_DATE=#{timestamp}",
           "--build-arg", "DISTRO_NAME=buster",
           "--build-arg", "FOO_VERSION=#{version}",
-          "--build-arg", "TIMESTAMP=#{timestamp}",
           "+buster-#{version}-push-all",
           { unsetenv_others: true }
         ]
