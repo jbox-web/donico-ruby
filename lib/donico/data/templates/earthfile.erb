@@ -1,0 +1,44 @@
+# !!! THIS IS A GENERATED FILE !!! DON'T EDIT ME MANUALLY !!!
+# Instead edit donico.yml and run bin/rake generate-earthfile
+
+VERSION 0.6
+<%- images.each do |image| %>
+<%- comments = (image.distro.size + 4).times.map { "#" }.join('') -%>
+<%= comments %>
+# <%= image.distro.upcase %> #
+<%= comments %>
+
+<%= image.distro %>-<%= image.version %>-docker-build:
+  ARG TARGETPLATFORM
+<% image.build_args.each do |arg| -%>
+  ARG <%= arg.split('=').first %>
+<% end %>
+  <%-
+    build_args = image.build_args.map do |a|
+      arg = a.split('=').first
+      "--build-arg #{arg}=\"$#{arg}\""
+    end.join(' ')
+  -%>
+  FROM DOCKERFILE -f <%= image.dockerfile %> <%= build_args %> --platform "$TARGETPLATFORM" .
+  SAVE IMAGE --cache-hint <%= image.name %>/"$<%= image.version_env_var %>"/"$DISTRO_NAME":"$BUILD_DATE"
+
+<%= image.distro %>-<%= image.version %>-docker-push:
+  ARG TARGETPLATFORM
+<% image.build_args.each do |arg| -%>
+  ARG <%= arg.split('=').first %>
+<% end %>
+  <%-
+    build_args = image.build_args.map do |a|
+      arg = a.split('=').first
+      "--build-arg #{arg}=\"$#{arg}\""
+    end.join(' ')
+  -%>
+  FROM DOCKERFILE -f <%= image.dockerfile %> <%= build_args %> --platform "$TARGETPLATFORM" .
+  SAVE IMAGE --push <%= image.prod_tags.join(' ') %>
+
+<%= image.distro %>-<%= image.version %>-build:
+  BUILD <%= image.archs.map { |a| "--platform \"#{a}\"" }.join(' ') %> +<%= image.distro %>-<%= image.version %>-docker-build
+
+<%= image.distro %>-<%= image.version %>-push:
+  BUILD <%= image.archs.map { |a| "--platform \"#{a}\"" }.join(' ') %> +<%= image.distro %>-<%= image.version %>-docker-push
+<%- end -%>

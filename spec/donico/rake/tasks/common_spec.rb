@@ -11,8 +11,9 @@ RSpec.describe "common.rake", type: :task do
 
       describe "lint-dockerfile" do
         it "lint dockerfile" do
-          args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", "harbor.jbox-cloud.fr/jbox/base/hadolint:latest", "hadolint", "/app/Dockerfile"]
-          expect(Donico).to receive(:run_cmd).with(*args).and_yield(true)
+          args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_DOCKER_LINTER, "hadolint", "/app/Dockerfile"]
+          # return false to not pollute stdout but we could also have returned true
+          expect(Donico).to receive(:run_cmd).with(*args).and_yield(false)
           Rake::Task["lint-dockerfile"].invoke
         end
       end
@@ -25,11 +26,13 @@ RSpec.describe "common.rake", type: :task do
 
       describe "lint-dockerfile" do
         it "lint dockerfile" do
-          args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", "harbor.jbox-cloud.fr/jbox/base/hadolint:latest", "hadolint", "/app/dockerfiles/3.1/Dockerfile"]
-          expect(Donico).to receive(:run_cmd).with(*args).and_yield(true)
+          args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_DOCKER_LINTER, "hadolint", "/app/dockerfiles/3.1/Dockerfile"]
+          # return false to not pollute stdout but we could also have returned true
+          expect(Donico).to receive(:run_cmd).with(*args).and_yield(false)
 
-          args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", "harbor.jbox-cloud.fr/jbox/base/hadolint:latest", "hadolint", "/app/dockerfiles/3.2/Dockerfile"]
-          expect(Donico).to receive(:run_cmd).with(*args).and_yield(true)
+          args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_DOCKER_LINTER, "hadolint", "/app/dockerfiles/3.2/Dockerfile"]
+          # return false to not pollute stdout but we could also have returned true
+          expect(Donico).to receive(:run_cmd).with(*args).and_yield(false)
 
           Rake::Task["lint-dockerfile"].invoke
         end
@@ -42,8 +45,8 @@ RSpec.describe "common.rake", type: :task do
       after  { Rake::Task.clear }
 
       it "lint commits" do
-        args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", "harbor.jbox-cloud.fr/jbox/base/commitlint:latest", "commitlint", "/app"]
-        expect(Donico).to receive(:with_exit_status).with(*args).and_yield(true)
+        args = ["docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_COMMIT_LINTER, "commitlint", "/app"]
+        expect(Donico).to receive(:with_exit_status).with(*args).and_yield(false)
         Rake::Task["lint-commits"].invoke
       end
     end

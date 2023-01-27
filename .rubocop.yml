@@ -4,10 +4,13 @@ AllCops:
   TargetRubyVersion: 3.0
   Exclude:
     - bin/*
-    - test/**/*
+    - spec/**/*
 
 Gemspec/RequireMFA:
   Enabled: false
+
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
 
 ##########
 # Layout #

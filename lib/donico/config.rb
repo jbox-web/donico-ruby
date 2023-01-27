@@ -11,15 +11,15 @@ module Donico
       @image_builder     = config.fetch("image_builder", "docker")
       @matrix            = config.fetch("matrix", [{}]).map { |m| Matrix.new(m) }
 
-      @commit_linter     = config.fetch("commit_linter", "harbor.jbox-cloud.fr/jbox/base/commitlint:latest")
-      @docker_linter     = config.fetch("docker_linter", "harbor.jbox-cloud.fr/jbox/base/hadolint:latest")
+      @commit_linter     = config.fetch("commit_linter", Donico.default_commit_linter)
+      @docker_linter     = config.fetch("docker_linter", Donico.default_docker_linter)
     end
 
     # When running in CI, use CI_COMMIT_TIMESTAMP as a timestamp to name the build image.
     # When running in dev, generate a timestamp from the current date to name the build image.
     def timestamp
       if ENV.key?("CI_COMMIT_TIMESTAMP")
-        date = Time.parse(ENV["CI_COMMIT_TIMESTAMP"])
+        date = Time.parse(ENV.fetch("CI_COMMIT_TIMESTAMP", nil))
         date.strftime("%Y%m%d%H%M%S")
       else
         date = Time.now
@@ -42,5 +42,6 @@ module Donico
         matrix:            matrix.map(&:to_h),
       }
     end
+
   end
 end

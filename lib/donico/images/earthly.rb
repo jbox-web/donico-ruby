@@ -39,12 +39,12 @@ module Donico
 
 
       def build_task
-        "+#{distro}-#{version}-build-all"
+        "+#{distro}-#{version}-build"
       end
 
 
       def push_task
-        "+#{distro}-#{version}-push-all"
+        "+#{distro}-#{version}-push"
       end
 
 

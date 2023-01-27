@@ -15,6 +15,18 @@ RSpec.describe Donico do
     end
   end
 
+  describe ".default_commit_linter" do
+    it "returns Donico root dir" do
+      expect(Donico.default_commit_linter).to eq Donico::DEFAULT_COMMIT_LINTER
+    end
+  end
+
+  describe ".default_docker_linter" do
+    it "returns Donico root dir" do
+      expect(Donico.default_docker_linter).to eq Donico::DEFAULT_DOCKER_LINTER
+    end
+  end
+
   describe ".config_file" do
     it "returns Donico config file path" do
       expect(Donico.config_file).to eq "#{Dir.pwd}/donico.yml"
@@ -26,39 +38,41 @@ RSpec.describe Donico do
     after  { ENV.delete("FOO") }
 
     it "returns Donico config file path" do
-      expect(Donico.load_config(get_fixture_path("docker/erb.yml")).to_h).to eq({
-                                                                                  docker_registry:   "registry.example.net/images/base",
-                                                                                  docker_image_name: "foo",
-                                                                                  docker_image_tag:  nil,
-                                                                                  image_builder:     "docker",
-                                                                                  commit_linter:     "harbor.jbox-cloud.fr/jbox/base/commitlint:latest",
-                                                                                  docker_linter:     "harbor.jbox-cloud.fr/jbox/base/hadolint:latest",
-                                                                                  matrix:            [
-                                                                                    {
-                                                                                      distro:     "buster",
-                                                                                      dockerfile: "Dockerfile",
-                                                                                      version:    "1.0.0",
-                                                                                      archs:      [
-                                                                                        "linux/amd64"
-                                                                                      ],
-                                                                                      build_args: [
-                                                                                        "NODEJS_VERSION=14.17.3",
-                                                                                        "FOO=BAR"
-                                                                                      ],
-                                                                                      test_args:  [
-                                                                                        "RUBYGEM_VERSION=3.2.24"
-                                                                                      ],
-                                                                                      tags:       [
-                                                                                        "latest",
-                                                                                        "%<version>s",
-                                                                                        "%<version>s-%<distro>s",
-                                                                                        "%<timestamp>s-%<distro>s",
-                                                                                        "%<version>s-%<timestamp>s-%<distro>s",
-                                                                                        "%<version>s-%<timestamp>s-%<distro>s-%<arch>s"
-                                                                                      ],
-                                                                                    }
-                                                                                  ],
-                                                                                })
+      expect(Donico.load_config(get_fixture_path("docker/erb.yml")).to_h).to eq(
+        {
+          docker_registry:   "registry.example.net/images/base",
+          docker_image_name: "foo",
+          docker_image_tag:  nil,
+          image_builder:     "docker",
+          commit_linter:     Donico::DEFAULT_COMMIT_LINTER,
+          docker_linter:     Donico::DEFAULT_DOCKER_LINTER,
+          matrix: [
+            {
+              distro:  "buster",
+              dockerfile: "Dockerfile",
+              version: "1.0.0",
+              archs: [
+                "linux/amd64"
+              ],
+              build_args: [
+                "NODEJS_VERSION=14.17.3",
+                "FOO=BAR"
+              ],
+              test_args: [
+                "RUBYGEM_VERSION=3.2.24"
+              ],
+              tags: [
+                "latest",
+                "%<version>s",
+                "%<version>s-%<distro>s",
+                "%<timestamp>s-%<distro>s",
+                "%<version>s-%<timestamp>s-%<distro>s",
+                "%<version>s-%<timestamp>s-%<distro>s-%<arch>s",
+              ]
+            }
+          ]
+        }
+      )
     end
   end
 end

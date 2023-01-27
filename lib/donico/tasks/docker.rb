@@ -17,14 +17,14 @@ module Donico
 
 
       def tag
-        run_cmd_with_tag do |tag|
+        run_cmd_with_tags(image.tags) do |tag|
           ["docker", "tag", image.build_tag, image.prod_tag(tag)]
         end
       end
 
 
       def push
-        run_cmd_with_tag do |tag|
+        run_cmd_with_tags(image.tags) do |tag|
           ["docker", "push", image.prod_tag(tag)]
         end
       end
@@ -45,11 +45,11 @@ module Donico
       private
 
 
-      def run_cmd_with_tag
+      def run_cmd_with_tags(tags)
         results = []
         logs    = []
 
-        image.tags.each do |tag|
+        tags.each do |tag|
           cmd = yield tag
           result, log = Donico.run_cmd(*cmd)
           results << result
@@ -71,7 +71,6 @@ module Donico
         exit_code = results.include?(false) ? 1 : 0
         Kernel.exit(exit_code)
       end
-
 
     end
   end

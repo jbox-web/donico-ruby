@@ -4,14 +4,8 @@
 # BUILD section #
 #################
 
-# Fetch config
-image_name = Donico.config.docker_image_name
-registry   = Donico.config.docker_registry
-matrix     = Donico.config.matrix
-timestamp  = Donico.config.timestamp
-
 # Build rake commands
-matrix.each do |m|
+Donico.config.matrix.each do |m|
   version    = m.version
   distro     = m.distro
   archs      = m.archs
@@ -19,8 +13,7 @@ matrix.each do |m|
   namespace distro do
     namespace version do
 
-      opts  = m.to_h.merge(name: image_name, registry: registry, timestamp: timestamp)
-      image = Donico::Images::Earthly.new(**opts)
+      image = Donico::Images::Base.build_image_from_matrix(matrix: m)
 
       desc "Build docker image for #{distro}/#{version} #{archs}"
       task :build do
@@ -57,5 +50,6 @@ end
 
 desc "Generate Earthfile"
 task :"generate-earthfile" do
-  Donico::Templates.generate_earthfile(Donico.config)
+  Donico::Tasks::Earthly.generate_earthfile
+  puts "Earthfile generated"
 end

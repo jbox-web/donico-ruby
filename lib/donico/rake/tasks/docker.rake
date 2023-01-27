@@ -4,14 +4,8 @@
 # BUILD section #
 #################
 
-# Fetch config
-image_name = Donico.config.docker_image_name
-registry   = Donico.config.docker_registry
-matrix     = Donico.config.matrix
-timestamp  = Donico.config.timestamp
-
 # Build rake commands
-matrix.each do |m|
+Donico.config.matrix.each do |m|
   version    = m.version
   distro     = m.distro
   archs      = m.archs
@@ -21,8 +15,7 @@ matrix.each do |m|
       namespace distro do
         namespace version do
 
-          opts  = m.to_h.except(:archs).merge(name: image_name, registry: registry, arch: arch, timestamp: timestamp)
-          image = Donico::Images::Docker.new(**opts)
+          image = Donico::Images::Base.build_image_from_matrix(matrix: m, arch: arch)
 
           desc "Build docker image for #{arch}/#{distro}/#{version}"
           task :build do

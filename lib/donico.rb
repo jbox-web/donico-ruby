@@ -24,6 +24,9 @@ require_relative "donico/version"
 module Donico
   module_function
 
+  DEFAULT_COMMIT_LINTER = "harbor.jbox-cloud.fr/jbox/base/commitlint:latest"
+  DEFAULT_DOCKER_LINTER = "harbor.jbox-cloud.fr/jbox/base/hadolint:latest"
+
   def load!
     load_config
     load_tasks
@@ -71,7 +74,25 @@ module Donico
     @tasks_dir ||= root.join("lib", "donico", "rake", "tasks")
   end
 
+  def default_commit_linter
+    DEFAULT_COMMIT_LINTER
+  end
+
+  def default_docker_linter
+    DEFAULT_DOCKER_LINTER
+  end
+
+  def images_list
+    config.matrix.map { |m| Donico::Images::Base.build_image_from_matrix(matrix: m) }
+  end
+
+  def log_args(method, args)
+    puts "#{method}: #{args.join(' ')}" unless defined?(RSpec)
+  end
+
   def with_exit_status(*args)
+    log_args("with_exit_status", args)
+
     success = system(*args)
     yield success if block_given?
     status = success ? 0 : 1
@@ -94,14 +115,15 @@ module Donico
   #
   # It should not harm to clean env vars before executing any command, so let's do it.
   def exec(*args)
-    puts args.join(" ")
+    log_args("exec", args)
+
     env = Bundler.original_env
     Kernel.exec(env, *args, unsetenv_others: true)
   end
 
   # rubocop:disable Metrics/MethodLength
   def run_cmd(*args)
-    puts args.join(" ")
+    log_args("run_cmd", args)
 
     begin
       stdout, stderr, status = Open3.capture3(*args)

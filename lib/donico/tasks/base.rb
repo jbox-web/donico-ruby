@@ -27,14 +27,6 @@ module Donico
         def login(image)
           new(image).login
         end
-
-        def syscall(*cmd)
-          stdout, stderr, status = Open3.capture3(*cmd)
-          out = status.success? ? stdout : stderr
-          puts out unless out.empty?
-        rescue StandardError => e
-          puts e
-        end
       end
 
       attr_reader :image

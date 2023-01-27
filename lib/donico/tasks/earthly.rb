@@ -4,8 +4,17 @@ module Donico
   module Tasks
     class Earthly < Base
 
+      class << self
+
+        def generate_earthfile
+          Donico::Templates::Earthfile.generate
+        end
+
+      end
+
+
       def build
-        cmd = ["earthly", *image.formatted_build_args, image.build_task]
+        cmd = ["earthly", "--ci", "--output", *image.formatted_build_args, image.build_task]
         Donico.exec(*cmd)
       end
 
@@ -17,7 +26,7 @@ module Donico
 
 
       def push
-        cmd = ["earthly", "--push", *image.formatted_build_args, image.push_task]
+        cmd = ["earthly", "--ci", "--output", "--push", *image.formatted_build_args, image.push_task]
         Donico.exec(*cmd)
       end
 

@@ -25,7 +25,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "rake",     "13.0.6"
   s.add_runtime_dependency "zeitwerk", "2.6.6"
 
-  unless ENV["DONICO_RELEASE"] == "true"
+  # We don't want development dependencies in our final gem file
+  unless ENV.fetch("DONICO_RELEASE", nil) == "true"
     s.add_development_dependency "guard-rspec"
     s.add_development_dependency "rspec"
     s.add_development_dependency "rubocop"

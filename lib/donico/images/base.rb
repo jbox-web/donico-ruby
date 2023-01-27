@@ -4,6 +4,25 @@ module Donico
   module Images
     class Base
 
+      class << self
+        def default_options
+          { name: Donico.config.docker_image_name, registry: Donico.config.docker_registry, timestamp: Donico.config.timestamp }
+        end
+
+        def build_options_for(matrix, image_builder, arch = nil)
+          opts = matrix.to_h.merge(default_options)
+          opts = opts.except(:archs).merge(arch: arch) if image_builder == "docker"
+          opts
+        end
+
+        def build_image_from_matrix(matrix:, arch: nil)
+          image_builder = Donico.config.image_builder
+          opts          = build_options_for(matrix, image_builder, arch)
+          klass         = Donico::Utils.constantize("Donico::Images::#{image_builder.capitalize}")
+          klass.new(**opts)
+        end
+      end
+
       attr_reader :name, :registry, :distro, :version, :timestamp, :tags, :dockerfile
 
       # rubocop:disable Metrics/ParameterLists
@@ -21,14 +40,14 @@ module Donico
       # rubocop:enable Metrics/ParameterLists
 
 
-      private
-
-
       # Convert docker-in-docker to DOCKER_IN_DOCKER_VERSION
       def version_env_var
         env_var = underscore(name).upcase
         "#{env_var}_VERSION"
       end
+
+
+      private
 
 
       # See: https://stackoverflow.com/a/1509939

@@ -98,14 +98,14 @@ RSpec.describe Donico::Config do
   describe "#commit_linter" do
     context "when value is set" do
       it "returns Donico commit_linter" do
-        expect(subject.commit_linter).to eq "harbor.jbox-cloud.fr/jbox/base/commitlint:latest"
+        expect(subject.commit_linter).to eq Donico::DEFAULT_COMMIT_LINTER
       end
     end
 
     context "when value is not set" do
       let(:config) { super().except("commit_linter") }
       it "returns a default value" do
-        expect(subject.commit_linter).to eq "harbor.jbox-cloud.fr/jbox/base/commitlint:latest"
+        expect(subject.commit_linter).to eq Donico::DEFAULT_COMMIT_LINTER
       end
     end
   end
@@ -113,14 +113,14 @@ RSpec.describe Donico::Config do
   describe "#docker_linter" do
     context "when value is set" do
       it "returns Donico docker_linter" do
-        expect(subject.docker_linter).to eq "harbor.jbox-cloud.fr/jbox/base/hadolint:latest"
+        expect(subject.docker_linter).to eq Donico::DEFAULT_DOCKER_LINTER
       end
     end
 
     context "when value is not set" do
       let(:config) { super().except("docker_linter") }
       it "returns a default value" do
-        expect(subject.docker_linter).to eq "harbor.jbox-cloud.fr/jbox/base/hadolint:latest"
+        expect(subject.docker_linter).to eq Donico::DEFAULT_DOCKER_LINTER
       end
     end
   end

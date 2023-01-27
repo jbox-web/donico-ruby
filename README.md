@@ -21,6 +21,7 @@ ainsi que sur des actions prédéfinies par Donico :
 * `tag`
 * `push`
 * `login`
+* `clean`
 
 
 Ainsi, le fichier de configuration Donico suivant :
@@ -52,38 +53,44 @@ générera la matrice d'actions Rake suivante :
 
 ```sh
   rake amd64:bullseye:3.0.1:build    # Build docker image for amd64/bullseye/3.0.1
+  rake amd64:bullseye:3.0.1:clean    # Clean docker image for amd64/bullseye/3.0.1
   rake amd64:bullseye:3.0.1:login    # Inspect docker image for amd64/bullseye/3.0.1
   rake amd64:bullseye:3.0.1:push     # Push docker image for amd64/bullseye/3.0.1
   rake amd64:bullseye:3.0.1:tag      # Tag docker image for amd64/bullseye/3.0.1
   rake amd64:bullseye:3.0.1:test     # Test docker image for amd64/bullseye/3.0.1
   rake amd64:buster:2.7.3:build      # Build docker image for amd64/buster/2.7.3
+  rake amd64:buster:2.7.3:clean      # Clean docker image for amd64/buster/2.7.3
   rake amd64:buster:2.7.3:login      # Inspect docker image for amd64/buster/2.7.3
   rake amd64:buster:2.7.3:push       # Push docker image for amd64/buster/2.7.3
   rake amd64:buster:2.7.3:tag        # Tag docker image for amd64/buster/2.7.3
   rake amd64:buster:2.7.3:test       # Test docker image for amd64/buster/2.7.3
   rake amd64:buster:3.0.1:build      # Build docker image for amd64/buster/3.0.1
+  rake amd64:buster:3.0.1:clean      # Clean docker image for amd64/buster/3.0.1
   rake amd64:buster:3.0.1:login      # Inspect docker image for amd64/buster/3.0.1
   rake amd64:buster:3.0.1:push       # Push docker image for amd64/buster/3.0.1
   rake amd64:buster:3.0.1:tag        # Tag docker image for amd64/buster/3.0.1
   rake amd64:buster:3.0.1:test       # Test docker image for amd64/buster/3.0.1
   rake arm64:bullseye:3.0.1:build    # Build docker image for arm64/bullseye/3.0.1
+  rake arm64:bullseye:3.0.1:clean    # Clean docker image for arm64/bullseye/3.0.1
   rake arm64:bullseye:3.0.1:login    # Inspect docker image for arm64/bullseye/3.0.1
   rake arm64:bullseye:3.0.1:push     # Push docker image for arm64/bullseye/3.0.1
   rake arm64:bullseye:3.0.1:tag      # Tag docker image for arm64/bullseye/3.0.1
   rake arm64:bullseye:3.0.1:test     # Test docker image for arm64/bullseye/3.0.1
   rake arm64:buster:3.0.1:build      # Build docker image for arm64/buster/3.0.1
+  rake arm64:buster:3.0.1:clean      # Clean docker image for arm64/buster/3.0.1
   rake arm64:buster:3.0.1:login      # Inspect docker image for arm64/buster/3.0.1
   rake arm64:buster:3.0.1:push       # Push docker image for arm64/buster/3.0.1
   rake arm64:buster:3.0.1:tag        # Tag docker image for arm64/buster/3.0.1
   rake arm64:buster:3.0.1:test       # Test docker image for arm64/buster/3.0.1
   rake i386:stretch:2.6.8:build      # Build docker image for i386/stretch/2.6.8
+  rake i386:stretch:2.6.8:clean      # Clean docker image for i386/stretch/2.6.8
   rake i386:stretch:2.6.8:login      # Inspect docker image for i386/stretch/2.6.8
   rake i386:stretch:2.6.8:push       # Push docker image for i386/stretch/2.6.8
   rake i386:stretch:2.6.8:tag        # Tag docker image for i386/stretch/2.6.8
   rake i386:stretch:2.6.8:test       # Test docker image for i386/stretch/2.6.8
 ```
 
-Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`) ne sont en fait que des wrappers autour de différentes commandes `docker` :
+Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`, `clean`) ne sont en fait que des wrappers autour de différentes commandes `docker` :
 
 | Commande                            | Traduction |
 |-------------------------------------|------------|
@@ -92,6 +99,7 @@ Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`) n
 | `rake amd64:bullseye:3.0.1:tag`     | `docker tag amd64/bullseye/foo-3.0.1:20210603 registry.digitick.net/images/base/amd64/bullseye/foo:3.0.1`
 | `rake amd64:bullseye:3.0.1:push`    | `docker push registry.digitick.net/images/base/amd64/bullseye/foo:3.0.1`
 | `rake amd64:bullseye:3.0.1:login`   | `docker run -it --rm amd64/bullseye/foo-3.0.1:20210603 /bin/bash`
+| `rake amd64:bullseye:3.0.1:clean`   | `docker rmi amd64/bullseye/foo-3.0.1:20210603`
 
 Donico ajoute également des commandes utilitaires :
 
@@ -111,7 +119,9 @@ Donico ajoute également des commandes utilitaires :
 
 source 'https://rubygems.org'
 
-gem 'donico', git: 'ssh://git@gitlab.digitick.net/infra/donico.git'
+# When in CI use the installed gem, otherwise use latest stable version
+opts = ENV.key?('CI') ? {} : { git: 'ssh://git@gitlab.digitick.net/infra/donico.git', tag: 'v1.6.0' }
+gem 'donico', opts
 ```
 
 puis lancez `bundle install` pour installer la gem.
@@ -138,21 +148,97 @@ Donico.load!
 ---
 registry: registry.digitick.net/infra/base
 image_name: skeleton
-matrix:
-  - version: latest
-    distro: buster
-    archs: [amd64]
 ```
 
-5. Enfin, construisez, testez et poussez votre première image avec Donico
+5. Enfin, commitez le tout!
+
+```sh
+git add Gemfile
+git add Gemfile.lock
+git add bin/
+git add Rakefile
+git add donico.yml
+git commit -m "ci: build Docker image with Donico"
+git push
+```
+
+## Utilisation
+
+Vous pouvez maintenant construire, tester et pousser votre première image avec Donico :
+
+1. `build`
 
 ```sh
 bin/rake amd64:buster:latest:build
+```
+
+Lance la construction de l'image (`docker build`).
+
+Les arguments suivants sont passés par défaut lors du build ([`--build-arg`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg)) :
+
+* `DISTRO_NAME` (ex: `buster`)
+* `ARCH` (ex: `amd64`)
+* `<image_name>_<version>` (ex: `NODEJS_VERSION`)
+
+Vous pouvez déclarer des arguments supplémentaires via la clé [`build_args`](#déclarer-des-arguments-supplémentaires-pour-le-build).
+
+
+2. `test`
+
+```sh
 bin/rake amd64:buster:latest:test
+```
+
+Lance les tests Inspec.
+
+Les arguments suivants sont passés par défaut lors des tests ([`--input`](https://docs.chef.io/inspec/inputs/)) :
+
+* `distro_name` (ex: `buster`)
+* `arch` (ex: `amd64`)
+* `<image_name>_<version>` (ex: `nodejs_version`)
+
+Vous pouvez déclarer des arguments supplémentaires via la clé [`test_args`](#déclarer-des-arguments-supplémentaires-pour-les-tests).
+
+
+3. `login`
+
+```sh
 bin/rake amd64:buster:latest:login
+```
+
+Permet de se "logger" dans l'image Docker que l'on vient de construire.
+
+
+4. `tag`
+
+```sh
 bin/rake amd64:buster:latest:tag
+```
+
+Créé les tags Docker pour l'image que l'on vient de construire.
+
+Si aucun tag n'est spécifié le tag par défaut `<version>-<distro_name>` sera créé.
+
+Vous pouvez déclarer la liste des tags à créer via la clé [`tags`](#déclarer-la-liste-des-tags-à-produire).
+
+
+5. `push`
+
+```sh
 bin/rake amd64:buster:latest:push
 ```
+
+Pousse les tags que l'on vient de créer vers le registry Docker.
+
+
+6. `clean`
+
+```sh
+bin/rake amd64:buster:latest:clean
+```
+
+Supprime l'image que l'on vient de construire (ex: `amd64/bullseye/foo-3.0.1:20210603`). Les tags ne sont pas touchés.
+
 
 ## Intégration avec GitlabCI
 
@@ -174,7 +260,7 @@ bin/rake generate-matrix
 ---
 .docker-in-docker:
   # Use custom Docker image with Docker installed inside
-  image: registry.digitick.net/images/base/$DOCKER_ARCH/$DOCKER_DISTRO/donico:latest
+  image: registry.digitick.net/images/base/donico:latest
 
   # Only use Gitlab runners with "dind" (Docker in Docker) tag
   tags:
@@ -213,6 +299,7 @@ stages:
   - test
   - tag
   - push
+  - clean
 
 # Define tasks to run
 lint-commits:
@@ -278,9 +365,16 @@ push:
     - .image-push-rules
   needs:
     - tag
-```
 
-Et pim!
+clean:
+  stage: clean
+  extends:
+    - .matrix
+    - .docker-in-docker
+    - .image-push-rules
+  needs:
+    - push
+```
 
 ## Configuration
 
@@ -295,12 +389,82 @@ Le fichier de configuration de Donico peut contenir les paramètres suivants :
 
 `Matrix` :
 
-| Nom       | Type           | Requis | Défaut | Description
-|-----------|----------------|--------|--------|-------------
-| `version` | `string`       | `oui`  | *na*   | La version de l'application à construire : `x.x.x|latest`
-| `distro`  | `string`       | `oui`  | *na*   | Le nom de la distribution à utiliser pour la construction : `stretch|buster|whatever`
-| `archs`   | `list[string]` | `oui`  | *na*   | La liste des architectures à constuire : `[i386, amd64, whatever]`
+| Nom          | Type           | Requis | Défaut                       | Description
+|--------------|----------------|--------|------------------------------|-------------
+| `version`    | `string`       | `non`  | `latest`                     | La version de l'application à construire : `x.x.x|latest`
+| `distro`     | `string`       | `non`  | `buster`                     | Le nom de la distribution à utiliser pour la construction : `stretch|buster|whatever`
+| `archs`      | `list[string]` | `non`  | `[amd64]`                    | La liste des architectures à constuire : `[i386, amd64, whatever]`
+| `build_args` | `list[string]` | `non`  | `[]`                         | Une liste d'arguments à passer au moment du build (voir: [build-time variables](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg))
+| `test_args`  | `list[string]` | `non`  | `[]`                         | Une liste d'arguments à passer au moment des tests (voir: [Inspec inputs](https://docs.chef.io/inspec/inputs/))
+| `tags`       | `list[string]` | `non`  | `["%<version>s-%<distro>s"]` | La liste des tags à produire
 
+### Déclarer la liste des tags à produire
+
+Il suffit de déclarer une liste de tags via la clé `tags` :
+
+```yml
+---
+registry: registry.example.net/images/base
+image_name: foo
+matrix:
+  - version: 1.0.0
+    distro: buster
+    archs: [amd64]
+    tags:
+      - latest                                          # latest
+      - "%<version>s"                                   # 1.0.0
+      - "%<version>s-%<distro>s"                        # 1.0.0-buster
+      - "%<timestamp>s-%<distro>s"                      # 20210603-buster
+      - "%<version>s-%<timestamp>s-%<distro>s"          # 1.0.0-20210603-buster
+      - "%<version>s-%<timestamp>s-%<distro>s-%<arch>s" # 1.0.0-20210603-buster-amd64
+```
+
+Les tags peuvent être personnalisés grâce à des macros qui seront évaluées au moment de la création des tags.
+
+Les macros suivantes sont disponibles :
+
+* `%<arch>s`
+* `%<distro>s`
+* `%<version>s`
+* `%<timestamp>s`
+
+Voir : https://ruby-doc.org/core-3.0.2/Kernel.html#method-i-sprintf
+
+### Déclarer des arguments supplémentaires pour le build
+
+Il suffit de déclarer une liste d'arguments via la clé `build_args` :
+
+Exemple:
+
+```yml
+---
+registry: registry.example.net/images/base
+image_name: foo
+matrix:
+  - version: 1.0.0
+    distro: buster
+    archs: [amd64]
+    build_args:
+      - FOO=BAR
+```
+
+### Déclarer des arguments supplémentaires pour les tests
+
+Il suffit de déclarer une liste d'arguments via la clé `test_args` :
+
+Exemple:
+
+```yml
+---
+registry: registry.example.net/images/base
+image_name: foo
+matrix:
+  - version: 1.0.0
+    distro: buster
+    archs: [amd64]
+    test_args:
+      - FOO=BAR
+```
 
 ## Hooks
 

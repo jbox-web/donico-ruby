@@ -3,14 +3,9 @@
 module Donico
   class Matrix
     class << self
-      def generate(config)
-        global_matrix = []
-
-        config.matrix.each do |m|
-          global_matrix << m.matrix_for(config.image_builder)
-        end
-
-        write_matrix(global_matrix)
+      def generate(config:)
+        matrix = config.matrix.map { |m| m.matrix_for(config.image_builder) }
+        write_matrix(matrix)
       end
 
       # rubocop:disable Metrics/MethodLength
@@ -29,8 +24,6 @@ module Donico
           f.write warning
           f.write YAML.dump(config)
         end
-
-        puts "GitlabCI Matrix file generated"
       end
       # rubocop:enable Metrics/MethodLength
     end
