@@ -5,7 +5,7 @@ PATH
       bundler (>= 2.3)
       dotenv (= 2.8.1)
       rake (= 13.0.6)
-      zeitwerk (= 2.6.6)
+      zeitwerk (= 2.6.7)
 
 GEM
   remote: https://rubygems.org/
@@ -42,7 +42,7 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     parallel (1.22.1)
-    parser (3.2.0.0)
+    parser (3.2.1.0)
       ast (~> 2.4.1)
     pry (0.14.2)
       coderay (~> 1.1)
@@ -52,13 +52,13 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    regexp_parser (2.6.2)
+    regexp_parser (2.7.0)
     rexml (3.2.5)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
       rspec-mocks (~> 3.12.0)
-    rspec-core (3.12.0)
+    rspec-core (3.12.1)
       rspec-support (~> 3.12.0)
     rspec-expectations (3.12.2)
       diff-lcs (>= 1.2.0, < 2.0)
@@ -67,7 +67,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.0)
-    rubocop (1.44.1)
+    rubocop (1.45.1)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.2.0.0)
@@ -89,7 +89,7 @@ GEM
     simplecov_json_formatter (0.1.4)
     thor (1.2.1)
     unicode-display_width (2.4.2)
-    zeitwerk (2.6.6)
+    zeitwerk (2.6.7)
 
 PLATFORMS
   x86_64-linux
@@ -102,4 +102,4 @@ DEPENDENCIES
   simplecov
 
 BUNDLED WITH
-   2.4.5
+   2.4.6
