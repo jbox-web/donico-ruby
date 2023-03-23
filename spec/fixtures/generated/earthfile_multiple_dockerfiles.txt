@@ -24,7 +24,7 @@ bullseye-3.2.0-docker-push:
   ARG NODEJS_VERSION
   ARG RUBY_VERSION
 
-  FROM DOCKERFILE -f dockerfiles/3.2/Dockerfile --build-arg BUILD_DATE="$BUILD_DATE" --build-arg DISTRO_NAME="$DISTRO_NAME" --build-arg NODEJS_VERSION="$NODEJS_VERSION" --build-arg RUBY_VERSION="$RUBY_VERSION" --platform "$TARGETPLATFORM" .
+  FROM --platform "$TARGETPLATFORM" +bullseye-3.2.0-docker-build
   SAVE IMAGE --push registry.example.net/images/base/ruby:3.2.0-bullseye registry.example.net/images/base/ruby:latest-bullseye
 
 bullseye-3.2.0-build:
@@ -54,7 +54,7 @@ buster-3.1.3-docker-push:
   ARG NODEJS_VERSION
   ARG RUBY_VERSION
 
-  FROM DOCKERFILE -f dockerfiles/3.1/Dockerfile --build-arg BUILD_DATE="$BUILD_DATE" --build-arg DISTRO_NAME="$DISTRO_NAME" --build-arg NODEJS_VERSION="$NODEJS_VERSION" --build-arg RUBY_VERSION="$RUBY_VERSION" --platform "$TARGETPLATFORM" .
+  FROM --platform "$TARGETPLATFORM" +buster-3.1.3-docker-build
   SAVE IMAGE --push registry.example.net/images/base/ruby:3.1.3-buster registry.example.net/images/base/ruby:latest-buster
 
 buster-3.1.3-build:

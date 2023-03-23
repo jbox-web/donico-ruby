@@ -33,7 +33,7 @@ VERSION 0.6
       "--build-arg #{arg}=\"$#{arg}\""
     end.join(' ')
   -%>
-  FROM DOCKERFILE -f <%= image.dockerfile %> <%= build_args %> --platform "$TARGETPLATFORM" .
+  FROM --platform "$TARGETPLATFORM" +<%= image.distro %>-<%= image.version %>-docker-build
   SAVE IMAGE --push <%= image.prod_tags.join(' ') %>
 
 <%= image.distro %>-<%= image.version %>-build:

@@ -24,7 +24,7 @@ buster-1.0.0-docker-push:
   ARG FOO_BAR_VERSION
   ARG NODEJS_VERSION
 
-  FROM DOCKERFILE -f foo/Dockerfile --build-arg BUILD_DATE="$BUILD_DATE" --build-arg DISTRO_NAME="$DISTRO_NAME" --build-arg FOO_BAR_VERSION="$FOO_BAR_VERSION" --build-arg NODEJS_VERSION="$NODEJS_VERSION" --platform "$TARGETPLATFORM" .
+  FROM --platform "$TARGETPLATFORM" +buster-1.0.0-docker-build
   SAVE IMAGE --push registry.example.net/images/base/foo-bar:1.0.0 registry.example.net/images/base/foo-bar:1.0.0-buster registry.example.net/images/base/foo-bar:latest
 
 buster-1.0.0-build:
