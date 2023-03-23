@@ -53,6 +53,7 @@ module Donico
 
         # Exit properly
         exit_code = results.include?(false) ? 1 : 0
+        puts logs.join("\n") if exit_code == 1
         Kernel.exit(exit_code)
       end
       # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
