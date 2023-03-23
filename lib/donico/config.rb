@@ -2,13 +2,14 @@
 
 module Donico
   class Config
-    attr_reader :docker_image_name, :docker_registry, :docker_image_tag, :image_builder, :matrix, :commit_linter, :docker_linter
+    attr_reader :docker_image_name, :docker_registry, :docker_image_tag, :image_builder, :earthly_version, :matrix, :commit_linter, :docker_linter
 
     def initialize(config)
       @docker_image_name = config.fetch("image_name")
       @docker_registry   = config.fetch("registry")
       @docker_image_tag  = config.fetch("tag", nil)
       @image_builder     = config.fetch("image_builder", "docker")
+      @earthly_version   = config.fetch("earthly_version", "0.6")
       @matrix            = config.fetch("matrix", [{}]).map { |m| Matrix.new(m) }
 
       @commit_linter     = config.fetch("commit_linter", Donico.default_commit_linter)
@@ -37,6 +38,7 @@ module Donico
         docker_image_name: docker_image_name,
         docker_image_tag:  docker_image_tag,
         image_builder:     image_builder,
+        earthly_version:   earthly_version,
         commit_linter:     commit_linter,
         docker_linter:     docker_linter,
         matrix:            matrix.map(&:to_h),

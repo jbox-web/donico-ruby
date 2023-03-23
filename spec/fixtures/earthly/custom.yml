@@ -2,6 +2,7 @@
 registry: registry.example.net/images/base
 image_name: foo-bar
 image_builder: earthly
+earthly_version: 0.7
 matrix:
   - version: 1.0.0
     distro: buster

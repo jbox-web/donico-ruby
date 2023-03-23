@@ -15,7 +15,7 @@ RSpec.describe Donico::Tasks::Earthly do
       earthfile = Donico::Tasks::Earthly.generate_earthfile
       expect(earthfile.template).to eq Donico.root.join("lib/donico/data/templates/earthfile.erb")
       expect(earthfile.file).to eq "Earthfile"
-      expect(earthfile.data).to match({ images: array_including(instance_of(Donico::Images::Earthly)) })
+      expect(earthfile.data).to match({ images: array_including(instance_of(Donico::Images::Earthly)), earthly_version: "0.7" })
     end
   end
 end

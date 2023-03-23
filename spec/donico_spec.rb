@@ -44,6 +44,7 @@ RSpec.describe Donico do
           docker_image_name: "foo",
           docker_image_tag:  nil,
           image_builder:     "docker",
+          earthly_version:   "0.6",
           commit_linter:     Donico::DEFAULT_COMMIT_LINTER,
           docker_linter:     Donico::DEFAULT_DOCKER_LINTER,
           matrix: [
