@@ -12,10 +12,6 @@
     # Login to Docker registry to push Docker image
     - mkdir ~/.docker && echo $REGISTRY_DOCKER_TOKEN > ~/.docker/config.json && chmod 600 ~/.docker/config.json
 
-  variables:
-    # Setup env vars for Postgres image
-    EARTHLY_NO_CACHE: 'true'
-
   # Build Debian images
   script: |
     # CI_JOB_NAME looks like : 'build: [buster]', here we only need the first part (before ':')
