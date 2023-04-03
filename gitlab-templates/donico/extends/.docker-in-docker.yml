@@ -10,7 +10,7 @@
   # Prepare build context
   before_script:
     # Login to Docker registry to push Docker image
-    - mkdir ~/.docker && echo $REGISTRY_DOCKER_TOKEN > ~/.docker/config.json && chmod 600 ~/.docker/config.json
+    - mkdir -p ~/.docker && echo $REGISTRY_DOCKER_TOKEN > ~/.docker/config.json && chmod 600 ~/.docker/config.json
 
   # Build Debian images
   script: |
