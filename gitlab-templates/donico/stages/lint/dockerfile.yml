@@ -2,7 +2,7 @@
 lint-dockerfile:
   # We can't access to $DOCKER_ARCH and $DOCKER_DISTRO here because
   # the GitlabCI matrix is not loaded
-  # Anyway we don't care since it's just about mouting the current dir
+  # Anyway we don't care since it's just about mounting the current dir
   # inside hadolint container and run hadolint
   image: harbor.jbox-cloud.fr/jbox/base/donico:latest
 
