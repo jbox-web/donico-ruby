@@ -43,13 +43,3 @@ Donico.config.matrix.each do |m|
     end
   end
 end
-
-###################
-# RELEASE section #
-###################
-
-desc "Generate Earthfile"
-task :"generate-earthfile" do
-  Donico::Tasks::Earthly.generate_earthfile
-  puts "Earthfile generated"
-end

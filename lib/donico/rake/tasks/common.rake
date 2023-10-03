@@ -25,10 +25,15 @@ end
 # RELEASE section #
 ###################
 
-desc "Generate GitlabCI matix"
-task :"generate-matrix" do
+desc "Generate GitlabCI matrix and Earthfile"
+task :"generate-files" do
   Donico::Matrix.generate(config: Donico.config)
   puts "GitlabCI Matrix file generated"
+
+  if Donico.config.image_builder == "earthly"
+    Donico::Tasks::Earthly.generate_earthfile
+    puts "Earthfile generated"
+  end
 end
 
 
