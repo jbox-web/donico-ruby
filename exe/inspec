@@ -34,11 +34,6 @@ echo "Running Inspec on ${image} (test_mode: '${test_mode}', pwd: '$(pwd)', test
 # Load test_inputs key=value so we can access them if we need to (see php image)
 load_env "${test_inputs}"
 
-# In kaniko mode, fetch Docker image before starting it.
-if [ "${test_mode}" = "kaniko" ]; then
-  pull_image ${image}
-fi
-
 # Start container to run tests
 container_id=$(container_spin "${test_mode}" "${image}" "${test_inputs}")
 

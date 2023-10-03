@@ -129,11 +129,9 @@ function run_spec() {
         inspec exec ${dir} -t docker://${container_id} ${args} ${test_inputs}
     ;;
 
-    kaniko)
-      local dir=./test/
-
-      # Launch Inspec
-      inspec exec ${dir} -t docker://${container_id} ${args} ${test_inputs}
+    *)
+      echo "Unknow test mode: ${test_mode}"
+      exit 1
     ;;
   esac
 }
