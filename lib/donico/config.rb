@@ -5,7 +5,7 @@ module Donico
     attr_reader :docker_image_name, :docker_registry, :docker_image_tag, :image_builder, :earthly_version, :matrix, :commit_linter, :docker_linter
 
     def initialize(config)
-      @docker_image_name = config.fetch("image_name")
+      @docker_image_name = config.fetch("image_name", nil)
       @docker_registry   = config.fetch("registry")
       @docker_image_tag  = config.fetch("tag", nil)
       @image_builder     = config.fetch("image_builder", "docker")

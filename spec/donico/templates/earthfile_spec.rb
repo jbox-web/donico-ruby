@@ -35,5 +35,15 @@ RSpec.describe Donico::Templates::Earthfile do
         expect(object.render).to eq File.read(get_fixture_path(generated_file))
       end
     end
+
+    context "with debian config file" do
+      let(:fixture_file) { "earthly/debian.yml" }
+      let(:generated_file) { "generated/earthfile_debian.txt" }
+
+      it "render template" do
+        object = described_class.new
+        expect(object.render).to eq File.read(get_fixture_path(generated_file))
+      end
+    end
   end
 end

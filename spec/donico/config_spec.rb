@@ -13,14 +13,14 @@ RSpec.describe Donico::Config do
       end
     end
 
-    context "when value is not set" do
-      let(:config) { super().except("image_name") }
-      it "raises an error" do
-        expect do
-          subject.docker_image_name
-        end.to raise_error(KeyError)
-      end
-    end
+    # context "when value is not set" do
+    #   let(:config) { super().except("image_name") }
+    #   it "raises an error" do
+    #     expect do
+    #       subject.docker_image_name
+    #     end.to raise_error(KeyError)
+    #   end
+    # end
   end
 
   describe "#docker_registry" do

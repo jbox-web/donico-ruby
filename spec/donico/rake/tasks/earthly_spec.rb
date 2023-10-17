@@ -245,4 +245,30 @@ RSpec.describe "earthly.rake", type: :task do
       end
     end
   end
+
+  context "with debian configuration" do
+    let(:version) { "latest" }
+    let(:fixture_file) { "earthly/debian.yml" }
+
+    describe "bookworm:latest:build" do
+      it "build bookworm:latest" do
+        # setup test
+        args = [
+          hash_including,
+          "earthly",
+          "--ci",
+          "--output",
+          "--build-arg", "BOOKWORM_VERSION=latest",
+          "--build-arg", "BUILD_DATE=#{timestamp}",
+          "--build-arg", "DISTRO_NAME=bookworm",
+          "+bookworm-#{version}-build",
+          { unsetenv_others: true }
+        ]
+        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+
+        # run the test
+        Rake::Task["bookworm:#{version}:build"].invoke
+      end
+    end
+  end
 end

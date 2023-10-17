@@ -28,9 +28,10 @@ module Donico
       # rubocop:enable Metrics/MethodLength
     end
 
-    attr_reader :version, :distro, :archs, :dockerfile, :build_args, :test_args, :tags
+    attr_reader :image_name, :version, :distro, :archs, :dockerfile, :build_args, :test_args, :tags
 
     def initialize(opts = {})
+      @image_name = opts.fetch("image_name", nil)
       @version    = opts.fetch("version", "latest").to_s
       @distro     = opts.fetch("distro", "buster")
       @archs      = opts.fetch("archs", ["linux/amd64"])
