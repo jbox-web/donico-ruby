@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "bundler",  ">= 2.3"
   s.add_runtime_dependency "dotenv",   "2.8.1"
-  s.add_runtime_dependency "rake",     "13.0.6"
+  s.add_runtime_dependency "rake"
   s.add_runtime_dependency "zeitwerk", "2.6.12"
 
   # We don't want development dependencies in our final gem file
