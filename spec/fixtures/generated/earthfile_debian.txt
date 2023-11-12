@@ -26,10 +26,10 @@ bookworm-latest-docker-push:
   SAVE IMAGE --push registry.example.net/debian/bookworm:latest
 
 bookworm-latest-build:
-  BUILD --platform "amd64" --platform "386" --platform "arm64" +bookworm-latest-docker-build
+  BUILD --platform "linux/amd64" --platform "linux/386" --platform "linux/arm64" +bookworm-latest-docker-build
 
 bookworm-latest-push:
-  BUILD --platform "amd64" --platform "386" --platform "arm64" +bookworm-latest-docker-push
+  BUILD --platform "linux/amd64" --platform "linux/386" --platform "linux/arm64" +bookworm-latest-docker-push
 
 ############
 # BULLSEYE #
@@ -54,10 +54,10 @@ bullseye-latest-docker-push:
   SAVE IMAGE --push registry.example.net/debian/bullseye:latest
 
 bullseye-latest-build:
-  BUILD --platform "amd64" --platform "386" --platform "arm64" +bullseye-latest-docker-build
+  BUILD --platform "linux/amd64" --platform "linux/386" --platform "linux/arm64" +bullseye-latest-docker-build
 
 bullseye-latest-push:
-  BUILD --platform "amd64" --platform "386" --platform "arm64" +bullseye-latest-docker-push
+  BUILD --platform "linux/amd64" --platform "linux/386" --platform "linux/arm64" +bullseye-latest-docker-push
 
 ##########
 # BUSTER #
@@ -82,10 +82,10 @@ buster-latest-docker-push:
   SAVE IMAGE --push registry.example.net/debian/buster:latest
 
 buster-latest-build:
-  BUILD --platform "amd64" --platform "386" --platform "arm64" +buster-latest-docker-build
+  BUILD --platform "linux/amd64" --platform "linux/386" --platform "linux/arm64" +buster-latest-docker-build
 
 buster-latest-push:
-  BUILD --platform "amd64" --platform "386" --platform "arm64" +buster-latest-docker-push
+  BUILD --platform "linux/amd64" --platform "linux/386" --platform "linux/arm64" +buster-latest-docker-push
 
 ###########
 # STRETCH #
@@ -110,10 +110,10 @@ stretch-latest-docker-push:
   SAVE IMAGE --push registry.example.net/debian/stretch:latest
 
 stretch-latest-build:
-  BUILD --platform "amd64" --platform "386" --platform "arm64" +stretch-latest-docker-build
+  BUILD --platform "linux/amd64" --platform "linux/386" --platform "linux/arm64" +stretch-latest-docker-build
 
 stretch-latest-push:
-  BUILD --platform "amd64" --platform "386" --platform "arm64" +stretch-latest-docker-push
+  BUILD --platform "linux/amd64" --platform "linux/386" --platform "linux/arm64" +stretch-latest-docker-push
 
 ##########
 # JESSIE #
@@ -138,10 +138,10 @@ jessie-latest-docker-push:
   SAVE IMAGE --push registry.example.net/debian/jessie:latest
 
 jessie-latest-build:
-  BUILD --platform "amd64" --platform "386" +jessie-latest-docker-build
+  BUILD --platform "linux/amd64" --platform "linux/386" +jessie-latest-docker-build
 
 jessie-latest-push:
-  BUILD --platform "amd64" --platform "386" +jessie-latest-docker-push
+  BUILD --platform "linux/amd64" --platform "linux/386" +jessie-latest-docker-push
 
 ##########
 # WHEEZY #
@@ -166,10 +166,10 @@ wheezy-latest-docker-push:
   SAVE IMAGE --push registry.example.net/debian/wheezy:latest
 
 wheezy-latest-build:
-  BUILD --platform "amd64" --platform "386" +wheezy-latest-docker-build
+  BUILD --platform "linux/amd64" --platform "linux/386" +wheezy-latest-docker-build
 
 wheezy-latest-push:
-  BUILD --platform "amd64" --platform "386" +wheezy-latest-docker-push
+  BUILD --platform "linux/amd64" --platform "linux/386" +wheezy-latest-docker-push
 
 ###########
 # SQUEEZE #
@@ -194,10 +194,10 @@ squeeze-latest-docker-push:
   SAVE IMAGE --push registry.example.net/debian/squeeze:latest
 
 squeeze-latest-build:
-  BUILD --platform "amd64" --platform "386" +squeeze-latest-docker-build
+  BUILD --platform "linux/amd64" --platform "linux/386" +squeeze-latest-docker-build
 
 squeeze-latest-push:
-  BUILD --platform "amd64" --platform "386" +squeeze-latest-docker-push
+  BUILD --platform "linux/amd64" --platform "linux/386" +squeeze-latest-docker-push
 
 #########
 # LENNY #
@@ -222,7 +222,7 @@ lenny-latest-docker-push:
   SAVE IMAGE --push registry.example.net/debian/lenny:latest
 
 lenny-latest-build:
-  BUILD --platform "amd64" --platform "386" +lenny-latest-docker-build
+  BUILD --platform "linux/amd64" --platform "linux/386" +lenny-latest-docker-build
 
 lenny-latest-push:
-  BUILD --platform "amd64" --platform "386" +lenny-latest-docker-push
+  BUILD --platform "linux/amd64" --platform "linux/386" +lenny-latest-docker-push
