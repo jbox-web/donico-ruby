@@ -25,6 +25,11 @@
       # See: https://docs.earthly.dev/docs/guides/multi-platform#linux
       docker run --rm --privileged multiarch/qemu-user-static > /dev/null 2>&1 || true
 
+      # Use one earthly builder by distro to avoid errors during builds with empty caches
+      # docker: Error response from daemon: Conflict. The container name "/earthly-buildkitd" is already in use by container
+      # See: https://docs.earthly.dev/v/earthly-0.7/docs/earthly-command
+      export EARTHLY_INSTALLATION_NAME="earthly-$DOCKER_DISTRO"
+
       # Run job CMD
       rake "$DOCKER_DISTRO:$VERSION:$JOB_NAME"
     else
