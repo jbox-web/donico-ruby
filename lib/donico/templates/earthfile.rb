@@ -13,7 +13,7 @@ module Donico
       end
 
       def initialize(template: Donico.root.join("lib/donico/data/templates/earthfile.erb"), file: "Earthfile", **)
-        super data: { images: Donico.images_list, earthly_version: Donico.config.earthly_version.to_s }, template: template, file: file
+        super(data: { images: Donico.images_list, earthly_version: Donico.config.earthly_version.to_s }, template: template, file: file)
       end
 
     end
