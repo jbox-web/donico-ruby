@@ -21,9 +21,9 @@ Gem::Specification.new do |s|
   s.executables = ["inspec"]
 
   s.add_runtime_dependency "bundler",  ">= 2.3"
-  s.add_runtime_dependency "dotenv",   "3.1.0"
+  s.add_runtime_dependency "dotenv",   "3.1.2"
   s.add_runtime_dependency "rake",     "13.2.1"
-  s.add_runtime_dependency "zeitwerk", "2.6.13"
+  s.add_runtime_dependency "zeitwerk", "2.6.16"
 
   # We don't want development dependencies in our final gem file
   unless ENV.fetch("DONICO_RELEASE", nil) == "true"
