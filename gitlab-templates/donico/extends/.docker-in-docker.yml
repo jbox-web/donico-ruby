@@ -24,7 +24,8 @@
       # Setup qemu for multiarch builds
       # See: https://docs.earthly.dev/docs/guides/multi-platform#linux
       echo "Setup qemu for multiarch builds"
-      docker run --rm --privileged multiarch/qemu-user-static > /dev/null 2>&1 || true
+      docker run --rm --privileged multiarch/qemu-user-static > /tmp/qemu-user-static.log 2>&1 || true
+      cat /tmp/qemu-user-static.log
 
       # Use one earthly builder by distro to avoid errors during builds with empty caches
       # docker: Error response from daemon: Conflict. The container name "/earthly-buildkitd" is already in use by container
