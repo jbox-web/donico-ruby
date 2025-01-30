@@ -24,12 +24,4 @@ Gem::Specification.new do |s|
   s.add_dependency "dotenv",   "3.1.2"
   s.add_dependency "rake",     "13.2.1"
   s.add_dependency "zeitwerk", "2.6.16"
-
-  # We don't want development dependencies in our final gem file
-  unless ENV.fetch("DONICO_RELEASE", nil) == "true"
-    s.add_development_dependency "guard-rspec"
-    s.add_development_dependency "rspec"
-    s.add_development_dependency "rubocop"
-    s.add_development_dependency "simplecov"
-  end
 end

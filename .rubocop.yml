@@ -9,9 +9,6 @@ AllCops:
 Gemspec/RequireMFA:
   Enabled: false
 
-Gemspec/DevelopmentDependencies:
-  EnforcedStyle: gemspec
-
 ##########
 # Layout #
 ##########
