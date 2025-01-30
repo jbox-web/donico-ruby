@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.executables = ["inspec"]
 
   s.add_dependency "bundler",  ">= 2.3"
-  s.add_dependency "dotenv",   "3.1.2"
+  s.add_dependency "dotenv",   "3.1.7"
   s.add_dependency "rake",     "13.2.1"
-  s.add_dependency "zeitwerk", "2.6.16"
+  s.add_dependency "zeitwerk", "2.6.18"
 end
