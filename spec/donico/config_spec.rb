@@ -72,9 +72,9 @@ RSpec.describe Donico::Config do
               "%<version>s-%<distro>s",
               "%<timestamp>s-%<distro>s",
               "%<version>s-%<timestamp>s-%<distro>s",
-              "%<version>s-%<timestamp>s-%<distro>s-%<arch>s"
+              "%<version>s-%<timestamp>s-%<distro>s-%<arch>s",
             ],
-          }
+          },
         ]
       end
     end

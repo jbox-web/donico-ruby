@@ -28,7 +28,7 @@ RSpec.describe "docker.rake", type: :task do
           "--build-arg", "DISTRO_NAME=buster",
           "--build-arg", "FOO_VERSION=#{version}",
           ".",
-          { unsetenv_others: true }
+          { unsetenv_others: true },
         ]
         expect(Kernel).to receive(:exec).with(*args).and_return(true)
 
@@ -49,7 +49,7 @@ RSpec.describe "docker.rake", type: :task do
           "build_date=#{timestamp}",
           "distro_name=buster",
           "foo_version=#{version}",
-          { unsetenv_others: true }
+          { unsetenv_others: true },
         ]
         expect(Kernel).to receive(:exec).with(*args).and_return(true)
 
@@ -164,7 +164,7 @@ RSpec.describe "docker.rake", type: :task do
           "--build-arg", "FOO_VERSION=#{version}",
           "--build-arg", "NODEJS_VERSION=14.17.3",
           ".",
-          { unsetenv_others: true }
+          { unsetenv_others: true },
         ]
         expect(Kernel).to receive(:exec).with(*args).and_return(true)
 
@@ -187,7 +187,7 @@ RSpec.describe "docker.rake", type: :task do
           "foo_version=#{version}",
           "nodejs_version=14.17.3",
           "rubygem_version=3.2.24",
-          { unsetenv_others: true }
+          { unsetenv_others: true },
         ]
         expect(Kernel).to receive(:exec).with(*args).and_return(true)
 
@@ -343,7 +343,7 @@ RSpec.describe "docker.rake", type: :task do
           "--build-arg", "DISTRO_NAME=buster",
           "--build-arg", "FOO_VERSION=#{version}",
           ".",
-          { unsetenv_others: true }
+          { unsetenv_others: true },
         ]
         expect(Kernel).to receive(:exec).with(*args).and_return(true)
 
@@ -364,7 +364,7 @@ RSpec.describe "docker.rake", type: :task do
           "build_date=#{timestamp}",
           "distro_name=buster",
           "foo_version=#{version}",
-          { unsetenv_others: true }
+          { unsetenv_others: true },
         ]
         expect(Kernel).to receive(:exec).with(*args).and_return(true)
 
