@@ -5,31 +5,31 @@ require "spec_helper"
 RSpec.describe Donico do
   describe ".root_dir" do
     it "returns Donico root dir" do
-      expect(Donico.root_dir).to eq File.realpath(File.dirname(File.expand_path("../donico.gemspec", __dir__)))
+      expect(described_class.root_dir).to eq File.realpath(File.dirname(File.expand_path("../donico.gemspec", __dir__)))
     end
   end
 
   describe ".tasks_dir" do
     it "returns Donico tasks dir" do
-      expect(Donico.tasks_dir).to eq Donico.root.join("lib", "donico", "rake", "tasks")
+      expect(described_class.tasks_dir).to eq described_class.root.join("lib", "donico", "rake", "tasks")
     end
   end
 
   describe ".default_commit_linter" do
     it "returns Donico root dir" do
-      expect(Donico.default_commit_linter).to eq Donico::DEFAULT_COMMIT_LINTER
+      expect(described_class.default_commit_linter).to eq Donico::DEFAULT_COMMIT_LINTER
     end
   end
 
   describe ".default_docker_linter" do
     it "returns Donico root dir" do
-      expect(Donico.default_docker_linter).to eq Donico::DEFAULT_DOCKER_LINTER
+      expect(described_class.default_docker_linter).to eq Donico::DEFAULT_DOCKER_LINTER
     end
   end
 
   describe ".config_file" do
     it "returns Donico config file path" do
-      expect(Donico.config_file).to eq "#{Dir.pwd}/donico.yml"
+      expect(described_class.config_file).to eq "#{Dir.pwd}/donico.yml"
     end
   end
 
@@ -37,43 +37,45 @@ RSpec.describe Donico do
     before { ENV["FOO"] = "BAR" }
     after  { ENV.delete("FOO") }
 
+    let(:config) do
+      {
+        docker_registry:   "registry.example.net/images/base",
+        docker_image_name: "foo",
+        docker_image_tag:  nil,
+        image_builder:     "docker",
+        earthly_version:   "0.6",
+        commit_linter:     Donico::DEFAULT_COMMIT_LINTER,
+        docker_linter:     Donico::DEFAULT_DOCKER_LINTER,
+        matrix:            [
+          {
+            distro:     "buster",
+            dockerfile: "Dockerfile",
+            version:    "1.0.0",
+            archs:      [
+              "linux/amd64",
+            ],
+            build_args: [
+              "NODEJS_VERSION=14.17.3",
+              "FOO=BAR",
+            ],
+            test_args:  [
+              "RUBYGEM_VERSION=3.2.24",
+            ],
+            tags:       [
+              "latest",
+              "%<version>s",
+              "%<version>s-%<distro>s",
+              "%<timestamp>s-%<distro>s",
+              "%<version>s-%<timestamp>s-%<distro>s",
+              "%<version>s-%<timestamp>s-%<distro>s-%<arch>s",
+            ],
+          },
+        ],
+      }
+    end
+
     it "returns Donico config file path" do
-      expect(Donico.load_config(get_fixture_path("docker/erb.yml")).to_h).to eq(
-        {
-          docker_registry:   "registry.example.net/images/base",
-          docker_image_name: "foo",
-          docker_image_tag:  nil,
-          image_builder:     "docker",
-          earthly_version:   "0.6",
-          commit_linter:     Donico::DEFAULT_COMMIT_LINTER,
-          docker_linter:     Donico::DEFAULT_DOCKER_LINTER,
-          matrix:            [
-            {
-              distro:     "buster",
-              dockerfile: "Dockerfile",
-              version:    "1.0.0",
-              archs:      [
-                "linux/amd64",
-              ],
-              build_args: [
-                "NODEJS_VERSION=14.17.3",
-                "FOO=BAR",
-              ],
-              test_args:  [
-                "RUBYGEM_VERSION=3.2.24",
-              ],
-              tags:       [
-                "latest",
-                "%<version>s",
-                "%<version>s-%<distro>s",
-                "%<timestamp>s-%<distro>s",
-                "%<version>s-%<timestamp>s-%<distro>s",
-                "%<version>s-%<timestamp>s-%<distro>s-%<arch>s",
-              ],
-            },
-          ],
-        }
-      )
+      expect(described_class.load_config(get_fixture_path("docker/erb.yml")).to_h).to eq(config)
     end
   end
 end

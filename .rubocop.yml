@@ -2,7 +2,7 @@
 require:
   - rubocop-performance
   - rubocop-rake
-  # - rubocop-rspec
+  - rubocop-rspec
 
 AllCops:
   NewCops: enable
@@ -65,3 +65,26 @@ Style/TrailingCommaInHashLiteral:
 
 Metrics/BlockLength:
   Enabled: false
+
+#########
+# RSpec #
+#########
+
+RSpec/NestedGroups:
+  Max: 4
+
+RSpec/ExampleLength:
+  Max: 11
+
+RSpec/MultipleExpectations:
+  Max: 9
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+RSpec/IndexedLet:
+  AllowedPatterns:
+    - args
+
+RSpec/MessageSpies:
+  EnforcedStyle: receive

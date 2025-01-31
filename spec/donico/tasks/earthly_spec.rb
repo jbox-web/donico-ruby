@@ -10,9 +10,9 @@ RSpec.describe Donico::Tasks::Earthly do
 
     it "generates a valid Earthfile" do
       # don't write file for real
-      expect_any_instance_of(Donico::Templates::Earthfile).to receive(:write).with(no_args).and_return(true)
+      allow_any_instance_of(Donico::Templates::Earthfile).to receive(:write).with(no_args).and_return(true) # rubocop:disable RSpec/AnyInstance
 
-      earthfile = Donico::Tasks::Earthly.generate_earthfile
+      earthfile = described_class.generate_earthfile
       expect(earthfile.template).to eq Donico.root.join("lib/donico/data/templates/earthfile.erb")
       expect(earthfile.file).to eq "Earthfile"
       expect(earthfile.data).to match({ images: array_including(instance_of(Donico::Images::Earthly)), earthly_version: "0.7" })

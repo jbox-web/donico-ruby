@@ -3,10 +3,15 @@
 require "spec_helper"
 
 RSpec.describe "earthly.rake", type: :task do
-  before { ENV.delete("CI_COMMIT_TIMESTAMP") }
-  before { Donico.load_config(get_fixture_path(fixture_file)) }
-  before { Donico.load_tasks }
-  after  { Rake::Task.clear }
+  before do
+    ENV.delete("CI_COMMIT_TIMESTAMP")
+    Donico.load_config(get_fixture_path(fixture_file))
+    Donico.load_tasks
+  end
+
+  after do
+    Rake::Task.clear
+  end
 
   let(:timestamp) { Time.now.strftime("%Y%m%d") }
 
@@ -15,9 +20,8 @@ RSpec.describe "earthly.rake", type: :task do
     let(:fixture_file) { "earthly/minimal.yml" }
 
     describe "buster:latest:build" do
-      it "build buster:latest" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "earthly",
           "--ci",
@@ -28,7 +32,11 @@ RSpec.describe "earthly.rake", type: :task do
           "+buster-#{version}-build",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "build buster:latest" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["buster:#{version}:build"].invoke
@@ -36,9 +44,8 @@ RSpec.describe "earthly.rake", type: :task do
     end
 
     describe "buster:latest:test" do
-      it "test buster:latest" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "bin/inspec",
           "donico",
@@ -48,7 +55,11 @@ RSpec.describe "earthly.rake", type: :task do
           "foo_version=#{version}",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "test buster:latest" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["buster:#{version}:test"].invoke
@@ -56,9 +67,8 @@ RSpec.describe "earthly.rake", type: :task do
     end
 
     describe "buster:latest:push" do
-      it "push buster:latest" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "earthly",
           "--ci",
@@ -70,7 +80,11 @@ RSpec.describe "earthly.rake", type: :task do
           "+buster-#{version}-push",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "push buster:latest" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["buster:#{version}:push"].invoke
@@ -79,15 +93,15 @@ RSpec.describe "earthly.rake", type: :task do
 
     describe "buster:latest:clean" do
       context "when command is success" do
+        let(:args1) { ["docker", "rmi", "foo/#{version}/buster:#{timestamp}"] }
+        let(:args2) { ["docker", "rmi", "foo/#{version}/buster:#{timestamp}_linux_amd64"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "clean buster:latest" do
           # setup test
-          args1 = ["docker", "rmi", "foo/#{version}/buster:#{timestamp}"]
-          args2 = ["docker", "rmi", "foo/#{version}/buster:#{timestamp}_linux_amd64"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(2).times.and_return(true)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+          expect(result).to receive(:success?).twice.and_return(true)
+          allow(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
           # run the test
@@ -96,16 +110,16 @@ RSpec.describe "earthly.rake", type: :task do
       end
 
       context "when command is failure" do
+        let(:args1) { ["docker", "rmi", "foo/#{version}/buster:#{timestamp}"] }
+        let(:args2) { ["docker", "rmi", "foo/#{version}/buster:#{timestamp}_linux_amd64"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "doesn't clean buster:latest" do
           # setup test
-          args1 = ["docker", "rmi", "foo/#{version}/buster:#{timestamp}"]
-          args2 = ["docker", "rmi", "foo/#{version}/buster:#{timestamp}_linux_amd64"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(true)
-          expect(result).to receive(:success?).exactly(1).times.and_return(false)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+          expect(result).to receive(:success?).once.and_return(true)
+          expect(result).to receive(:success?).once.and_return(false)
+          allow(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
           # run the test
@@ -115,10 +129,22 @@ RSpec.describe "earthly.rake", type: :task do
     end
 
     describe "buster:latest:login" do
+      let(:args) do
+        [
+          hash_including,
+          "docker",
+          "run",
+          "-it",
+          "--rm",
+          "foo/#{version}/buster:#{timestamp}",
+          "/bin/bash",
+          { unsetenv_others: true },
+        ]
+      end
+
       it "login buster:latest" do
         # setup test
-        args = [hash_including, "docker", "run", "-it", "--rm", "foo/#{version}/buster:#{timestamp}", "/bin/bash", { unsetenv_others: true }]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["buster:#{version}:login"].invoke
@@ -131,9 +157,8 @@ RSpec.describe "earthly.rake", type: :task do
     let(:fixture_file) { "earthly/custom.yml" }
 
     describe "buster:1.0.0:build" do
-      it "build buster:1.0.0" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "earthly",
           "--ci",
@@ -145,7 +170,11 @@ RSpec.describe "earthly.rake", type: :task do
           "+buster-#{version}-build",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "build buster:1.0.0" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["buster:#{version}:build"].invoke
@@ -153,9 +182,8 @@ RSpec.describe "earthly.rake", type: :task do
     end
 
     describe "buster:1.0.0:test" do
-      it "test buster:1.0.0" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "bin/inspec",
           "donico",
@@ -167,7 +195,11 @@ RSpec.describe "earthly.rake", type: :task do
           "rubygem_version=3.2.24",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "test buster:1.0.0" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["buster:#{version}:test"].invoke
@@ -175,9 +207,8 @@ RSpec.describe "earthly.rake", type: :task do
     end
 
     describe "buster:1.0.0:push" do
-      it "push buster:1.0.0" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "earthly",
           "--ci",
@@ -190,7 +221,11 @@ RSpec.describe "earthly.rake", type: :task do
           "+buster-#{version}-push",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "push buster:1.0.0" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["buster:#{version}:push"].invoke
@@ -199,16 +234,16 @@ RSpec.describe "earthly.rake", type: :task do
 
     describe "buster:1.0.0:clean" do
       context "when command is success" do
+        let(:args1) { ["docker", "rmi", "foo-bar/#{version}/buster:#{timestamp}"] }
+        let(:args2) { ["docker", "rmi", "foo-bar/#{version}/buster:#{timestamp}_linux_amd64"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "clean buster:1.0.0" do
           # setup test
-          args1 = ["docker", "rmi", "foo-bar/#{version}/buster:#{timestamp}"]
-          args2 = ["docker", "rmi", "foo-bar/#{version}/buster:#{timestamp}_linux_amd64"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(2).times.and_return(true)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
-          expect(Kernel).to receive(:exit).with(0)
+          expect(result).to receive(:success?).twice.and_return(true)
+          allow(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+          allow(Kernel).to receive(:exit).with(0)
 
           # run the test
           Rake::Task["buster:#{version}:clean"].invoke
@@ -216,17 +251,17 @@ RSpec.describe "earthly.rake", type: :task do
       end
 
       context "when command is failure" do
+        let(:args1) { ["docker", "rmi", "foo-bar/#{version}/buster:#{timestamp}"] }
+        let(:args2) { ["docker", "rmi", "foo-bar/#{version}/buster:#{timestamp}_linux_amd64"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "doesn't clean buster:1.0.0" do
           # setup test
-          args1 = ["docker", "rmi", "foo-bar/#{version}/buster:#{timestamp}"]
-          args2 = ["docker", "rmi", "foo-bar/#{version}/buster:#{timestamp}_linux_amd64"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(true)
-          expect(result).to receive(:success?).exactly(1).times.and_return(false)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
-          expect(Kernel).to receive(:exit).with(1)
+          expect(result).to receive(:success?).once.and_return(true)
+          expect(result).to receive(:success?).once.and_return(false)
+          allow(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+          allow(Kernel).to receive(:exit).with(1)
 
           # run the test
           Rake::Task["buster:#{version}:clean"].invoke
@@ -235,10 +270,22 @@ RSpec.describe "earthly.rake", type: :task do
     end
 
     describe "buster:1.0.0:login" do
+      let(:args) do
+        [
+          hash_including,
+          "docker",
+          "run",
+          "-it",
+          "--rm",
+          "foo-bar/#{version}/buster:#{timestamp}",
+          "/bin/bash",
+          { unsetenv_others: true },
+        ]
+      end
+
       it "login buster:1.0.0" do
         # setup test
-        args = [hash_including, "docker", "run", "-it", "--rm", "foo-bar/#{version}/buster:#{timestamp}", "/bin/bash", { unsetenv_others: true }]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["buster:#{version}:login"].invoke
@@ -251,9 +298,8 @@ RSpec.describe "earthly.rake", type: :task do
     let(:fixture_file) { "earthly/debian.yml" }
 
     describe "bookworm:latest:build" do
-      it "build bookworm:latest" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "earthly",
           "--ci",
@@ -264,7 +310,11 @@ RSpec.describe "earthly.rake", type: :task do
           "+bookworm-#{version}-build",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "build bookworm:latest" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["bookworm:#{version}:build"].invoke

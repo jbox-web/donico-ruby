@@ -3,21 +3,21 @@
 require "spec_helper"
 
 RSpec.describe Donico::Config do
-  let(:config)  { YAML.load_file(get_fixture_path("docker/custom.yml")) }
-  let(:subject) { described_class.new(config) }
+  let(:config_file) { YAML.load_file(get_fixture_path("docker/custom.yml")) }
+  let(:config) { described_class.new(config_file) }
 
   describe "#docker_image_name" do
     context "when value is set" do
       it "returns Donico docker_image_name" do
-        expect(subject.docker_image_name).to eq "foo"
+        expect(config.docker_image_name).to eq "foo"
       end
     end
 
     # context "when value is not set" do
-    #   let(:config) { super().except("image_name") }
+    #   let(:config_file) { super().except("image_name") }
     #   it "raises an error" do
     #     expect do
-    #       subject.docker_image_name
+    #       config.docker_image_name
     #     end.to raise_error(KeyError)
     #   end
     # end
@@ -26,15 +26,16 @@ RSpec.describe Donico::Config do
   describe "#docker_registry" do
     context "when value is set" do
       it "returns Donico docker_registry" do
-        expect(subject.docker_registry).to eq "registry.example.net/images/base"
+        expect(config.docker_registry).to eq "registry.example.net/images/base"
       end
     end
 
     context "when value is not set" do
-      let(:config) { super().except("registry") }
+      let(:config_file) { super().except("registry") }
+
       it "raises an error" do
         expect do
-          subject.docker_registry
+          config.docker_registry
         end.to raise_error(KeyError)
       end
     end
@@ -43,22 +44,23 @@ RSpec.describe Donico::Config do
   describe "#image_builder" do
     context "when value is set" do
       it "returns Donico image_builder" do
-        expect(subject.image_builder).to eq "docker"
+        expect(config.image_builder).to eq "docker"
       end
     end
 
     context "when value is not set" do
-      let(:config) { super().except("image_builder") }
+      let(:config_file) { super().except("image_builder") }
+
       it "returns a default value" do
-        expect(subject.image_builder).to eq "docker"
+        expect(config.image_builder).to eq "docker"
       end
     end
   end
 
   describe "#matrix" do
     context "when value is set" do
-      it "returns Donico matrix" do
-        expect(subject.matrix.map(&:to_h)).to eq [
+      let(:matrix) do
+        [
           {
             archs:      ["linux/amd64"],
             distro:     "buster",
@@ -77,14 +79,19 @@ RSpec.describe Donico::Config do
           },
         ]
       end
+
+      it "returns Donico matrix" do
+        expect(config.matrix.map(&:to_h)).to eq matrix
+      end
     end
 
     context "when value is not set" do
-      let(:config) { super().except("matrix") }
-      it "returns a default value" do
-        expect(subject.matrix.first).to be_a(Donico::Matrix)
+      let(:config_file) { super().except("matrix") }
 
-        matrix = subject.matrix.first
+      it "returns a default value" do
+        expect(config.matrix.first).to be_a(Donico::Matrix)
+
+        matrix = config.matrix.first
         expect(matrix.version).to eq "latest"
         expect(matrix.distro).to eq "buster"
         expect(matrix.archs).to eq ["linux/amd64"]
@@ -98,14 +105,15 @@ RSpec.describe Donico::Config do
   describe "#commit_linter" do
     context "when value is set" do
       it "returns Donico commit_linter" do
-        expect(subject.commit_linter).to eq Donico::DEFAULT_COMMIT_LINTER
+        expect(config.commit_linter).to eq Donico::DEFAULT_COMMIT_LINTER
       end
     end
 
     context "when value is not set" do
-      let(:config) { super().except("commit_linter") }
+      let(:config_file) { super().except("commit_linter") }
+
       it "returns a default value" do
-        expect(subject.commit_linter).to eq Donico::DEFAULT_COMMIT_LINTER
+        expect(config.commit_linter).to eq Donico::DEFAULT_COMMIT_LINTER
       end
     end
   end
@@ -113,14 +121,15 @@ RSpec.describe Donico::Config do
   describe "#docker_linter" do
     context "when value is set" do
       it "returns Donico docker_linter" do
-        expect(subject.docker_linter).to eq Donico::DEFAULT_DOCKER_LINTER
+        expect(config.docker_linter).to eq Donico::DEFAULT_DOCKER_LINTER
       end
     end
 
     context "when value is not set" do
-      let(:config) { super().except("docker_linter") }
+      let(:config_file) { super().except("docker_linter") }
+
       it "returns a default value" do
-        expect(subject.docker_linter).to eq Donico::DEFAULT_DOCKER_LINTER
+        expect(config.docker_linter).to eq Donico::DEFAULT_DOCKER_LINTER
       end
     end
   end
@@ -130,7 +139,7 @@ RSpec.describe Donico::Config do
       before { ENV.delete("CI_COMMIT_TIMESTAMP") }
 
       it "returns a timestamp to name the image" do
-        expect(subject.timestamp).to eq Time.now.strftime("%Y%m%d")
+        expect(config.timestamp).to eq Time.now.strftime("%Y%m%d")
       end
     end
 
@@ -139,7 +148,7 @@ RSpec.describe Donico::Config do
       after  { ENV.delete("CI_COMMIT_TIMESTAMP") }
 
       it "returns a timestamp to name the image" do
-        expect(subject.timestamp).to eq "20210609115022"
+        expect(config.timestamp).to eq "20210609115022"
       end
     end
   end

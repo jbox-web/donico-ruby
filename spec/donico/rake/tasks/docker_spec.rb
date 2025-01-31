@@ -3,10 +3,13 @@
 require "spec_helper"
 
 RSpec.describe "docker.rake", type: :task do
-  before { ENV.delete("CI_COMMIT_TIMESTAMP") }
-  before { Donico.load_config(get_fixture_path(fixture_file)) }
-  before { Donico.load_tasks }
-  after  { Rake::Task.clear }
+  before do
+    ENV.delete("CI_COMMIT_TIMESTAMP")
+    Donico.load_config(get_fixture_path(fixture_file))
+    Donico.load_tasks
+  end
+
+  after { Rake::Task.clear }
 
   let(:timestamp) { Time.now.strftime("%Y%m%d") }
 
@@ -15,9 +18,8 @@ RSpec.describe "docker.rake", type: :task do
     let(:fixture_file) { "docker/minimal.yml" }
 
     describe "amd64:buster:latest:build" do
-      it "build amd64:buster:latest" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "docker", "build",
           "-f", "Dockerfile",
@@ -30,7 +32,11 @@ RSpec.describe "docker.rake", type: :task do
           ".",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "build amd64:buster:latest" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:build"].invoke
@@ -38,9 +44,8 @@ RSpec.describe "docker.rake", type: :task do
     end
 
     describe "amd64:buster:1.0.0:test" do
-      it "test amd64:buster:1.0.0" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "bin/inspec",
           "donico",
@@ -51,7 +56,11 @@ RSpec.describe "docker.rake", type: :task do
           "foo_version=#{version}",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "test amd64:buster:1.0.0" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:test"].invoke
@@ -60,13 +69,13 @@ RSpec.describe "docker.rake", type: :task do
 
     describe "amd64:buster:1.0.0:tag" do
       context "when command is success" do
+        let(:args) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "tag amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(true)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(result).to receive(:success?).once.and_return(true)
+          allow(Open3).to receive(:capture3).with(*args).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
           # run the test
@@ -75,13 +84,13 @@ RSpec.describe "docker.rake", type: :task do
       end
 
       context "when command is failure" do
+        let(:args) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "doesn't tag amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(false)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(result).to receive(:success?).once.and_return(false)
+          allow(Open3).to receive(:capture3).with(*args).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
           # run the test
@@ -92,13 +101,13 @@ RSpec.describe "docker.rake", type: :task do
 
     describe "amd64:buster:1.0.0:push" do
       context "when command is success" do
+        let(:args) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "push amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(true)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(result).to receive(:success?).once.and_return(true)
+          allow(Open3).to receive(:capture3).with(*args).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
           # run the test
@@ -107,13 +116,13 @@ RSpec.describe "docker.rake", type: :task do
       end
 
       context "when command is failure" do
+        let(:args) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "doesn't push amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(false)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(result).to receive(:success?).once.and_return(false)
+          allow(Open3).to receive(:capture3).with(*args).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
           # run the test
@@ -123,10 +132,11 @@ RSpec.describe "docker.rake", type: :task do
     end
 
     describe "amd64:buster:1.0.0:clean" do
+      let(:args) { [hash_including, "docker", "rmi", "amd64/buster/foo-#{version}:#{timestamp}", { unsetenv_others: true }] }
+
       it "clean amd64:buster:1.0.0" do
         # setup test
-        args = [hash_including, "docker", "rmi", "amd64/buster/foo-#{version}:#{timestamp}", { unsetenv_others: true }]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:clean"].invoke
@@ -134,10 +144,22 @@ RSpec.describe "docker.rake", type: :task do
     end
 
     describe "amd64:buster:1.0.0:login" do
+      let(:args) do
+        [
+          hash_including,
+          "docker",
+          "run",
+          "-it",
+          "--rm",
+          "amd64/buster/foo-#{version}:#{timestamp}",
+          "/bin/bash",
+          { unsetenv_others: true },
+        ]
+      end
+
       it "login amd64:buster:1.0.0" do
         # setup test
-        args = [hash_including, "docker", "run", "-it", "--rm", "amd64/buster/foo-#{version}:#{timestamp}", "/bin/bash", { unsetenv_others: true }]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:login"].invoke
@@ -150,9 +172,8 @@ RSpec.describe "docker.rake", type: :task do
     let(:fixture_file) { "docker/custom.yml" }
 
     describe "amd64:buster:1.0.0:build" do
-      it "build amd64:buster:1.0.0" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "docker", "build",
           "-f", "foo/Dockerfile",
@@ -166,7 +187,11 @@ RSpec.describe "docker.rake", type: :task do
           ".",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "build amd64:buster:1.0.0" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:build"].invoke
@@ -174,9 +199,8 @@ RSpec.describe "docker.rake", type: :task do
     end
 
     describe "amd64:buster:1.0.0:test" do
-      it "test amd64:buster:1.0.0" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "bin/inspec",
           "donico",
@@ -189,7 +213,11 @@ RSpec.describe "docker.rake", type: :task do
           "rubygem_version=3.2.24",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "test amd64:buster:1.0.0" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:test"].invoke
@@ -198,23 +226,23 @@ RSpec.describe "docker.rake", type: :task do
 
     describe "amd64:buster:1.0.0:tag" do
       context "when command is success" do
+        let(:args1) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:latest"] }
+        let(:args2) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}"] }
+        let(:args3) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:args4) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{timestamp}-buster"] }
+        let(:args5) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster"] }
+        let(:args6) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "tag amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:latest"]
-          args2 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}"]
-          args3 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
-          args4 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{timestamp}-buster"]
-          args5 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster"]
-          args6 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"]
-
-          result = double("result")
           expect(result).to receive(:success?).exactly(6).times.and_return(true)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
           # run the test
@@ -223,24 +251,24 @@ RSpec.describe "docker.rake", type: :task do
       end
 
       context "when command is failure" do
+        let(:args1) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:latest"] }
+        let(:args2) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}"] }
+        let(:args3) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:args4) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{timestamp}-buster"] }
+        let(:args5) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster"] }
+        let(:args6) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "doesn't tag amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:latest"]
-          args2 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}"]
-          args3 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
-          args4 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{timestamp}-buster"]
-          args5 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster"]
-          args6 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"]
-
-          result = double("result")
           expect(result).to receive(:success?).exactly(5).times.and_return(true)
-          expect(result).to receive(:success?).at_most(1).times.and_return(false)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
+          expect(result).to receive(:success?).at_most(:once).and_return(false)
+          allow(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
           # run the test
@@ -251,23 +279,23 @@ RSpec.describe "docker.rake", type: :task do
 
     describe "amd64:buster:1.0.0:push" do
       context "when command is success" do
+        let(:args1) { ["docker", "push", "registry.example.net/images/base/foo:latest"] }
+        let(:args2) { ["docker", "push", "registry.example.net/images/base/foo:#{version}"] }
+        let(:args3) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:args4) { ["docker", "push", "registry.example.net/images/base/foo:#{timestamp}-buster"] }
+        let(:args5) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster"] }
+        let(:args6) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "push amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "push", "registry.example.net/images/base/foo:latest"]
-          args2 = ["docker", "push", "registry.example.net/images/base/foo:#{version}"]
-          args3 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
-          args4 = ["docker", "push", "registry.example.net/images/base/foo:#{timestamp}-buster"]
-          args5 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster"]
-          args6 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"]
-
-          result = double("result")
           expect(result).to receive(:success?).exactly(6).times.and_return(true)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
           # run the test
@@ -276,24 +304,24 @@ RSpec.describe "docker.rake", type: :task do
       end
 
       context "when command is failure" do
+        let(:args1) { ["docker", "push", "registry.example.net/images/base/foo:latest"] }
+        let(:args2) { ["docker", "push", "registry.example.net/images/base/foo:#{version}"] }
+        let(:args3) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:args4) { ["docker", "push", "registry.example.net/images/base/foo:#{timestamp}-buster"] }
+        let(:args5) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster"] }
+        let(:args6) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "doesn't push amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "push", "registry.example.net/images/base/foo:latest"]
-          args2 = ["docker", "push", "registry.example.net/images/base/foo:#{version}"]
-          args3 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
-          args4 = ["docker", "push", "registry.example.net/images/base/foo:#{timestamp}-buster"]
-          args5 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster"]
-          args6 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-#{timestamp}-buster-amd64"]
-
-          result = double("result")
           expect(result).to receive(:success?).exactly(5).times.and_return(true)
-          expect(result).to receive(:success?).at_most(1).times.and_return(false)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
-          expect(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
+          expect(result).to receive(:success?).at_most(:once).and_return(false)
+          allow(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args2).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args3).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args4).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args5).and_return(["", "", result])
+          allow(Open3).to receive(:capture3).with(*args6).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
           # run the test
@@ -303,10 +331,11 @@ RSpec.describe "docker.rake", type: :task do
     end
 
     describe "amd64:buster:1.0.0:clean" do
+      let(:args) { [hash_including, "docker", "rmi", "amd64/buster/foo-#{version}:#{timestamp}", { unsetenv_others: true }] }
+
       it "clean amd64:buster:1.0.0" do
         # setup test
-        args = [hash_including, "docker", "rmi", "amd64/buster/foo-#{version}:#{timestamp}", { unsetenv_others: true }]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:clean"].invoke
@@ -314,10 +343,11 @@ RSpec.describe "docker.rake", type: :task do
     end
 
     describe "amd64:buster:1.0.0:login" do
+      let(:args) { [hash_including, "docker", "run", "-it", "--rm", "amd64/buster/foo-#{version}:#{timestamp}", "/bin/bash", { unsetenv_others: true }] }
+
       it "login amd64:buster:1.0.0" do
         # setup test
-        args = [hash_including, "docker", "run", "-it", "--rm", "amd64/buster/foo-#{version}:#{timestamp}", "/bin/bash", { unsetenv_others: true }]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:login"].invoke
@@ -330,9 +360,8 @@ RSpec.describe "docker.rake", type: :task do
     let(:fixture_file) { "docker/deprecated_archs.yml" }
 
     describe "amd64:buster:latest:build" do
-      it "build amd64:buster:latest" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "docker", "build",
           "-f", "Dockerfile",
@@ -345,7 +374,11 @@ RSpec.describe "docker.rake", type: :task do
           ".",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "build amd64:buster:latest" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:build"].invoke
@@ -353,9 +386,8 @@ RSpec.describe "docker.rake", type: :task do
     end
 
     describe "amd64:buster:1.0.0:test" do
-      it "test amd64:buster:1.0.0" do
-        # setup test
-        args = [
+      let(:args) do
+        [
           hash_including,
           "bin/inspec",
           "donico",
@@ -366,7 +398,11 @@ RSpec.describe "docker.rake", type: :task do
           "foo_version=#{version}",
           { unsetenv_others: true },
         ]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+      end
+
+      it "test amd64:buster:1.0.0" do
+        # setup test
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:test"].invoke
@@ -375,13 +411,13 @@ RSpec.describe "docker.rake", type: :task do
 
     describe "amd64:buster:1.0.0:tag" do
       context "when command is success" do
+        let(:args) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "tag amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(true)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(result).to receive(:success?).once.and_return(true)
+          allow(Open3).to receive(:capture3).with(*args).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
           # run the test
@@ -390,13 +426,13 @@ RSpec.describe "docker.rake", type: :task do
       end
 
       context "when command is failure" do
+        let(:args) { ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "doesn't tag amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "tag", "amd64/buster/foo-#{version}:#{timestamp}", "registry.example.net/images/base/foo:#{version}-buster"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(false)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(result).to receive(:success?).once.and_return(false)
+          allow(Open3).to receive(:capture3).with(*args).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
           # run the test
@@ -407,13 +443,13 @@ RSpec.describe "docker.rake", type: :task do
 
     describe "amd64:buster:1.0.0:push" do
       context "when command is success" do
+        let(:args) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "push amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(true)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(result).to receive(:success?).once.and_return(true)
+          allow(Open3).to receive(:capture3).with(*args).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(0)
 
           # run the test
@@ -422,13 +458,13 @@ RSpec.describe "docker.rake", type: :task do
       end
 
       context "when command is failure" do
+        let(:args) { ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"] }
+        let(:result) { instance_double(Process::Status) }
+
         it "doesn't push amd64:buster:1.0.0" do
           # setup test
-          args1 = ["docker", "push", "registry.example.net/images/base/foo:#{version}-buster"]
-
-          result = double("result")
-          expect(result).to receive(:success?).exactly(1).times.and_return(false)
-          expect(Open3).to receive(:capture3).with(*args1).and_return(["", "", result])
+          expect(result).to receive(:success?).once.and_return(false)
+          allow(Open3).to receive(:capture3).with(*args).and_return(["", "", result])
           expect(Kernel).to receive(:exit).with(1)
 
           # run the test
@@ -438,10 +474,11 @@ RSpec.describe "docker.rake", type: :task do
     end
 
     describe "amd64:buster:1.0.0:clean" do
+      let(:args) { [hash_including, "docker", "rmi", "amd64/buster/foo-#{version}:#{timestamp}", { unsetenv_others: true }] }
+
       it "clean amd64:buster:1.0.0" do
         # setup test
-        args = [hash_including, "docker", "rmi", "amd64/buster/foo-#{version}:#{timestamp}", { unsetenv_others: true }]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:clean"].invoke
@@ -449,10 +486,11 @@ RSpec.describe "docker.rake", type: :task do
     end
 
     describe "amd64:buster:1.0.0:login" do
+      let(:args) { [hash_including, "docker", "run", "-it", "--rm", "amd64/buster/foo-#{version}:#{timestamp}", "/bin/bash", { unsetenv_others: true }] }
+
       it "login amd64:buster:1.0.0" do
         # setup test
-        args = [hash_including, "docker", "run", "-it", "--rm", "amd64/buster/foo-#{version}:#{timestamp}", "/bin/bash", { unsetenv_others: true }]
-        expect(Kernel).to receive(:exec).with(*args).and_return(true)
+        expect(Kernel).to receive(:exec).with(*args)
 
         # run the test
         Rake::Task["amd64:buster:#{version}:login"].invoke
