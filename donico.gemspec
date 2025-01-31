@@ -15,7 +15,14 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = ">= 3.3.0"
 
-  s.files = ["donico.gemspec", "README.md"] + %x(git ls-files | grep -E '^(bash|lib|exe)').split("\n")
+  s.files = Dir[
+    "README.md",
+    "lib/**/*.rb",
+    "lib/**/*.erb",
+    "lib/**/*.rake",
+    "exe/*",
+    "bash/*.sh"
+  ]
 
   s.bindir      = "exe"
   s.executables = ["inspec"]
