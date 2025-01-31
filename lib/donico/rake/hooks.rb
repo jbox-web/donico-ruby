@@ -6,9 +6,10 @@ module Donico
   module Rake
     module Hooks
 
+      # rubocop:disable Performance/RedundantBlockCall
       def before(*task_names, &new_task)
         task_names.each do |task_name|
-          old_task = ::Rake.application.instance_variable_get("@tasks").delete(task_name.to_s)
+          old_task = ::Rake.application.instance_variable_get(:@tasks).delete(task_name.to_s)
           desc old_task.full_comment
           task task_name => old_task.prerequisites do
             new_task.call
@@ -23,7 +24,7 @@ module Donico
         ignore_exceptions = options.delete(:ignore_exceptions) || false
 
         task_names.each do |task_name|
-          old_task = ::Rake.application.instance_variable_get("@tasks").delete(task_name.to_s)
+          old_task = ::Rake.application.instance_variable_get(:@tasks).delete(task_name.to_s)
           desc old_task.full_comment
           task task_name => old_task.prerequisites do
             begin
@@ -40,13 +41,14 @@ module Donico
 
       def redefine(*task_names, &new_task)
         task_names.each do |task_name|
-          old_task = ::Rake.application.instance_variable_get("@tasks").delete(task_name.to_s)
+          old_task = ::Rake.application.instance_variable_get(:@tasks).delete(task_name.to_s)
           desc old_task.full_comment
           task task_name => old_task.prerequisites do
             new_task.call
           end
         end
       end
+      # rubocop:enable Performance/RedundantBlockCall
 
     end
   end
