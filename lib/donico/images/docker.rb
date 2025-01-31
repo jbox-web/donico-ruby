@@ -15,13 +15,13 @@ module Donico
 
 
       def build_tag
-        format("%<arch>s/%<distro>s/%<name>s-%<version>s:%<tag>s", arch: deprecated_arch, distro: distro, name: name, version: version, tag: timestamp)
+        format_tag("%<arch>s/%<distro>s/%<name>s-%<version>s:%<tag>s", arch: deprecated_arch, distro: distro, name: name, version: version, tag: timestamp)
       end
 
 
       def prod_tag(tag)
-        new_tag = format(tag, version: version, distro: distro, timestamp: timestamp, arch: deprecated_arch)
-        image_name = format("%<name>s:%<tag>s", name: name, tag: new_tag)
+        new_tag = format_tag(tag, version: version, distro: distro, timestamp: timestamp, arch: deprecated_arch)
+        image_name = format_tag("%<name>s:%<tag>s", name: name, tag: new_tag)
         "#{registry}/#{image_name}"
       end
 

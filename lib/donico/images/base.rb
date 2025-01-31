@@ -60,6 +60,18 @@ module Donico
               .downcase
       end
 
+
+      # rubocop:disable Style/RedundantBegin, Style/ParallelAssignment
+      def format_tag(tag, opts = {})
+        begin
+          old_verbose, $VERBOSE = $VERBOSE, nil
+          format(tag, opts)
+        ensure
+          $VERBOSE = old_verbose
+        end
+      end
+      # rubocop:enable Style/RedundantBegin, Style/ParallelAssignment
+
     end
   end
 end
