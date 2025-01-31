@@ -103,7 +103,7 @@ Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`, `
 
 Donico ajoute également des commandes utilitaires :
 
-* `rake generate-matrix` : pour générer le fichier de configuration pour GitlabCI (voir plus bas [Intégration avec GitlabCI](#intégration-avec-gitlabci))
+* `rake generate-files` : pour générer les fichiers de configuration pour Earthly et GitlabCI (voir plus bas [Intégration avec GitlabCI](#intégration-avec-gitlabci))
 * `rake lint-commits` : pour linter les commits
 * `rake lint-dockerfile` : pour linter le `Dockerfile`
 * `rake version` : pour afficher la version de Donico
@@ -491,7 +491,7 @@ Donico embarque la gem [Dotenv](https://github.com/bkeepers/dotenv) afin de donn
 
 **Note:** Par défault Donico ne charge ni ne dépend d'aucune variable d'environnement. Tout passe par le fichier de configuration `donico.yml`.
 
-L'image Docker de Donico utilise les variables d'environnement pour pour télécharger la gem Donico avant de l'installer dans l'image Docker :)
+L'image Docker de Donico utilise les variables d'environnement pour télécharger la gem Donico avant de l'installer dans l'image Docker :)
 
 Voir : https://gitlab.digitick.net/infra/docker-images/donico/-/blob/master/Rakefile#L25
 
