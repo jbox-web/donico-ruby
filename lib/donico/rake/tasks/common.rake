@@ -30,9 +30,15 @@ task :"generate-files" do
   Donico::Matrix.generate(config: Donico.config)
   puts "GitlabCI Matrix file generated"
 
-  if Donico.config.image_builder == "earthly"
+  case Donico.config.image_builder
+  when "earthly"
     Donico::Tasks::Earthly.generate_earthfile
     puts "Earthfile generated"
+  when "bake"
+    Donico::Tasks::Bake.generate_bakefile
+    puts "Bakefile generated"
+  else
+    puts "Unknown file format"
   end
 end
 

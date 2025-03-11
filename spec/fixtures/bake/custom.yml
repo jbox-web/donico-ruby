@@ -1,0 +1,19 @@
+---
+registry: registry.example.net/images/base
+image_name: foo-bar
+image_builder: bake
+earthly_version: 0.7
+matrix:
+  - version: 1.0.0
+    distro: buster
+    archs: ["linux/amd64"]
+    dockerfile: foo/Dockerfile
+    build_args:
+      - NODEJS_VERSION=14.17.3
+      - BAR_VERSION=Zm9vCg==
+    test_args:
+      - RUBYGEM_VERSION=3.2.24
+    tags:
+      - latest
+      - "%<version>s"
+      - "%<version>s-%<distro>s"

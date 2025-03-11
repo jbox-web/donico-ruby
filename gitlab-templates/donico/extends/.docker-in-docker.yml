@@ -33,6 +33,19 @@
 
       # Run job CMD
       rake "$DOCKER_DISTRO:$VERSION:$JOB_NAME"
+
+    elif grep -q bake donico.yml; then
+      echo "Docker Bake build detected"
+      echo "CMD: rake $DOCKER_DISTRO:$VERSION:$JOB_NAME"
+
+      # Setup qemu for multiarch builds
+      # See: https://docs.earthly.dev/docs/guides/multi-platform#linux
+      echo "Setup qemu for multiarch builds"
+      docker run --rm --privileged tonistiigi/binfmt --install all > /dev/null 2>&1 || true
+
+      # Run job CMD
+      rake "$DOCKER_DISTRO:$VERSION:$JOB_NAME"
+
     else
       # Job name that extends this job should match Makefile recipe name.
       if [ -z "${VERSION+x}" ]; then

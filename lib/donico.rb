@@ -114,10 +114,10 @@ module Donico
   # such env vars. So clean them up before calling bin/inspec
   #
   # It should not harm to clean env vars before executing any command, so let's do it.
-  def exec(*args)
+  def exec(*args, env: {})
     log_args("exec", args)
 
-    env = Bundler.original_env
+    env = env.merge(Bundler.original_env)
     Kernel.exec(env, *args, unsetenv_others: true)
   end
 

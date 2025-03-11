@@ -1,0 +1,119 @@
+# !!! THIS IS A GENERATED FILE !!! DON'T EDIT ME MANUALLY !!!
+# Instead edit donico.yml and run bin/rake generate-files
+
+
+#########################
+# BULLSEYE - ruby 3.2.0 #
+#########################
+
+variable "BUILD_DATE" {
+  validation {
+    condition = BUILD_DATE != ""
+    error_message = "The variable 'BUILD_DATE' must not be empty."
+  }
+}
+
+variable "DISTRO_NAME" {
+  validation {
+    condition = DISTRO_NAME != ""
+    error_message = "The variable 'DISTRO_NAME' must not be empty."
+  }
+}
+
+variable "NODEJS_VERSION" {
+  validation {
+    condition = NODEJS_VERSION != ""
+    error_message = "The variable 'NODEJS_VERSION' must not be empty."
+  }
+}
+
+variable "RUBY_VERSION" {
+  validation {
+    condition = RUBY_VERSION != ""
+    error_message = "The variable 'RUBY_VERSION' must not be empty."
+  }
+}
+
+target "bullseye-3-2-0-build" {
+  dockerfile = "dockerfiles/3.2/Dockerfile"
+  args = {
+    BUILD_DATE = "${BUILD_DATE}"
+    DISTRO_NAME = "bullseye"
+    NODEJS_VERSION = "14.17.3"
+    RUBY_VERSION = "3.2.0"
+  }
+  tags      = ["ruby/${RUBY_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
+  platforms = ["linux/amd64", "linux/arm64"]
+  output    = [{ type = "docker" }]
+}
+
+target "bullseye-3-2-0-push" {
+  dockerfile = "dockerfiles/3.2/Dockerfile"
+  args = {
+    BUILD_DATE = "${BUILD_DATE}"
+    DISTRO_NAME = "bullseye"
+    NODEJS_VERSION = "14.17.3"
+    RUBY_VERSION = "3.2.0"
+  }
+  tags      = ["registry.example.net/images/base/ruby:3.2.0-bullseye", "registry.example.net/images/base/ruby:latest-bullseye"]
+  platforms = ["linux/amd64", "linux/arm64"]
+  output    = [{ type = "registry" }]
+}
+
+#######################
+# BUSTER - ruby 3.1.3 #
+#######################
+
+variable "BUILD_DATE" {
+  validation {
+    condition = BUILD_DATE != ""
+    error_message = "The variable 'BUILD_DATE' must not be empty."
+  }
+}
+
+variable "DISTRO_NAME" {
+  validation {
+    condition = DISTRO_NAME != ""
+    error_message = "The variable 'DISTRO_NAME' must not be empty."
+  }
+}
+
+variable "NODEJS_VERSION" {
+  validation {
+    condition = NODEJS_VERSION != ""
+    error_message = "The variable 'NODEJS_VERSION' must not be empty."
+  }
+}
+
+variable "RUBY_VERSION" {
+  validation {
+    condition = RUBY_VERSION != ""
+    error_message = "The variable 'RUBY_VERSION' must not be empty."
+  }
+}
+
+target "buster-3-1-3-build" {
+  dockerfile = "dockerfiles/3.1/Dockerfile"
+  args = {
+    BUILD_DATE = "${BUILD_DATE}"
+    DISTRO_NAME = "buster"
+    NODEJS_VERSION = "14.17.3"
+    RUBY_VERSION = "3.1.3"
+  }
+  tags      = ["ruby/${RUBY_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
+  platforms = ["linux/amd64"]
+  output    = [{ type = "docker" }]
+}
+
+target "buster-3-1-3-push" {
+  dockerfile = "dockerfiles/3.1/Dockerfile"
+  args = {
+    BUILD_DATE = "${BUILD_DATE}"
+    DISTRO_NAME = "buster"
+    NODEJS_VERSION = "14.17.3"
+    RUBY_VERSION = "3.1.3"
+  }
+  tags      = ["registry.example.net/images/base/ruby:3.1.3-buster", "registry.example.net/images/base/ruby:latest-buster"]
+  platforms = ["linux/amd64"]
+  output    = [{ type = "registry" }]
+}

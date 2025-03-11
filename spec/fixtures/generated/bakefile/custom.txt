@@ -1,0 +1,70 @@
+# !!! THIS IS A GENERATED FILE !!! DON'T EDIT ME MANUALLY !!!
+# Instead edit donico.yml and run bin/rake generate-files
+
+
+##########################
+# BUSTER - foo-bar 1.0.0 #
+##########################
+
+variable "BAR_VERSION" {
+  validation {
+    condition = BAR_VERSION != ""
+    error_message = "The variable 'BAR_VERSION' must not be empty."
+  }
+}
+
+variable "BUILD_DATE" {
+  validation {
+    condition = BUILD_DATE != ""
+    error_message = "The variable 'BUILD_DATE' must not be empty."
+  }
+}
+
+variable "DISTRO_NAME" {
+  validation {
+    condition = DISTRO_NAME != ""
+    error_message = "The variable 'DISTRO_NAME' must not be empty."
+  }
+}
+
+variable "FOO_BAR_VERSION" {
+  validation {
+    condition = FOO_BAR_VERSION != ""
+    error_message = "The variable 'FOO_BAR_VERSION' must not be empty."
+  }
+}
+
+variable "NODEJS_VERSION" {
+  validation {
+    condition = NODEJS_VERSION != ""
+    error_message = "The variable 'NODEJS_VERSION' must not be empty."
+  }
+}
+
+target "buster-1-0-0-build" {
+  dockerfile = "foo/Dockerfile"
+  args = {
+    BAR_VERSION = "Zm9vCg=="
+    BUILD_DATE = "${BUILD_DATE}"
+    DISTRO_NAME = "buster"
+    FOO_BAR_VERSION = "1.0.0"
+    NODEJS_VERSION = "14.17.3"
+  }
+  tags      = ["foo-bar/${FOO_BAR_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
+  platforms = ["linux/amd64"]
+  output    = [{ type = "docker" }]
+}
+
+target "buster-1-0-0-push" {
+  dockerfile = "foo/Dockerfile"
+  args = {
+    BAR_VERSION = "Zm9vCg=="
+    BUILD_DATE = "${BUILD_DATE}"
+    DISTRO_NAME = "buster"
+    FOO_BAR_VERSION = "1.0.0"
+    NODEJS_VERSION = "14.17.3"
+  }
+  tags      = ["registry.example.net/images/base/foo-bar:1.0.0", "registry.example.net/images/base/foo-bar:1.0.0-buster", "registry.example.net/images/base/foo-bar:latest"]
+  platforms = ["linux/amd64"]
+  output    = [{ type = "registry" }]
+}

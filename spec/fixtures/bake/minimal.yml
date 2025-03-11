@@ -1,0 +1,4 @@
+---
+registry: registry.example.net/images/base
+image_name: foo
+image_builder: bake
