@@ -6,3 +6,6 @@
 
 # Ignore coverage files
 coverage/
+
+# Ignore MacOS files
+.DS_Store
