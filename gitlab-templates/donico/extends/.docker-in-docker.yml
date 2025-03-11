@@ -43,6 +43,9 @@
       echo "Setup qemu for multiarch builds"
       docker run --rm --privileged tonistiigi/binfmt --install all > /dev/null 2>&1 || true
 
+      # Create Docker cache
+      docker buildx create --use --bootstrap --name "donico-$DOCKER_DISTRO" || true
+
       # Run job CMD
       rake "$DOCKER_DISTRO:$VERSION:$JOB_NAME"
 
