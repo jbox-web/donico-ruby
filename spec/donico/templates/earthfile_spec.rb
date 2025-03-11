@@ -8,7 +8,7 @@ RSpec.describe Donico::Templates::Earthfile do
   describe "#render_template" do
     context "with minimal config file" do
       let(:fixture_file) { "earthly/minimal.yml" }
-      let(:generated_file) { "generated/earthfile_minimal.txt" }
+      let(:generated_file) { "generated/earthfile/minimal.txt" }
 
       it "render template" do
         object = described_class.new
@@ -18,7 +18,7 @@ RSpec.describe Donico::Templates::Earthfile do
 
     context "with custom config file" do
       let(:fixture_file) { "earthly/custom.yml" }
-      let(:generated_file) { "generated/earthfile_custom.txt" }
+      let(:generated_file) { "generated/earthfile/custom.txt" }
 
       it "render template" do
         object = described_class.new
@@ -28,7 +28,7 @@ RSpec.describe Donico::Templates::Earthfile do
 
     context "with complex config file" do
       let(:fixture_file) { "earthly/multiple_dockerfiles.yml" }
-      let(:generated_file) { "generated/earthfile_multiple_dockerfiles.txt" }
+      let(:generated_file) { "generated/earthfile/multiple_dockerfiles.txt" }
 
       it "render template" do
         object = described_class.new
@@ -38,7 +38,7 @@ RSpec.describe Donico::Templates::Earthfile do
 
     context "with debian config file" do
       let(:fixture_file) { "earthly/debian.yml" }
-      let(:generated_file) { "generated/earthfile_debian.txt" }
+      let(:generated_file) { "generated/earthfile/debian.txt" }
 
       it "render template" do
         object = described_class.new
