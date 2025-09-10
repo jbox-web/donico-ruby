@@ -1,18 +1,6 @@
 # !!! THIS IS A GENERATED FILE !!! DON'T EDIT ME MANUALLY !!!
 # Instead edit donico.yml and run bin/rake generate-files
 
-
-##############################
-# BOOKWORM - bookworm latest #
-##############################
-
-variable "BOOKWORM_VERSION" {
-  validation {
-    condition = BOOKWORM_VERSION != ""
-    error_message = "The variable 'BOOKWORM_VERSION' must not be empty."
-  }
-}
-
 variable "BUILD_DATE" {
   validation {
     condition = BUILD_DATE != ""
@@ -20,12 +8,9 @@ variable "BUILD_DATE" {
   }
 }
 
-variable "DISTRO_NAME" {
-  validation {
-    condition = DISTRO_NAME != ""
-    error_message = "The variable 'DISTRO_NAME' must not be empty."
-  }
-}
+##############################
+# BOOKWORM - bookworm latest #
+##############################
 
 target "bookworm-latest-build" {
   dockerfile = "Dockerfile"
@@ -34,9 +19,9 @@ target "bookworm-latest-build" {
     BUILD_DATE = "${BUILD_DATE}"
     DISTRO_NAME = "bookworm"
   }
-  tags      = ["bookworm/${BOOKWORM_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = ["linux/amd64", "linux/386", "linux/arm64"]
   output    = [{ type = "docker" }]
+  tags      = ["bookworm/latest/bookworm:${BUILD_DATE}"]
 }
 
 target "bookworm-latest-push" {
@@ -46,35 +31,16 @@ target "bookworm-latest-push" {
     BUILD_DATE = "${BUILD_DATE}"
     DISTRO_NAME = "bookworm"
   }
-  tags      = ["registry.example.net/debian/bookworm:latest"]
   platforms = ["linux/amd64", "linux/386", "linux/arm64"]
   output    = [{ type = "registry" }]
+  tags      = [
+    "registry.example.net/debian/bookworm:latest",
+  ]
 }
 
 ##############################
 # BULLSEYE - bullseye latest #
 ##############################
-
-variable "BUILD_DATE" {
-  validation {
-    condition = BUILD_DATE != ""
-    error_message = "The variable 'BUILD_DATE' must not be empty."
-  }
-}
-
-variable "BULLSEYE_VERSION" {
-  validation {
-    condition = BULLSEYE_VERSION != ""
-    error_message = "The variable 'BULLSEYE_VERSION' must not be empty."
-  }
-}
-
-variable "DISTRO_NAME" {
-  validation {
-    condition = DISTRO_NAME != ""
-    error_message = "The variable 'DISTRO_NAME' must not be empty."
-  }
-}
 
 target "bullseye-latest-build" {
   dockerfile = "Dockerfile"
@@ -83,9 +49,9 @@ target "bullseye-latest-build" {
     BULLSEYE_VERSION = "latest"
     DISTRO_NAME = "bullseye"
   }
-  tags      = ["bullseye/${BULLSEYE_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = ["linux/amd64", "linux/386", "linux/arm64"]
   output    = [{ type = "docker" }]
+  tags      = ["bullseye/latest/bullseye:${BUILD_DATE}"]
 }
 
 target "bullseye-latest-push" {
@@ -95,35 +61,16 @@ target "bullseye-latest-push" {
     BULLSEYE_VERSION = "latest"
     DISTRO_NAME = "bullseye"
   }
-  tags      = ["registry.example.net/debian/bullseye:latest"]
   platforms = ["linux/amd64", "linux/386", "linux/arm64"]
   output    = [{ type = "registry" }]
+  tags      = [
+    "registry.example.net/debian/bullseye:latest",
+  ]
 }
 
 ##########################
 # BUSTER - buster latest #
 ##########################
-
-variable "BUILD_DATE" {
-  validation {
-    condition = BUILD_DATE != ""
-    error_message = "The variable 'BUILD_DATE' must not be empty."
-  }
-}
-
-variable "BUSTER_VERSION" {
-  validation {
-    condition = BUSTER_VERSION != ""
-    error_message = "The variable 'BUSTER_VERSION' must not be empty."
-  }
-}
-
-variable "DISTRO_NAME" {
-  validation {
-    condition = DISTRO_NAME != ""
-    error_message = "The variable 'DISTRO_NAME' must not be empty."
-  }
-}
 
 target "buster-latest-build" {
   dockerfile = "Dockerfile"
@@ -132,9 +79,9 @@ target "buster-latest-build" {
     BUSTER_VERSION = "latest"
     DISTRO_NAME = "buster"
   }
-  tags      = ["buster/${BUSTER_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = ["linux/amd64", "linux/386", "linux/arm64"]
   output    = [{ type = "docker" }]
+  tags      = ["buster/latest/buster:${BUILD_DATE}"]
 }
 
 target "buster-latest-push" {
@@ -144,35 +91,16 @@ target "buster-latest-push" {
     BUSTER_VERSION = "latest"
     DISTRO_NAME = "buster"
   }
-  tags      = ["registry.example.net/debian/buster:latest"]
   platforms = ["linux/amd64", "linux/386", "linux/arm64"]
   output    = [{ type = "registry" }]
+  tags      = [
+    "registry.example.net/debian/buster:latest",
+  ]
 }
 
 ############################
 # STRETCH - stretch latest #
 ############################
-
-variable "BUILD_DATE" {
-  validation {
-    condition = BUILD_DATE != ""
-    error_message = "The variable 'BUILD_DATE' must not be empty."
-  }
-}
-
-variable "DISTRO_NAME" {
-  validation {
-    condition = DISTRO_NAME != ""
-    error_message = "The variable 'DISTRO_NAME' must not be empty."
-  }
-}
-
-variable "STRETCH_VERSION" {
-  validation {
-    condition = STRETCH_VERSION != ""
-    error_message = "The variable 'STRETCH_VERSION' must not be empty."
-  }
-}
 
 target "stretch-latest-build" {
   dockerfile = "Dockerfile"
@@ -181,9 +109,9 @@ target "stretch-latest-build" {
     DISTRO_NAME = "stretch"
     STRETCH_VERSION = "latest"
   }
-  tags      = ["stretch/${STRETCH_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = ["linux/amd64", "linux/386", "linux/arm64"]
   output    = [{ type = "docker" }]
+  tags      = ["stretch/latest/stretch:${BUILD_DATE}"]
 }
 
 target "stretch-latest-push" {
@@ -193,35 +121,16 @@ target "stretch-latest-push" {
     DISTRO_NAME = "stretch"
     STRETCH_VERSION = "latest"
   }
-  tags      = ["registry.example.net/debian/stretch:latest"]
   platforms = ["linux/amd64", "linux/386", "linux/arm64"]
   output    = [{ type = "registry" }]
+  tags      = [
+    "registry.example.net/debian/stretch:latest",
+  ]
 }
 
 ##########################
 # JESSIE - jessie latest #
 ##########################
-
-variable "BUILD_DATE" {
-  validation {
-    condition = BUILD_DATE != ""
-    error_message = "The variable 'BUILD_DATE' must not be empty."
-  }
-}
-
-variable "DISTRO_NAME" {
-  validation {
-    condition = DISTRO_NAME != ""
-    error_message = "The variable 'DISTRO_NAME' must not be empty."
-  }
-}
-
-variable "JESSIE_VERSION" {
-  validation {
-    condition = JESSIE_VERSION != ""
-    error_message = "The variable 'JESSIE_VERSION' must not be empty."
-  }
-}
 
 target "jessie-latest-build" {
   dockerfile = "Dockerfile"
@@ -230,9 +139,9 @@ target "jessie-latest-build" {
     DISTRO_NAME = "jessie"
     JESSIE_VERSION = "latest"
   }
-  tags      = ["jessie/${JESSIE_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = ["linux/amd64", "linux/386"]
   output    = [{ type = "docker" }]
+  tags      = ["jessie/latest/jessie:${BUILD_DATE}"]
 }
 
 target "jessie-latest-push" {
@@ -242,35 +151,16 @@ target "jessie-latest-push" {
     DISTRO_NAME = "jessie"
     JESSIE_VERSION = "latest"
   }
-  tags      = ["registry.example.net/debian/jessie:latest"]
   platforms = ["linux/amd64", "linux/386"]
   output    = [{ type = "registry" }]
+  tags      = [
+    "registry.example.net/debian/jessie:latest",
+  ]
 }
 
 ##########################
 # WHEEZY - wheezy latest #
 ##########################
-
-variable "BUILD_DATE" {
-  validation {
-    condition = BUILD_DATE != ""
-    error_message = "The variable 'BUILD_DATE' must not be empty."
-  }
-}
-
-variable "DISTRO_NAME" {
-  validation {
-    condition = DISTRO_NAME != ""
-    error_message = "The variable 'DISTRO_NAME' must not be empty."
-  }
-}
-
-variable "WHEEZY_VERSION" {
-  validation {
-    condition = WHEEZY_VERSION != ""
-    error_message = "The variable 'WHEEZY_VERSION' must not be empty."
-  }
-}
 
 target "wheezy-latest-build" {
   dockerfile = "Dockerfile"
@@ -279,9 +169,9 @@ target "wheezy-latest-build" {
     DISTRO_NAME = "wheezy"
     WHEEZY_VERSION = "latest"
   }
-  tags      = ["wheezy/${WHEEZY_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = ["linux/amd64", "linux/386"]
   output    = [{ type = "docker" }]
+  tags      = ["wheezy/latest/wheezy:${BUILD_DATE}"]
 }
 
 target "wheezy-latest-push" {
@@ -291,35 +181,16 @@ target "wheezy-latest-push" {
     DISTRO_NAME = "wheezy"
     WHEEZY_VERSION = "latest"
   }
-  tags      = ["registry.example.net/debian/wheezy:latest"]
   platforms = ["linux/amd64", "linux/386"]
   output    = [{ type = "registry" }]
+  tags      = [
+    "registry.example.net/debian/wheezy:latest",
+  ]
 }
 
 ############################
 # SQUEEZE - squeeze latest #
 ############################
-
-variable "BUILD_DATE" {
-  validation {
-    condition = BUILD_DATE != ""
-    error_message = "The variable 'BUILD_DATE' must not be empty."
-  }
-}
-
-variable "DISTRO_NAME" {
-  validation {
-    condition = DISTRO_NAME != ""
-    error_message = "The variable 'DISTRO_NAME' must not be empty."
-  }
-}
-
-variable "SQUEEZE_VERSION" {
-  validation {
-    condition = SQUEEZE_VERSION != ""
-    error_message = "The variable 'SQUEEZE_VERSION' must not be empty."
-  }
-}
 
 target "squeeze-latest-build" {
   dockerfile = "Dockerfile"
@@ -328,9 +199,9 @@ target "squeeze-latest-build" {
     DISTRO_NAME = "squeeze"
     SQUEEZE_VERSION = "latest"
   }
-  tags      = ["squeeze/${SQUEEZE_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = ["linux/amd64", "linux/386"]
   output    = [{ type = "docker" }]
+  tags      = ["squeeze/latest/squeeze:${BUILD_DATE}"]
 }
 
 target "squeeze-latest-push" {
@@ -340,35 +211,16 @@ target "squeeze-latest-push" {
     DISTRO_NAME = "squeeze"
     SQUEEZE_VERSION = "latest"
   }
-  tags      = ["registry.example.net/debian/squeeze:latest"]
   platforms = ["linux/amd64", "linux/386"]
   output    = [{ type = "registry" }]
+  tags      = [
+    "registry.example.net/debian/squeeze:latest",
+  ]
 }
 
 ########################
 # LENNY - lenny latest #
 ########################
-
-variable "BUILD_DATE" {
-  validation {
-    condition = BUILD_DATE != ""
-    error_message = "The variable 'BUILD_DATE' must not be empty."
-  }
-}
-
-variable "DISTRO_NAME" {
-  validation {
-    condition = DISTRO_NAME != ""
-    error_message = "The variable 'DISTRO_NAME' must not be empty."
-  }
-}
-
-variable "LENNY_VERSION" {
-  validation {
-    condition = LENNY_VERSION != ""
-    error_message = "The variable 'LENNY_VERSION' must not be empty."
-  }
-}
 
 target "lenny-latest-build" {
   dockerfile = "Dockerfile"
@@ -377,9 +229,9 @@ target "lenny-latest-build" {
     DISTRO_NAME = "lenny"
     LENNY_VERSION = "latest"
   }
-  tags      = ["lenny/${LENNY_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = ["linux/amd64", "linux/386"]
   output    = [{ type = "docker" }]
+  tags      = ["lenny/latest/lenny:${BUILD_DATE}"]
 }
 
 target "lenny-latest-push" {
@@ -389,7 +241,9 @@ target "lenny-latest-push" {
     DISTRO_NAME = "lenny"
     LENNY_VERSION = "latest"
   }
-  tags      = ["registry.example.net/debian/lenny:latest"]
   platforms = ["linux/amd64", "linux/386"]
   output    = [{ type = "registry" }]
+  tags      = [
+    "registry.example.net/debian/lenny:latest",
+  ]
 }

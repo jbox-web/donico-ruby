@@ -1,22 +1,18 @@
 # !!! THIS IS A GENERATED FILE !!! DON'T EDIT ME MANUALLY !!!
 # Instead edit donico.yml and run bin/rake generate-files
 
+variable "BUILD_DATE" {
+  validation {
+    condition = BUILD_DATE != ""
+    error_message = "The variable 'BUILD_DATE' must not be empty."
+  }
+}
 <%- images.each do |image| %>
 <%- comments = (image.distro.size + image.name.size + image.version.size + 8).times.map { "#" }.join('') -%>
 <%= comments %>
 # <%= image.distro.upcase %> - <%= image.name %> <%= image.version %> #
 <%= comments %>
 
-<%- image.build_args.each do |arg| -%>
-<%- name, value = arg.split('=', 2) -%>
-variable "<%= name %>" {
-  validation {
-    condition = <%= name %> != ""
-    error_message = "The variable '<%= name %>' must not be empty."
-  }
-}
-
-<%- end -%>
 target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-build" {
   dockerfile = "<%= image.dockerfile %>"
   args = {
@@ -29,9 +25,9 @@ target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-build" {
     <%- end -%>
     <%- end -%>
   }
-  tags      = ["<%= image.name %>/${<%= image.version_env_var %>}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = <%= image.archs %>
   output    = [{ type = "docker" }]
+  tags      = ["<%= image.name %>/<%= image.version %>/<%= image.distro %>:${BUILD_DATE}"]
 }
 
 target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-push" {
@@ -46,8 +42,12 @@ target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-push" {
     <%- end -%>
     <%- end -%>
   }
-  tags      = <%= image.prod_tags %>
   platforms = <%= image.archs %>
   output    = [{ type = "registry" }]
+  tags      = [
+  <%- image.prod_tags.each do |tag| -%>
+    "<%= tag %>",
+  <%- end -%>
+  ]
 }
 <%- end -%>

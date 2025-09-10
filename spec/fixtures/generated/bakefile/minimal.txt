@@ -1,11 +1,6 @@
 # !!! THIS IS A GENERATED FILE !!! DON'T EDIT ME MANUALLY !!!
 # Instead edit donico.yml and run bin/rake generate-files
 
-
-#######################
-# BUSTER - foo latest #
-#######################
-
 variable "BUILD_DATE" {
   validation {
     condition = BUILD_DATE != ""
@@ -13,19 +8,9 @@ variable "BUILD_DATE" {
   }
 }
 
-variable "DISTRO_NAME" {
-  validation {
-    condition = DISTRO_NAME != ""
-    error_message = "The variable 'DISTRO_NAME' must not be empty."
-  }
-}
-
-variable "FOO_VERSION" {
-  validation {
-    condition = FOO_VERSION != ""
-    error_message = "The variable 'FOO_VERSION' must not be empty."
-  }
-}
+#######################
+# BUSTER - foo latest #
+#######################
 
 target "buster-latest-build" {
   dockerfile = "Dockerfile"
@@ -34,9 +19,9 @@ target "buster-latest-build" {
     DISTRO_NAME = "buster"
     FOO_VERSION = "latest"
   }
-  tags      = ["foo/${FOO_VERSION}/${DISTRO_NAME}:${BUILD_DATE}"]
   platforms = ["linux/amd64"]
   output    = [{ type = "docker" }]
+  tags      = ["foo/latest/buster:${BUILD_DATE}"]
 }
 
 target "buster-latest-push" {
@@ -46,7 +31,9 @@ target "buster-latest-push" {
     DISTRO_NAME = "buster"
     FOO_VERSION = "latest"
   }
-  tags      = ["registry.example.net/images/base/foo:latest-buster"]
   platforms = ["linux/amd64"]
   output    = [{ type = "registry" }]
+  tags      = [
+    "registry.example.net/images/base/foo:latest-buster",
+  ]
 }
