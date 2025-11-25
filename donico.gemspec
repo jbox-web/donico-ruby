@@ -29,6 +29,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency "bundler",  ">= 2.7"
   s.add_dependency "dotenv",   "3.1.8"
-  s.add_dependency "rake",     "13.3.0"
+  s.add_dependency "rake",     "13.3.1"
   s.add_dependency "zeitwerk", "2.7.3"
 end
