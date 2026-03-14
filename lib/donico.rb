@@ -146,4 +146,4 @@ end
 Rake::DSL.include(Donico::Rake::Hooks) if defined?(Rake::DSL)
 
 # Load our hooks in mainObject
-include Donico::Rake::Hooks unless self.class.included_modules.include?(Donico::Rake::Hooks) # rubocop:disable Style/MixinUsage
+include Donico::Rake::Hooks unless self.class.include?(Donico::Rake::Hooks) # rubocop:disable Style/MixinUsage
