@@ -13,4 +13,5 @@ lint-commits:
   stage: lint
 
   script:
+    - rm mise.toml
     - rake $CI_JOB_NAME
