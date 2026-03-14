@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# See: https://kvz.io/bash-best-practices.html
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# bin/rake release DONICO_RELEASE=true RUBYGEMS_HOST=$(GITLAB_PACKAGE_REGISTRY)
+# TODO: fix me when Gitlab issue is fixed
+# See: https://gitlab.com/gitlab-org/gitlab/-/issues/333607
+
+repo="https://gitlab.thetuxhouse.org/api/v4/projects/63/packages/generic"
+gem_name="donico"
+gem_version="$(echo ${CI_COMMIT_REF_NAME} | sed 's/^.//').gem"
+gem_release="${gem_name}-${gem_version}"
+url="${repo}/${gem_name}/${CI_COMMIT_REF_NAME}/${gem_release}"
+
+curl \
+  --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+  --upload-file pkg/${gem_release} \
+  "${url}"

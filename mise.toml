@@ -1,0 +1,38 @@
+[tools]
+ruby = '3.4.8'
+
+[settings.ruby]
+compile = false
+
+[vars]
+# Gem config
+GITLAB_PACKAGE_REGISTRY = "https://gitlab.thetuxhouse.org/api/v4/projects/63/packages/rubygems"
+
+# Dev tools config
+COMMIT_LINTER = "harbor.jbox-cloud.fr/jbox/base/commitlint:latest"
+
+[tasks.deps]
+description = "Install dependencies"
+run = "bundle install"
+
+[tasks.test]
+description = "Run RSpec"
+run = "bin/rspec"
+
+[tasks.build]
+description = "Build Donico gem"
+run = "bin/rake build DONICO_RELEASE=true"
+
+[tasks.push]
+description = "Push Donico gem"
+run = "bin/push"
+
+[tasks.lint-commits]
+description = "Lint commits"
+run = '''
+docker run --pull always --rm -v "${PWD}:/app" {{vars.COMMIT_LINTER}} commitlint /app && echo "Commits are OK!"
+'''
+
+[tasks.lint-project]
+description = "Lint project"
+run = "bin/rubocop"
