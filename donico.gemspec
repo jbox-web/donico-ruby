@@ -27,8 +27,8 @@ Gem::Specification.new do |s|
   s.bindir      = "exe"
   s.executables = ["inspec"]
 
-  s.add_dependency "bundler",  "~> 2.7"
+  s.add_dependency "bundler",  "~> 4.0"
   s.add_dependency "dotenv",   "3.2.0"
   s.add_dependency "rake",     "13.3.1"
-  s.add_dependency "zeitwerk", "2.7.3"
+  s.add_dependency "zeitwerk", "2.7.5"
 end
