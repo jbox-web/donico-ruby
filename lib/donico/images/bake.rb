@@ -24,7 +24,7 @@ module Donico
 
 
       def build_args
-        (@build_args + ["DISTRO_NAME=#{distro}", "BUILD_DATE=#{timestamp}", "#{version_env_var}=#{version}"]).sort
+        (@build_args + base_args).sort
       end
 
 
@@ -44,7 +44,7 @@ module Donico
 
 
       def test_args
-        (@build_args + @test_args + ["DISTRO_NAME=#{distro}", "BUILD_DATE=#{timestamp}", "#{version_env_var}=#{version}"]).sort.map(&:downcase)
+        (@build_args + @test_args + base_args).sort.map(&:downcase)
       end
 
 

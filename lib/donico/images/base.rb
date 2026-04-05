@@ -72,6 +72,11 @@ module Donico
       end
       # rubocop:enable Style/RedundantBegin, Style/ParallelAssignment
 
+
+      def base_args
+        ["DISTRO_NAME=#{distro}", "BUILD_DATE=#{timestamp}", "#{version_env_var}=#{version}"]
+      end
+
     end
   end
 end
