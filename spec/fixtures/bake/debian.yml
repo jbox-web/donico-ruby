@@ -1,8 +1,6 @@
 ---
 registry: registry.example.net/debian
-# image_name: alertmanager
 image_builder: bake
-earthly_version: 0.7
 
 matrix:
 
