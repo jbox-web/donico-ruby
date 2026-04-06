@@ -16,3 +16,8 @@ matrix:
       - latest
       - "%<version>s"
       - "%<version>s-%<distro>s"
+    secret_envs:
+      - id: GITHUB_TOKEN
+    secret_files:
+      - id: aws
+        src: "${HOME}/.aws/credentials"

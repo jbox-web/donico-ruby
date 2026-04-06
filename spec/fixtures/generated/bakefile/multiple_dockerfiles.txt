@@ -20,6 +20,12 @@ target "bullseye-3-2-0-build" {
     NODEJS_VERSION = "14.17.3"
     RUBY_VERSION = "3.2.0"
   }
+  secret = [
+    {
+      type = "env"
+      id = "GITHUB_TOKEN"
+    },
+  ]
   platforms = ["linux/amd64", "linux/arm64"]
   output    = [{ type = "docker" }]
   tags      = ["ruby/3.2.0/bullseye:${BUILD_DATE}"]
@@ -33,6 +39,12 @@ target "bullseye-3-2-0-push" {
     NODEJS_VERSION = "14.17.3"
     RUBY_VERSION = "3.2.0"
   }
+  secret = [
+    {
+      type = "env"
+      id = "GITHUB_TOKEN"
+    },
+  ]
   platforms = ["linux/amd64", "linux/arm64"]
   output    = [{ type = "registry" }]
   tags      = [
@@ -53,6 +65,13 @@ target "buster-3-1-3-build" {
     NODEJS_VERSION = "14.17.3"
     RUBY_VERSION = "3.1.3"
   }
+  secret = [
+    {
+      type = "file"
+      id = "aws"
+      src = "${HOME}/.aws/credentials"
+    },
+  ]
   platforms = ["linux/amd64"]
   output    = [{ type = "docker" }]
   tags      = ["ruby/3.1.3/buster:${BUILD_DATE}"]
@@ -66,6 +85,13 @@ target "buster-3-1-3-push" {
     NODEJS_VERSION = "14.17.3"
     RUBY_VERSION = "3.1.3"
   }
+  secret = [
+    {
+      type = "file"
+      id = "aws"
+      src = "${HOME}/.aws/credentials"
+    },
+  ]
   platforms = ["linux/amd64"]
   output    = [{ type = "registry" }]
   tags      = [

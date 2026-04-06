@@ -61,6 +61,8 @@ RSpec.describe Donico do
             test_args:  [
               "RUBYGEM_VERSION=3.2.24",
             ],
+            secret_envs: [],
+            secret_files: [],
             tags:       [
               "latest",
               "%<version>s",

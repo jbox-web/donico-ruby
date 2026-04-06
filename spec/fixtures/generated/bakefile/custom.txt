@@ -21,6 +21,17 @@ target "buster-1-0-0-build" {
     FOO_BAR_VERSION = "1.0.0"
     NODEJS_VERSION = "14.17.3"
   }
+  secret = [
+    {
+      type = "env"
+      id = "GITHUB_TOKEN"
+    },
+    {
+      type = "file"
+      id = "aws"
+      src = "${HOME}/.aws/credentials"
+    },
+  ]
   platforms = ["linux/amd64"]
   output    = [{ type = "docker" }]
   tags      = ["foo-bar/1.0.0/buster:${BUILD_DATE}"]
@@ -35,6 +46,17 @@ target "buster-1-0-0-push" {
     FOO_BAR_VERSION = "1.0.0"
     NODEJS_VERSION = "14.17.3"
   }
+  secret = [
+    {
+      type = "env"
+      id = "GITHUB_TOKEN"
+    },
+    {
+      type = "file"
+      id = "aws"
+      src = "${HOME}/.aws/credentials"
+    },
+  ]
   platforms = ["linux/amd64"]
   output    = [{ type = "registry" }]
   tags      = [

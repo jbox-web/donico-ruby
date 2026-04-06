@@ -24,19 +24,21 @@ module Donico
         end
       end
 
-      attr_reader :name, :registry, :distro, :version, :timestamp, :tags, :dockerfile
+      attr_reader :name, :registry, :distro, :version, :timestamp, :tags, :dockerfile, :secret_envs, :secret_files
 
       # rubocop:disable Metrics/ParameterLists
-      def initialize(name:, registry:, distro:, version:, timestamp:, tags:, dockerfile:, build_args:, test_args:)
-        @name       = name
-        @registry   = registry
-        @distro     = distro
-        @version    = version
-        @timestamp  = timestamp
-        @tags       = tags
-        @dockerfile = dockerfile
-        @build_args = build_args
-        @test_args  = test_args
+      def initialize(name:, registry:, distro:, version:, timestamp:, tags:, dockerfile:, build_args:, test_args:, secret_envs:, secret_files:) # rubocop:disable Metrics/MethodLength
+        @name         = name
+        @registry     = registry
+        @distro       = distro
+        @version      = version
+        @timestamp    = timestamp
+        @tags         = tags
+        @dockerfile   = dockerfile
+        @build_args   = build_args
+        @test_args    = test_args
+        @secret_envs  = secret_envs
+        @secret_files = secret_files
       end
       # rubocop:enable Metrics/ParameterLists
 
@@ -45,6 +47,11 @@ module Donico
       def version_env_var
         env_var = underscore(name).upcase
         "#{env_var}_VERSION"
+      end
+
+
+      def secrets?
+        !@secret_envs.empty? || !@secret_files.empty?
       end
 
 

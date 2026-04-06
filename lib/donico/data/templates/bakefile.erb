@@ -25,6 +25,23 @@ target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-build" {
     <%- end -%>
     <%- end -%>
   }
+  <%- if image.secrets? -%>
+  secret = [
+    <%- image.secret_envs.each do |secret| -%>
+    {
+      type = "env"
+      id = "<%= secret["id"] %>"
+    },
+    <%- end -%>
+    <%- image.secret_files.each do |secret| -%>
+    {
+      type = "file"
+      id = "<%= secret["id"] %>"
+      src = "<%= secret["src"] %>"
+    },
+    <%- end -%>
+  ]
+  <%- end -%>
   platforms = <%= image.archs %>
   output    = [{ type = "docker" }]
   tags      = ["<%= image.name %>/<%= image.version %>/<%= image.distro %>:${BUILD_DATE}"]
@@ -42,6 +59,23 @@ target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-push" {
     <%- end -%>
     <%- end -%>
   }
+  <%- if image.secrets? -%>
+  secret = [
+    <%- image.secret_envs.each do |secret| -%>
+    {
+      type = "env"
+      id = "<%= secret["id"] %>"
+    },
+    <%- end -%>
+    <%- image.secret_files.each do |secret| -%>
+    {
+      type = "file"
+      id = "<%= secret["id"] %>"
+      src = "<%= secret["src"] %>"
+    },
+    <%- end -%>
+  ]
+  <%- end -%>
   platforms = <%= image.archs %>
   output    = [{ type = "registry" }]
   tags      = [

@@ -62,13 +62,15 @@ RSpec.describe Donico::Config do
       let(:matrix) do
         [
           {
-            archs:      ["linux/amd64"],
-            distro:     "buster",
-            version:    "1.0.0",
-            dockerfile: "foo/Dockerfile",
-            build_args: ["NODEJS_VERSION=14.17.3"],
-            test_args:  ["RUBYGEM_VERSION=3.2.24"],
-            tags:       [
+            archs:        ["linux/amd64"],
+            distro:       "buster",
+            version:      "1.0.0",
+            dockerfile:   "foo/Dockerfile",
+            build_args:   ["NODEJS_VERSION=14.17.3"],
+            test_args:    ["RUBYGEM_VERSION=3.2.24"],
+            secret_envs:  [],
+            secret_files: [],
+            tags:         [
               "latest",
               "%<version>s",
               "%<version>s-%<distro>s",

@@ -28,17 +28,19 @@ module Donico
       # rubocop:enable Metrics/MethodLength
     end
 
-    attr_reader :image_name, :version, :distro, :archs, :dockerfile, :build_args, :test_args, :tags
+    attr_reader :image_name, :version, :distro, :archs, :dockerfile, :build_args, :test_args, :secret_envs, :secret_files, :tags
 
     def initialize(opts = {})
-      @image_name = opts.fetch("image_name", nil)
-      @version    = opts.fetch("version", "latest").to_s
-      @distro     = opts.fetch("distro", "buster")
-      @archs      = opts.fetch("archs", ["linux/amd64"])
-      @dockerfile = opts.fetch("dockerfile", "Dockerfile")
-      @build_args = opts.fetch("build_args", [])
-      @test_args  = opts.fetch("test_args", [])
-      @tags       = opts.fetch("tags", ["%<version>s-%<distro>s"])
+      @image_name   = opts.fetch("image_name", nil)
+      @version      = opts.fetch("version", "latest").to_s
+      @distro       = opts.fetch("distro", "buster")
+      @archs        = opts.fetch("archs", ["linux/amd64"])
+      @dockerfile   = opts.fetch("dockerfile", "Dockerfile")
+      @build_args   = opts.fetch("build_args", [])
+      @test_args    = opts.fetch("test_args", [])
+      @secret_envs  = opts.fetch("secret_envs", [])
+      @secret_files = opts.fetch("secret_files", [])
+      @tags         = opts.fetch("tags", ["%<version>s-%<distro>s"])
     end
 
     def matrix_for(image_builder)
@@ -52,15 +54,17 @@ module Donico
       end
     end
 
-    def to_h
+    def to_h # rubocop:disable Metrics/MethodLength
       {
-        archs:      archs,
-        distro:     distro,
-        version:    version,
-        dockerfile: dockerfile,
-        build_args: build_args,
-        test_args:  test_args,
-        tags:       tags,
+        archs:        archs,
+        distro:       distro,
+        version:      version,
+        dockerfile:   dockerfile,
+        build_args:   build_args,
+        test_args:    test_args,
+        secret_envs:  secret_envs,
+        secret_files: secret_files,
+        tags:         tags,
       }
     end
   end
