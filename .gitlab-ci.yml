@@ -14,7 +14,7 @@ stages:
   - lint
   - test
   - build
-  - release
+  - push
 
 lint-commits:
   extends: .default
@@ -41,9 +41,9 @@ build:
     paths:
       - "pkg/*.gem"
 
-release:
+push:
   extends: .default
-  stage: release
+  stage: push
   before_script:
     - |
       mkdir -p ~/.gem
