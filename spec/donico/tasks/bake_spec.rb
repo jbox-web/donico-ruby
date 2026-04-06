@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe Donico::Tasks::Bake do
   before { Donico.load_config(get_fixture_path(fixture_file)) }
 
-  describe ".generate_earthfile" do
+  describe ".generate_bakefile" do
     let(:fixture_file) { "bake/custom.yml" }
 
     it "generates a valid Bakefile" do
