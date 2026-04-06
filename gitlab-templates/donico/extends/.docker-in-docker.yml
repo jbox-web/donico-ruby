@@ -17,29 +17,11 @@
     # CI_JOB_NAME looks like : 'build: [buster]', here we only need the first part (before ':')
     JOB_NAME=$(echo $CI_JOB_NAME | cut -d ':' -f 1)
 
-    if grep -q earthly donico.yml; then
-      echo "Earthly build detected"
-      echo "CMD: rake $DOCKER_DISTRO:$VERSION:$JOB_NAME"
-
-      # Setup qemu for multiarch builds
-      # See: https://docs.earthly.dev/docs/guides/multi-platform#linux
-      echo "Setup qemu for multiarch builds"
-      docker run --rm --privileged multiarch/qemu-user-static > /dev/null 2>&1 || true
-
-      # Use one earthly builder by distro to avoid errors during builds with empty caches
-      # docker: Error response from daemon: Conflict. The container name "/earthly-buildkitd" is already in use by container
-      # See: https://docs.earthly.dev/v/earthly-0.7/docs/earthly-command
-      export EARTHLY_INSTALLATION_NAME="earthly-$DOCKER_DISTRO"
-
-      # Run job CMD
-      rake "$DOCKER_DISTRO:$VERSION:$JOB_NAME"
-
-    elif grep -q bake donico.yml; then
+    if grep -q bake donico.yml; then
       echo "Docker Bake build detected"
       echo "CMD: rake $DOCKER_DISTRO:$VERSION:$JOB_NAME"
 
       # Setup qemu for multiarch builds
-      # See: https://docs.earthly.dev/docs/guides/multi-platform#linux
       echo "Setup qemu for multiarch builds"
       docker run --rm --privileged tonistiigi/binfmt --install all > /dev/null 2>&1 || true
 

@@ -43,27 +43,26 @@ RSpec.describe Donico do
         docker_image_name: "foo",
         docker_image_tag:  nil,
         image_builder:     "docker",
-        earthly_version:   "0.6",
         commit_linter:     Donico::DEFAULT_COMMIT_LINTER,
         docker_linter:     Donico::DEFAULT_DOCKER_LINTER,
         matrix:            [
           {
-            distro:     "buster",
-            dockerfile: "Dockerfile",
-            version:    "1.0.0",
-            archs:      [
+            distro:       "buster",
+            dockerfile:   "Dockerfile",
+            version:      "1.0.0",
+            archs:        [
               "linux/amd64",
             ],
-            build_args: [
+            build_args:   [
               "NODEJS_VERSION=14.17.3",
               "FOO=BAR",
             ],
-            test_args:  [
+            test_args:    [
               "RUBYGEM_VERSION=3.2.24",
             ],
-            secret_envs: [],
+            secret_envs:  [],
             secret_files: [],
-            tags:       [
+            tags:         [
               "latest",
               "%<version>s",
               "%<version>s-%<distro>s",

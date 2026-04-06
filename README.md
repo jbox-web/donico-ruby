@@ -103,7 +103,7 @@ Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`, `
 
 Donico ajoute également des commandes utilitaires :
 
-* `rake generate-files` : pour générer les fichiers de configuration pour Earthly et GitlabCI (voir plus bas [Intégration avec GitlabCI](#intégration-avec-gitlabci))
+* `rake generate-files` : pour générer les fichiers de configuration pour Docker Bake et GitlabCI (voir plus bas [Intégration avec GitlabCI](#intégration-avec-gitlabci))
 * `rake lint-commits` : pour linter les commits
 * `rake lint-dockerfile` : pour linter le `Dockerfile`
 * `rake version` : pour afficher la version de Donico

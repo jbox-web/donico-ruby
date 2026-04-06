@@ -25,15 +25,12 @@ end
 # RELEASE section #
 ###################
 
-desc "Generate GitlabCI matrix and Earthfile"
+desc "Generate GitlabCI matrix and Bakefile"
 task :"generate-files" do
   Donico::Matrix.generate(config: Donico.config)
   puts "GitlabCI Matrix file generated"
 
   case Donico.config.image_builder
-  when "earthly"
-    Donico::Tasks::Earthly.generate_earthfile
-    puts "Earthfile generated"
   when "bake"
     Donico::Tasks::Bake.generate_bakefile
     puts "Bakefile generated"

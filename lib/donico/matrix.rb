@@ -47,7 +47,7 @@ module Donico
       case image_builder
       when "docker"
         { "VERSION" => version, "DOCKER_DISTRO" => distro, "DOCKER_ARCH" => archs }
-      when "earthly", "bake"
+      when "bake"
         { "VERSION" => version, "DOCKER_DISTRO" => distro }
       else
         raise "Unknown image_builder: #{image_builder}"
