@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Nicolas Rodriguez"]
   s.email       = ["nicolas.rodriguez.externe@seetickets.fr"]
-  s.homepage    = "https://gitlab.digitick.net/infra/donico"
+  s.homepage    = "https://gitlab.thetuxhouse.org/docker-image-factory/donico-cli"
   s.summary     = "A gem to easily build Docker Images"
   s.description = "A gem to easily build Docker Images (like Kaniko)"
   s.license     = "MIT"

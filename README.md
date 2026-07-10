@@ -28,7 +28,7 @@ Ainsi, le fichier de configuration Donico suivant :
 
 ```yaml
 ---
-registry: registry.digitick.net/images/base
+registry: harbor.jbox-cloud.fr/jbox/base
 image_name: foo
 category: languages
 matrix:
@@ -96,8 +96,8 @@ Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`, `
 |-------------------------------------|------------|
 | `rake amd64:bullseye:3.0.1:build`   | `docker build -f Dockerfile --tag amd64/bullseye/foo-3.0.1:20210603 --build-arg ARCH=amd64 --build-arg DISTRO_NAME=bullseye --build-arg FOO_VERSION=3.0.1 .`
 | `rake amd64:bullseye:3.0.1:test`    | `bin/inspec amd64/bullseye/foo-3.0.1:20210603 3.0.1`
-| `rake amd64:bullseye:3.0.1:tag`     | `docker tag amd64/bullseye/foo-3.0.1:20210603 registry.digitick.net/images/base/amd64/bullseye/foo:3.0.1`
-| `rake amd64:bullseye:3.0.1:push`    | `docker push registry.digitick.net/images/base/amd64/bullseye/foo:3.0.1`
+| `rake amd64:bullseye:3.0.1:tag`     | `docker tag amd64/bullseye/foo-3.0.1:20210603 harbor.jbox-cloud.fr/jbox/base/foo:3.0.1-bullseye`
+| `rake amd64:bullseye:3.0.1:push`    | `docker push harbor.jbox-cloud.fr/jbox/base/foo:3.0.1-bullseye`
 | `rake amd64:bullseye:3.0.1:login`   | `docker run -it --rm amd64/bullseye/foo-3.0.1:20210603 /bin/bash`
 | `rake amd64:bullseye:3.0.1:clean`   | `docker rmi amd64/bullseye/foo-3.0.1:20210603`
 
@@ -120,7 +120,7 @@ Donico ajoute également des commandes utilitaires :
 source 'https://rubygems.org'
 
 # When in CI use the installed gem, otherwise use latest stable version
-opts = ENV.key?('CI') ? {} : { git: 'ssh://git@gitlab.digitick.net/infra/donico.git', tag: 'v1.6.0' }
+opts = ENV.key?('CI') ? {} : { git: 'ssh://git@gitlab.thetuxhouse.org/docker-image-factory/donico-cli.git', tag: 'v1.14.0' }
 gem 'donico', opts
 ```
 
@@ -146,7 +146,7 @@ Donico.load!
 
 ```yaml
 ---
-registry: registry.digitick.net/infra/base
+registry: harbor.jbox-cloud.fr/jbox/base
 image_name: skeleton
 ```
 
@@ -242,55 +242,35 @@ Supprime l'image que l'on vient de construire (ex: `amd64/bullseye/foo-3.0.1:202
 
 ## Intégration avec GitlabCI
 
-Donico fournit une image Docker pour s'intégrer facilement à GitlabCI.
+Donico fournit une image Docker ainsi qu'un ensemble de templates GitlabCI partagés (dans [`gitlab-templates/`](gitlab-templates/donico)) pour s'intégrer facilement à GitlabCI.
 
 Pour construire vos images Docker avec Donico dans GitlabCI il suffit :
 
-1. De générer la matrice pour GitlabCI
+1. De générer les fichiers de CI
 
 ```sh
-bin/rake generate-matrix
+bin/rake generate-files
 ```
 
-2. De configurer GitlabCI
+Cette commande génère `.gitlab-ci/extends/.matrix.yml` (la matrice de build) et, en mode `bake`, un `docker-bake.hcl`.
+
+2. De configurer GitlabCI en incluant les templates Donico
 
 `.gitlab-ci.yml` :
 
 ```yml
 ---
-.docker-in-docker:
-  # Use custom Docker image with Docker installed inside
-  image: registry.digitick.net/images/base/donico:latest
-
-  # Only use Gitlab runners with "dind" (Docker in Docker) tag
-  tags:
-    - dind
-
-  # Prepare build context
-  before_script:
-    # Login to Docker registry to push Docker image
-    - mkdir ~/.docker && echo $REGISTRY_DOCKER_TOKEN > ~/.docker/config.json && chmod 600 ~/.docker/config.json
-
-  # Build Debian images
-  script: |
-    # CI_JOB_NAME looks like : 'build: [buster]', here we only need the first part (before ':')
-    JOB_NAME=$(echo $CI_JOB_NAME | cut -d ':' -f 1)
-    # Job name that extends this job should match Rakefile recipe name.
-    rake "$DOCKER_ARCH:$DOCKER_DISTRO:$VERSION:$JOB_NAME"
-
-.image-push-rules:
-  # Only publish image when:
-  # - On master branch
-  # - CI was triggered through GitLab UI
-  # - CI was triggered through schedule
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_PIPELINE_SOURCE == "web"
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-
-# Include matrix build
 include:
-  - .gitlab-ci/extends/.matrix.yml
+  # Templates partagés fournis par Donico
+  - project: docker-image-factory/donico-cli
+    ref: master
+    file:
+      - gitlab-templates/donico/extends/.docker-in-docker.yml
+      - gitlab-templates/donico/extends/.image-push-rules.yml
+      - gitlab-templates/donico/stages/lint/commits.yml
+      - gitlab-templates/donico/stages/lint/dockerfile.yml
+  # Matrice générée par `bin/rake generate-files`
+  - local: .gitlab-ci/extends/.matrix.yml
 
 # Define stages to run
 stages:
@@ -300,39 +280,6 @@ stages:
   - tag
   - push
   - clean
-
-# Define tasks to run
-lint-commits:
-  stage: lint
-
-  # We can't access to $DOCKER_ARCH and $DOCKER_DISTRO here because
-  # the GitlabCI matrix is not loaded
-  # Anyway we don't care since it's just about mouting the current dir
-  # inside commitlint container and run commitlint
-  image: registry.digitick.net/images/base/amd64/buster/donico:latest
-
-  # Only use Gitlab runners with "dind" (Docker in Docker) tag
-  tags:
-    - dind
-
-  script:
-    - rake $CI_JOB_NAME
-
-lint-dockerfile:
-  stage: lint
-
-  # We can't access to $DOCKER_ARCH and $DOCKER_DISTRO here because
-  # the GitlabCI matrix is not loaded
-  # Anyway we don't care since it's just about mouting the current dir
-  # inside hadolint container and run hadolint
-  image: registry.digitick.net/images/base/amd64/buster/donico:latest
-
-  # Only use Gitlab runners with "dind" (Docker in Docker) tag
-  tags:
-    - dind
-
-  script:
-    - rake $CI_JOB_NAME
 
 build:
   stage: build
@@ -375,6 +322,10 @@ clean:
   needs:
     - push
 ```
+
+Les jobs `lint-commits` et `lint-dockerfile` sont fournis clés en main par les templates `stages/lint/*` inclus ci-dessus.
+
+Le template `.docker-in-docker` détecte automatiquement le backend (`docker` ou `bake`) et configure QEMU/buildx pour les builds multi-architecture en mode `bake`.
 
 ## Configuration
 
@@ -474,15 +425,15 @@ Grâce au côté dynamique de Ruby, il est possible de se hooker sur une tâche 
 
 L'image Docker de Donico utilise elle même ce système de hook (grâce à la méthode `before`) pour télécharger la gem Donico avant de l'installer dans l'image Docker :)
 
-Voir : https://gitlab.digitick.net/infra/docker-images/donico/-/blob/master/Rakefile#L14
+Voir : https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/donico/-/blob/master/Rakefile#L14
 
 * `redefine`
 
 Il est également possible de **redéfinir** complètement une tâche Donico grâce à la méthode `redefine` :)
 
-L'image Docker [gitlab-runner](https://gitlab.digitick.net/infra/docker-images/gitlab-runner) utilise cette méthode pour redéfinir complètement la tâche `inpsect` de Donico pour toutes les matrices afin d'implémenter des tests un peu plus sophistiqués.
+L'image Docker [gitlab-runner](https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/gitlab-runner) utilise cette méthode pour redéfinir complètement la tâche `inpsect` de Donico pour toutes les matrices afin d'implémenter des tests un peu plus sophistiqués.
 
-Voir : https://gitlab.digitick.net/infra/docker-images/gitlab-runner/-/blob/master/Rakefile#L13
+Voir : https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/gitlab-runner/-/blob/master/Rakefile#L13
 
 
 ## Variables d'environnement
@@ -493,13 +444,13 @@ Donico embarque la gem [Dotenv](https://github.com/bkeepers/dotenv) afin de donn
 
 L'image Docker de Donico utilise les variables d'environnement pour télécharger la gem Donico avant de l'installer dans l'image Docker :)
 
-Voir : https://gitlab.digitick.net/infra/docker-images/donico/-/blob/master/Rakefile#L25
+Voir : https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/donico/-/blob/master/Rakefile#L25
 
-L'image Docker [gitlab-runner](https://gitlab.digitick.net/infra/docker-images/gitlab-runner) utilise également les variables d'environnement
+L'image Docker [gitlab-runner](https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/gitlab-runner) utilise également les variables d'environnement
 
 Voir :
 
-* https://gitlab.digitick.net/infra/docker-images/gitlab-runner/-/blob/master/.gitlab-ci.yml#L37
-* https://gitlab.digitick.net/infra/docker-images/gitlab-runner/-/blob/master/Rakefile#L15
-* https://gitlab.digitick.net/infra/docker-images/gitlab-runner/-/blob/master/bin/inspec#L56
-* https://gitlab.digitick.net/infra/docker-images/gitlab-runner/-/blob/master/bin/spin-container#L12
+* https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/gitlab-runner/-/blob/master/.gitlab-ci.yml#L37
+* https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/gitlab-runner/-/blob/master/Rakefile#L15
+* https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/gitlab-runner/-/blob/master/bin/inspec#L56
+* https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/gitlab-runner/-/blob/master/bin/spin-container#L12

@@ -110,9 +110,9 @@ to `bin/inspec donico <build_tag> <test_args>`.
 
 ## Gotchas
 
-- The `README.md` is the user-facing doc for *consumers* and is partly stale
-  (e.g. it references `generate-matrix`; the real task is `generate-files`, and
-  registry paths point at the old `registry.digitick.net` host). Trust the code
-  over the README for task names and defaults.
+- The `README.md` is the user-facing doc for *consumers*. Task names, registry
+  host (`harbor.jbox-cloud.fr/jbox/base`) and CI templates were realigned with the
+  code; a few illustrative snippets may still lag behind exact flag output, so
+  trust the code for authoritative task names and defaults.
 - Bumping the version means editing `lib/donico/version.rb` only — the gemspec and
   everything else read `Donico::VERSION::STRING` from it.
