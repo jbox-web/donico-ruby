@@ -38,7 +38,7 @@ docker run --pull always --rm -v "${PWD}:/app" {{vars.COMMIT_LINTER}} bash -l -c
 description = "Lint project"
 run = "bin/rubocop"
 
-[tasks.lint-shell]
+[tasks."dev:lint-shell"]
 description = "Lint shell scripts"
 # -x follows the sourced library so exe/inspec is checked against it
 run = "shellcheck -x bash/*.sh exe/inspec bin/push"
