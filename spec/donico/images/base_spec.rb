@@ -59,6 +59,22 @@ RSpec.describe Donico::Images::Base do
     end
   end
 
+  describe ".build_image_from_matrix" do
+    # The class used to be resolved by building a string and running it through a
+    # vendored constantize, so an unsupported backend surfaced as an opaque
+    # "uninitialized constant Donico::Images::Buildkit".
+    it "returns the docker image class for the docker backend" do
+      expect(described_class.build_image_from_matrix(matrix: Donico.config.matrix.first, arch: "linux/amd64"))
+        .to be_a Donico::Images::Docker
+    end
+
+    it "returns the bake image class for the bake backend" do
+      Donico.load_config(get_fixture_path("bake/minimal.yml"))
+
+      expect(described_class.build_image_from_matrix(matrix: Donico.config.matrix.first)).to be_a Donico::Images::Bake
+    end
+  end
+
   describe "#secrets?" do
     it "is false when no secret is declared" do
       expect(image_named("foo").secrets?).to be false

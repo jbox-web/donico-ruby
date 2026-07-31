@@ -19,11 +19,19 @@ module Donico
           opts
         end
 
+        # Explicit table rather than building a constant name from the config and
+        # resolving it dynamically: that indirection needed a vendored constantize
+        # and turned any unsupported backend into an opaque NameError.
+        IMAGE_CLASSES = {
+          "docker" => -> { Donico::Images::Docker },
+          "bake"   => -> { Donico::Images::Bake },
+        }.freeze
+
         def build_image_from_matrix(matrix:, arch: nil)
           image_builder = Donico.config.image_builder
           opts          = build_options_for(matrix, image_builder, arch)
-          klass         = Donico::Utils.constantize("Donico::Images::#{image_builder.capitalize}")
-          klass.new(**opts)
+
+          IMAGE_CLASSES.fetch(image_builder).call.new(**opts)
         end
       end
 
