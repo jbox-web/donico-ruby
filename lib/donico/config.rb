@@ -18,6 +18,7 @@ module Donico
       @commit_linter     = config.fetch("commit_linter", Donico.default_commit_linter)
       @docker_linter     = config.fetch("docker_linter", Donico.default_docker_linter)
 
+      validate_image_names!
       warn_unsupported_secrets
     end
 
@@ -55,6 +56,17 @@ module Donico
     end
 
     private
+
+    # The name can come from the top level or from the matrix entry, but it has to
+    # come from somewhere: a nil name used to render tags with an empty segment
+    # ("/1.0.0/buster:20260731") and a version env var called "_VERSION".
+    def validate_image_names!
+      return if matrix.all? { |m| m.image_name || docker_image_name }
+
+      raise ConfigError,
+            "\nMissing image_name in donico.yml.\n" \
+            "Set it at the top level, or on every matrix entry.\n\n"
+    end
 
     # Only the bake template consumes secret_envs / secret_files. The docker
     # backend used to drop them without a word, so the build silently ran without

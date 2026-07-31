@@ -13,14 +13,25 @@ RSpec.describe Donico::Config do
       end
     end
 
-    # context "when value is not set" do
-    #   let(:config_file) { super().except("image_name") }
-    #   it "raises an error" do
-    #     expect do
-    #       config.docker_image_name
-    #     end.to raise_error(KeyError)
-    #   end
-    # end
+    # Without a name anywhere, tags used to render with an empty segment
+    # ("/1.0.0/buster:20260731") and the version env var became "_VERSION".
+    context "when neither the config nor the matrix names the image" do
+      let(:config_file) { super().except("image_name") }
+
+      it "raises an explicit error" do
+        expect { config }.to raise_error(Donico::ConfigError, /image_name/)
+      end
+    end
+
+    context "when only the matrix names the image" do
+      let(:config_file) do
+        super().except("image_name").merge("matrix" => [{ "version" => "1.0.0", "image_name" => "bookworm" }])
+      end
+
+      it "is accepted" do
+        expect { config }.not_to raise_error
+      end
+    end
   end
 
   describe "#docker_registry" do
