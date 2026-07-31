@@ -18,6 +18,10 @@ module Donico
         end
       end
 
+      # CAVEAT: `after` cannot wrap a task that ends with Donico.exec (build, test,
+      # clean, login, and push on the bake backend). Kernel.exec replaces the current
+      # process, so control never returns here and the block is silently skipped.
+      # Use `before` or `redefine` for those tasks.
       # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Style/RescueStandardError
       def after(*task_names, &new_task)
         options = task_names.last.is_a?(Hash) ? task_names.pop : {}
