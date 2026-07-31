@@ -11,11 +11,28 @@ set -o pipefail
 
 repo="https://gitlab.thetuxhouse.org/api/v4/projects/63/packages/generic"
 gem_name="donico"
-gem_version="$(echo ${CI_COMMIT_REF_NAME} | sed 's/^.//').gem"
-gem_release="${gem_name}-${gem_version}"
+
+# Strip the leading 'v' of the tag only when it is actually there:
+# 'sed s/^.//' used to eat the first character of any tag shape, silently
+# building a path to a package that was never produced.
+gem_version="${CI_COMMIT_REF_NAME#v}"
+gem_release="${gem_name}-${gem_version}.gem"
+gem_path="pkg/${gem_release}"
 url="${repo}/${gem_name}/${CI_COMMIT_REF_NAME}/${gem_release}"
 
+if [ ! -f "${gem_path}" ]; then
+  echo "Gem package not found: ${gem_path}" >&2
+  echo "The build stage must produce a package matching tag '${CI_COMMIT_REF_NAME}'." >&2
+  exit 1
+fi
+
+# --fail is what turns an HTTP 4xx/5xx into a non-zero exit status: without it
+# curl reports success on a rejected upload and the push job stays green while
+# nothing was published.
 curl \
+  --fail \
+  --show-error \
+  --silent \
   --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-  --upload-file pkg/${gem_release} \
+  --upload-file "${gem_path}" \
   "${url}"
