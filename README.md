@@ -10,8 +10,8 @@ Le fonctionnement de Donico repose sur un fichier de configuration : `donico.yml
 
 Ce fichier de configuration permet de définir des matrices d'images Docker en se basant sur plusieurs dimensions :
 
-* l'architecture cible (`i386`, `amd64`, `arm`)
-* la distribution cible (`strech`, `buster`, `bullseye`)
+* l'architecture cible (`linux/386`, `linux/amd64`, `linux/arm64`)
+* la distribution cible (`stretch`, `buster`, `bullseye`)
 * la version cible de l'application (`2.7.3`, `3.0.1`)
 
 ainsi que sur des actions prédéfinies par Donico :
@@ -30,72 +30,85 @@ Ainsi, le fichier de configuration Donico suivant :
 ---
 registry: harbor.jbox-cloud.fr/jbox/base
 image_name: foo
-category: languages
 matrix:
-  - version: 3.0.1
+  - version: "3.0.1"
     distro: bullseye
-    archs: [amd64, arm64]
+    archs: [linux/amd64, linux/arm64]
 
-  - version: 3.0.1
+  - version: "3.0.1"
     distro: buster
-    archs: [amd64, arm64]
+    archs: [linux/amd64, linux/arm64]
 
-  - version: 2.7.3
+  - version: "2.7.3"
     distro: buster
-    archs: [amd64]
+    archs: [linux/amd64]
 
-  - version: 2.6.8
+  - version: "2.6.8"
     distro: stretch
-    archs: [i386]
+    archs: [linux/386]
 ```
+
+> **Quotez toujours `version`.** YAML convertit une valeur non quotée comme
+> `version: 3.10` en flottant `3.1` : l'image serait construite **et taguée** en
+> `3.1`. Donico refuse désormais une version non textuelle plutôt que de laisser
+> passer l'erreur.
 
 générera la matrice d'actions Rake suivante :
 
 ```sh
-  rake amd64:bullseye:3.0.1:build    # Build docker image for amd64/bullseye/3.0.1
-  rake amd64:bullseye:3.0.1:clean    # Clean docker image for amd64/bullseye/3.0.1
-  rake amd64:bullseye:3.0.1:login    # Inspect docker image for amd64/bullseye/3.0.1
-  rake amd64:bullseye:3.0.1:push     # Push docker image for amd64/bullseye/3.0.1
-  rake amd64:bullseye:3.0.1:tag      # Tag docker image for amd64/bullseye/3.0.1
-  rake amd64:bullseye:3.0.1:test     # Test docker image for amd64/bullseye/3.0.1
-  rake amd64:buster:2.7.3:build      # Build docker image for amd64/buster/2.7.3
-  rake amd64:buster:2.7.3:clean      # Clean docker image for amd64/buster/2.7.3
-  rake amd64:buster:2.7.3:login      # Inspect docker image for amd64/buster/2.7.3
-  rake amd64:buster:2.7.3:push       # Push docker image for amd64/buster/2.7.3
-  rake amd64:buster:2.7.3:tag        # Tag docker image for amd64/buster/2.7.3
-  rake amd64:buster:2.7.3:test       # Test docker image for amd64/buster/2.7.3
-  rake amd64:buster:3.0.1:build      # Build docker image for amd64/buster/3.0.1
-  rake amd64:buster:3.0.1:clean      # Clean docker image for amd64/buster/3.0.1
-  rake amd64:buster:3.0.1:login      # Inspect docker image for amd64/buster/3.0.1
-  rake amd64:buster:3.0.1:push       # Push docker image for amd64/buster/3.0.1
-  rake amd64:buster:3.0.1:tag        # Tag docker image for amd64/buster/3.0.1
-  rake amd64:buster:3.0.1:test       # Test docker image for amd64/buster/3.0.1
-  rake arm64:bullseye:3.0.1:build    # Build docker image for arm64/bullseye/3.0.1
-  rake arm64:bullseye:3.0.1:clean    # Clean docker image for arm64/bullseye/3.0.1
-  rake arm64:bullseye:3.0.1:login    # Inspect docker image for arm64/bullseye/3.0.1
-  rake arm64:bullseye:3.0.1:push     # Push docker image for arm64/bullseye/3.0.1
-  rake arm64:bullseye:3.0.1:tag      # Tag docker image for arm64/bullseye/3.0.1
-  rake arm64:bullseye:3.0.1:test     # Test docker image for arm64/bullseye/3.0.1
-  rake arm64:buster:3.0.1:build      # Build docker image for arm64/buster/3.0.1
-  rake arm64:buster:3.0.1:clean      # Clean docker image for arm64/buster/3.0.1
-  rake arm64:buster:3.0.1:login      # Inspect docker image for arm64/buster/3.0.1
-  rake arm64:buster:3.0.1:push       # Push docker image for arm64/buster/3.0.1
-  rake arm64:buster:3.0.1:tag        # Tag docker image for arm64/buster/3.0.1
-  rake arm64:buster:3.0.1:test       # Test docker image for arm64/buster/3.0.1
-  rake i386:stretch:2.6.8:build      # Build docker image for i386/stretch/2.6.8
-  rake i386:stretch:2.6.8:clean      # Clean docker image for i386/stretch/2.6.8
-  rake i386:stretch:2.6.8:login      # Inspect docker image for i386/stretch/2.6.8
-  rake i386:stretch:2.6.8:push       # Push docker image for i386/stretch/2.6.8
-  rake i386:stretch:2.6.8:tag        # Tag docker image for i386/stretch/2.6.8
-  rake i386:stretch:2.6.8:test       # Test docker image for i386/stretch/2.6.8
+  bin/rake 386:stretch:2.6.8:build     # Build docker image for linux/386/stretch/2.6.8
+  bin/rake 386:stretch:2.6.8:clean     # Clean docker image for linux/386/stretch/2.6.8
+  bin/rake 386:stretch:2.6.8:login     # Login into docker image for linux/386/stretch/2.6.8
+  bin/rake 386:stretch:2.6.8:push      # Push docker image for linux/386/stretch/2.6.8
+  bin/rake 386:stretch:2.6.8:tag       # Tag docker image for linux/386/stretch/2.6.8
+  bin/rake 386:stretch:2.6.8:test      # Test docker image for linux/386/stretch/2.6.8
+  bin/rake amd64:bullseye:3.0.1:build  # Build docker image for linux/amd64/bullseye/3.0.1
+  bin/rake amd64:bullseye:3.0.1:clean  # Clean docker image for linux/amd64/bullseye/3.0.1
+  bin/rake amd64:bullseye:3.0.1:login  # Login into docker image for linux/amd64/bullseye/3.0.1
+  bin/rake amd64:bullseye:3.0.1:push   # Push docker image for linux/amd64/bullseye/3.0.1
+  bin/rake amd64:bullseye:3.0.1:tag    # Tag docker image for linux/amd64/bullseye/3.0.1
+  bin/rake amd64:bullseye:3.0.1:test   # Test docker image for linux/amd64/bullseye/3.0.1
+  bin/rake amd64:buster:2.7.3:build    # Build docker image for linux/amd64/buster/2.7.3
+  bin/rake amd64:buster:2.7.3:clean    # Clean docker image for linux/amd64/buster/2.7.3
+  bin/rake amd64:buster:2.7.3:login    # Login into docker image for linux/amd64/buster/2.7.3
+  bin/rake amd64:buster:2.7.3:push     # Push docker image for linux/amd64/buster/2.7.3
+  bin/rake amd64:buster:2.7.3:tag      # Tag docker image for linux/amd64/buster/2.7.3
+  bin/rake amd64:buster:2.7.3:test     # Test docker image for linux/amd64/buster/2.7.3
+  bin/rake amd64:buster:3.0.1:build    # Build docker image for linux/amd64/buster/3.0.1
+  bin/rake amd64:buster:3.0.1:clean    # Clean docker image for linux/amd64/buster/3.0.1
+  bin/rake amd64:buster:3.0.1:login    # Login into docker image for linux/amd64/buster/3.0.1
+  bin/rake amd64:buster:3.0.1:push     # Push docker image for linux/amd64/buster/3.0.1
+  bin/rake amd64:buster:3.0.1:tag      # Tag docker image for linux/amd64/buster/3.0.1
+  bin/rake amd64:buster:3.0.1:test     # Test docker image for linux/amd64/buster/3.0.1
+  bin/rake arm64:bullseye:3.0.1:build  # Build docker image for linux/arm64/bullseye/3.0.1
+  bin/rake arm64:bullseye:3.0.1:clean  # Clean docker image for linux/arm64/bullseye/3.0.1
+  bin/rake arm64:bullseye:3.0.1:login  # Login into docker image for linux/arm64/bullseye/3.0.1
+  bin/rake arm64:bullseye:3.0.1:push   # Push docker image for linux/arm64/bullseye/3.0.1
+  bin/rake arm64:bullseye:3.0.1:tag    # Tag docker image for linux/arm64/bullseye/3.0.1
+  bin/rake arm64:bullseye:3.0.1:test   # Test docker image for linux/arm64/bullseye/3.0.1
+  bin/rake arm64:buster:3.0.1:build    # Build docker image for linux/arm64/buster/3.0.1
+  bin/rake arm64:buster:3.0.1:clean    # Clean docker image for linux/arm64/buster/3.0.1
+  bin/rake arm64:buster:3.0.1:login    # Login into docker image for linux/arm64/buster/3.0.1
+  bin/rake arm64:buster:3.0.1:push     # Push docker image for linux/arm64/buster/3.0.1
+  bin/rake arm64:buster:3.0.1:tag      # Tag docker image for linux/arm64/buster/3.0.1
+  bin/rake arm64:buster:3.0.1:test     # Test docker image for linux/arm64/buster/3.0.1
+  bin/rake generate-files              # Generate GitlabCI matrix and Bakefile
+  bin/rake image-builder               # Print the configured image builder
+  bin/rake lint-commits                # Lint commits
+  bin/rake lint-dockerfile             # Lint Dockerfile
+  bin/rake version                     # Version
 ```
+
+> Cette liste est la sortie exacte de `bin/rake` (tâche par défaut : `help`) pour
+> la configuration ci-dessus. En backend `bake`, la dimension architecture
+> disparaît des noms de tâches : `bin/rake bullseye:3.0.1:build`.
 
 Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`, `clean`) ne sont en fait que des wrappers autour de différentes commandes `docker` :
 
 | Commande                            | Traduction |
 |-------------------------------------|------------|
 | `rake amd64:bullseye:3.0.1:build`   | `docker build -f Dockerfile --tag amd64/bullseye/foo-3.0.1:20210603 --build-arg ARCH=amd64 --build-arg DISTRO_NAME=bullseye --build-arg FOO_VERSION=3.0.1 .`
-| `rake amd64:bullseye:3.0.1:test`    | `bin/inspec amd64/bullseye/foo-3.0.1:20210603 3.0.1`
+| `rake amd64:bullseye:3.0.1:test`    | `bin/inspec donico amd64/bullseye/foo-3.0.1:20210603 arch=amd64 build_date=20210603 distro_name=bullseye foo_version=3.0.1`
 | `rake amd64:bullseye:3.0.1:tag`     | `docker tag amd64/bullseye/foo-3.0.1:20210603 harbor.jbox-cloud.fr/jbox/base/foo:3.0.1-bullseye`
 | `rake amd64:bullseye:3.0.1:push`    | `docker push harbor.jbox-cloud.fr/jbox/base/foo:3.0.1-bullseye`
 | `rake amd64:bullseye:3.0.1:login`   | `docker run -it --rm amd64/bullseye/foo-3.0.1:20210603 /bin/bash`
@@ -105,8 +118,10 @@ Donico ajoute également des commandes utilitaires :
 
 * `rake generate-files` : pour générer les fichiers de configuration pour Docker Bake et GitlabCI (voir plus bas [Intégration avec GitlabCI](#intégration-avec-gitlabci))
 * `rake lint-commits` : pour linter les commits
-* `rake lint-dockerfile` : pour linter le `Dockerfile`
+* `rake lint-dockerfile` : pour linter le `Dockerfile` (sort en erreur si hadolint remonte une violation)
+* `rake image-builder` : pour afficher le backend configuré (`docker` ou `bake`) ; c'est ce qu'utilisent les templates GitlabCI pour choisir leur branche
 * `rake version` : pour afficher la version de Donico
+* `rake help` : la tâche par défaut, qui liste tout ce qui précède
 
 
 ## Installation
@@ -331,23 +346,42 @@ Le template `.docker-in-docker` détecte automatiquement le backend (`docker` ou
 
 Le fichier de configuration de Donico peut contenir les paramètres suivants :
 
-| Nom          | Type           | Requis | Défaut | Description
-|--------------|----------------|--------|--------|-------------
-| `registry`   | `string`       | `oui`  | *na*   | Le chemin vers le registry pour pousser l'image Docker
-| `image_name` | `string`       | `oui`  | *na*   | Le nom de l'image
-| `category`   | `string`       | `oui`  | *na*   | La catégorie de l'image : `tools|web|db|whatever` (pour la génération automatique de la documentation)
-| `matrix`     | `list[Matrix]` | `non`  | `[]`   | Une liste de `Matrix`
+| Nom             | Type           | Requis | Défaut     | Description
+|-----------------|----------------|--------|------------|-------------
+| `registry`      | `string`       | `oui`  | *na*       | Le chemin vers le registry pour pousser l'image Docker
+| `image_name`    | `string`       | `oui`* | *na*       | Le nom de l'image. *Requis ici **ou** sur chaque entrée de `matrix` ; la valeur de la matrice prime.
+| `image_builder` | `string`       | `non`  | `docker`   | Le backend de construction : `docker` ou `bake`. Toute autre valeur est refusée au chargement. En `bake`, la dimension architecture disparaît des noms de tâches et `generate-files` produit un `docker-bake.hcl`.
+| `commit_linter` | `string`       | `non`  | *image commitlint Donico* | L'image Docker utilisée par `rake lint-commits`
+| `docker_linter` | `string`       | `non`  | *image hadolint Donico*   | L'image Docker utilisée par `rake lint-dockerfile`
+| `matrix`        | `list[Matrix]` | `non`  | `[{}]`     | Une liste de `Matrix`
 
 `Matrix` :
 
-| Nom          | Type           | Requis | Défaut                       | Description
-|--------------|----------------|--------|------------------------------|-------------
-| `version`    | `string`       | `non`  | `latest`                     | La version de l'application à construire : `x.x.x|latest`
-| `distro`     | `string`       | `non`  | `buster`                     | Le nom de la distribution à utiliser pour la construction : `stretch|buster|whatever`
-| `archs`      | `list[string]` | `non`  | `[amd64]`                    | La liste des architectures à constuire : `[i386, amd64, whatever]`
-| `build_args` | `list[string]` | `non`  | `[]`                         | Une liste d'arguments à passer au moment du build (voir: [build-time variables](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg))
-| `test_args`  | `list[string]` | `non`  | `[]`                         | Une liste d'arguments à passer au moment des tests (voir: [Inspec inputs](https://docs.chef.io/inspec/inputs/))
-| `tags`       | `list[string]` | `non`  | `["%<version>s-%<distro>s"]` | La liste des tags à produire
+| Nom            | Type           | Requis | Défaut                       | Description
+|----------------|----------------|--------|------------------------------|-------------
+| `image_name`   | `string`       | `non`  | *`image_name` du top-level*  | Le nom de l'image pour cette entrée uniquement. Prime sur le `image_name` global.
+| `version`      | `string`       | `non`  | `latest`                     | La version de l'application à construire : `x.x.x` ou `latest`. **Doit être quotée** : YAML transformerait `3.10` en flottant `3.1`.
+| `distro`       | `string`       | `non`  | `buster`                     | Le nom de la distribution à utiliser pour la construction : `stretch`, `buster`, `bookworm`…
+| `archs`        | `list[string]` | `non`  | `["linux/amd64"]`            | La liste des plateformes à construire, au format `os/arch` : `[linux/386, linux/amd64, linux/arm64]`
+| `dockerfile`   | `string`       | `non`  | `Dockerfile`                 | Le chemin du Dockerfile à utiliser pour cette entrée (permet un Dockerfile par version)
+| `build_args`   | `list[string]` | `non`  | `[]`                         | Une liste d'arguments `CLÉ=VALEUR` à passer au moment du build (voir: [build-time variables](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg))
+| `test_args`    | `list[string]` | `non`  | `[]`                         | Une liste d'arguments `CLÉ=VALEUR` à passer au moment des tests (voir: [Inspec inputs](https://docs.chef.io/inspec/inputs/)). Seule la clé est minusculisée, la valeur est transmise telle quelle.
+| `secret_envs`  | `list[Secret]` | `non`  | `[]`                         | Secrets montés depuis l'environnement. Chaque entrée exige un `id`. **Backend `bake` uniquement** — un avertissement est émis en backend `docker`.
+| `secret_files` | `list[Secret]` | `non`  | `[]`                         | Secrets montés depuis un fichier. Chaque entrée exige un `id` et un `src`. **Backend `bake` uniquement**.
+| `tags`         | `list[string]` | `non`  | `["%<version>s-%<distro>s"]` | La liste des tags à produire
+
+Exemple de secrets (backend `bake`) :
+
+```yaml
+matrix:
+  - version: "3.4"
+    distro: bookworm
+    secret_envs:
+      - id: GITHUB_TOKEN
+    secret_files:
+      - id: aws
+        src: "${HOME}/.aws/credentials"
+```
 
 ### Déclarer la liste des tags à produire
 
@@ -358,9 +392,9 @@ Il suffit de déclarer une liste de tags via la clé `tags` :
 registry: registry.example.net/images/base
 image_name: foo
 matrix:
-  - version: 1.0.0
+  - version: "1.0.0"
     distro: buster
-    archs: [amd64]
+    archs: [linux/amd64]
     tags:
       - latest                                          # latest
       - "%<version>s"                                   # 1.0.0
@@ -374,10 +408,17 @@ Les tags peuvent être personnalisés grâce à des macros qui seront évaluées
 
 Les macros suivantes sont disponibles :
 
-* `%<arch>s`
-* `%<distro>s`
-* `%<version>s`
-* `%<timestamp>s`
+| Macro          | Backend `docker` | Backend `bake` |
+|----------------|------------------|----------------|
+| `%<version>s`  | ✅               | ✅             |
+| `%<distro>s`   | ✅               | ✅             |
+| `%<timestamp>s`| ✅               | ✅             |
+| `%<arch>s`     | ✅               | ❌ (bake résout lui-même la liste des plateformes : il n'y a pas d'architecture unique au moment du tag) |
+
+Les tags sont validés au chargement de `donico.yml` : une macro inconnue ou un `%`
+littéral est refusé avec un message nommant le tag fautif. Sans cette validation,
+un `%` littéral était silencieusement absorbé (`100%-slim` produisait
+`100{version: "1.0.0"}lim`).
 
 Voir : https://ruby-doc.org/core-3.0.2/Kernel.html#method-i-sprintf
 
@@ -392,9 +433,9 @@ Exemple:
 registry: registry.example.net/images/base
 image_name: foo
 matrix:
-  - version: 1.0.0
+  - version: "1.0.0"
     distro: buster
-    archs: [amd64]
+    archs: [linux/amd64]
     build_args:
       - FOO=BAR
 ```
@@ -410,9 +451,9 @@ Exemple:
 registry: registry.example.net/images/base
 image_name: foo
 matrix:
-  - version: 1.0.0
+  - version: "1.0.0"
     distro: buster
-    archs: [amd64]
+    archs: [linux/amd64]
     test_args:
       - FOO=BAR
 ```
@@ -426,6 +467,17 @@ Grâce au côté dynamique de Ruby, il est possible de se hooker sur une tâche 
 L'image Docker de Donico utilise elle même ce système de hook (grâce à la méthode `before`) pour télécharger la gem Donico avant de l'installer dans l'image Docker :)
 
 Voir : https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/donico/-/blob/master/Rakefile#L14
+
+* `after`
+
+Le pendant de `before`, pour exécuter une tâche **après** la tâche Donico.
+
+> ⚠️ **`after` ne fonctionne pas sur les tâches `build`, `test`, `clean`, `login`
+> (ni `push` en backend `bake`).** Ces tâches se terminent par `Kernel.exec`, qui
+> **remplace** le process courant : le bloc `after` n'est jamais atteint, et rien
+> ne le signale (code de sortie 0). Utilisez `before` ou `redefine` pour ces
+> tâches. Cette sémantique `exec` est volontaire (elle nettoie l'environnement
+> Bundler avant d'appeler `bin/inspec`, voir le commentaire dans `lib/donico.rb`).
 
 * `redefine`
 
@@ -441,6 +493,17 @@ Voir : https://gitlab.thetuxhouse.org/docker-image-factory/docker-images/gitlab-
 Donico embarque la gem [Dotenv](https://github.com/bkeepers/dotenv) afin de donner la possibilité de charger des variables d'environnement si besoin.
 
 **Note:** Par défault Donico ne charge ni ne dépend d'aucune variable d'environnement. Tout passe par le fichier de configuration `donico.yml`.
+
+Deux variables sont toutefois lues par Donico lui-même :
+
+| Variable              | Effet |
+|-----------------------|-------|
+| `CI_COMMIT_TIMESTAMP` | Positionnée par GitlabCI. Sert d'horodatage du tag de build (`%Y%m%d%H%M%S`). En son absence, Donico utilise la date du jour (`%Y%m%d`).
+| `DONICO_QUIET`        | Si définie, Donico n'affiche plus les commandes `docker` qu'il exécute.
+
+⚠️ Les build args déclarés dans `donico.yml` **priment** sur les variables de même
+nom présentes dans l'environnement. Une variable `RUBY_VERSION` exportée par
+chruby/rvm/direnv ne peut donc plus écraser silencieusement la version déclarée.
 
 L'image Docker de Donico utilise les variables d'environnement pour télécharger la gem Donico avant de l'installer dans l'image Docker :)
 
