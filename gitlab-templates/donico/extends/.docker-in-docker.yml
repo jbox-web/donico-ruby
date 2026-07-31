@@ -9,8 +9,14 @@
 
   # Prepare build context
   before_script:
-    # Login to Docker registry to push Docker image
-    - mkdir -p ~/.docker && echo $REGISTRY_DOCKER_TOKEN > ~/.docker/config.json && chmod 600 ~/.docker/config.json
+    # Login to Docker registry to push Docker image.
+    # The file is created with its final permissions BEFORE the token is written:
+    # writing first and chmod-ing after left it world readable for a short window.
+    # The variable stays quoted so its content is never re-split by the shell.
+    - |
+      mkdir -p ~/.docker
+      install -m 600 /dev/null ~/.docker/config.json
+      printf '%s' "$REGISTRY_DOCKER_TOKEN" > ~/.docker/config.json
 
   # Build Debian images
   script: |
