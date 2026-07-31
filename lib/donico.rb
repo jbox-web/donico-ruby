@@ -58,7 +58,14 @@ module Donico
   end
 
   # Load Rake tasks by using Ruby *load* method
+  #
+  # record_task_metadata must be enabled BEFORE the tasks are declared: Rake leaves
+  # it off during a normal run, which drops every `desc`. That is what forced the
+  # help task to shell out to `rake -T`, and what made the before/after/redefine
+  # hooks lose the description of the task they wrap.
   def load_tasks
+    ::Rake::TaskManager.record_task_metadata = true
+
     tasks = ["#{tasks_dir}/common.rake", "#{tasks_dir}/#{config.image_builder}.rake"].sort
     tasks.map { |t| load(t) }
   end

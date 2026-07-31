@@ -71,6 +71,32 @@ RSpec.describe "common.rake", type: :task do
       end
     end
 
+    # help used to shell out to `rake -T`, spawning a second Ruby that reloaded
+    # donico.yml, re-evaluated its ERB and rebuilt the whole matrix, and printed
+    # an empty usage block without a word if rake was not on the subshell PATH.
+    describe "help" do
+      before do
+        Donico.load_config(get_fixture_path("docker/minimal.yml"))
+        Donico.load_tasks
+      end
+
+      after { Rake::Task.clear }
+
+      it "lists the described tasks without spawning a subprocess" do
+        expect(Donico).not_to receive(:`)
+
+        expect { Rake::Task["help"].invoke }.to output(
+          include("Usage:")
+          .and(match(%r{bin/rake amd64:buster:latest:build\s+# Build docker image}))
+          .and(match(%r{bin/rake lint-dockerfile\s+# Lint Dockerfile}))
+        ).to_stdout
+      end
+
+      it "does not list itself" do
+        expect { Rake::Task["help"].invoke }.not_to output(%r{bin/rake help}).to_stdout
+      end
+    end
+
     describe "lint-commits" do
       before do
         Donico.load_config(get_fixture_path("docker/minimal.yml"))

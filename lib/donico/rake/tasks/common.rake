@@ -74,8 +74,13 @@ end
 
 desc "Help"
 task :help do
-  help = %x(rake -T)
-  help = help.split("\n").reject { |l| l.start_with?("rake help") }.map { |l| "  bin/#{l}" }.join("\n")
+  # Built in process: shelling out to `rake -T` spawned a second Ruby that
+  # reloaded donico.yml, re-evaluated its ERB and rebuilt the whole matrix, and
+  # it listed the tasks of whatever Rakefile that subshell happened to find.
+  described = Rake.application.tasks.select(&:comment).reject { |t| t.name == "help" }.sort_by(&:name)
+  width     = described.map { |t| t.name.length }.max.to_i
+
+  help = described.map { |t| format("  bin/rake %-#{width}s  # %s", t.name, t.comment) }.join("\n")
   puts "Usage:\n\n#{help}\n\n"
 end
 
