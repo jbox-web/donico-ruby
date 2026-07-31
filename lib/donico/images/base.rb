@@ -58,6 +58,23 @@ module Donico
       end
 
 
+      # The declared build args plus the ones Donico always injects, as a sorted
+      # list of "KEY=VALUE". This is the form bake and the HCL template consume.
+      #
+      # Named raw_/cli_ rather than build_args because a single `build_args` used to
+      # mean the flattened CLI form on the docker backend and this list on bake:
+      # anything written against Images::Base got one or the other with no clue why.
+      def raw_build_args
+        (@build_args + base_args).sort
+      end
+
+
+      # The docker CLI form: --build-arg KEY=VALUE --build-arg ...
+      def cli_build_args
+        raw_build_args.flat_map { |arg| ["--build-arg", arg] }
+      end
+
+
       private
 
 

@@ -23,23 +23,8 @@ module Donico
       end
 
 
-      def build_args
-        (@build_args + base_args).sort
-      end
-
-
       def build_args_hash
-        data = {}
-        build_args.each do |arg|
-          name, value = arg.split("=", 2)
-          data[name] = value
-        end
-        data
-      end
-
-
-      def formatted_build_args
-        build_args.map { |_| "--build-arg" }.zip(build_args).flatten
+        raw_build_args.to_h { |arg| arg.split("=", 2) }
       end
 
 

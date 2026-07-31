@@ -16,7 +16,7 @@ variable "BUILD_DATE" {
 target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-build" {
   dockerfile = "<%= image.dockerfile %>"
   args = {
-    <%- image.build_args.each do |arg| -%>
+    <%- image.raw_build_args.each do |arg| -%>
     <%- name, value = arg.split('=', 2) -%>
     <%- if name == "BUILD_DATE" -%>
     <%= name %> = "${<%= name %>}"
@@ -50,7 +50,7 @@ target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-build" {
 target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-push" {
   dockerfile = "<%= image.dockerfile %>"
   args = {
-    <%- image.build_args.each do |arg| -%>
+    <%- image.raw_build_args.each do |arg| -%>
     <%- name, value = arg.split('=', 2) -%>
     <%- if name == "BUILD_DATE" -%>
     <%= name %> = "${<%= name %>}"

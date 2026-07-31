@@ -20,9 +20,9 @@ RSpec.describe Donico::Images::Docker do
     end
   end
 
-  describe "#build_args" do
+  describe "#cli_build_args" do
     it "returns the sorted docker CLI form" do
-      expect(image.build_args).to eq [
+      expect(image.cli_build_args).to eq [
         "--build-arg", "ARCH=amd64",
         "--build-arg", "BUILD_DATE=#{timestamp}",
         "--build-arg", "DISTRO_NAME=buster",

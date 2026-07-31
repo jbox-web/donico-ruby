@@ -26,12 +26,6 @@ module Donico
       end
 
 
-      def build_args
-        args = (@build_args + base_args).sort
-        args.map { |_| "--build-arg" }.zip(args).flatten
-      end
-
-
       def test_args
         to_inspec_inputs((@build_args + @test_args + base_args).sort)
       end

@@ -24,9 +24,9 @@ RSpec.describe Donico::Images::Bake do
     end
   end
 
-  describe "#build_args" do
+  describe "#raw_build_args" do
     it "returns the raw sorted KEY=VALUE list" do
-      expect(image.build_args).to eq [
+      expect(image.raw_build_args).to eq [
         "BAR_VERSION=Zm9vCg==",
         "BUILD_DATE=#{timestamp}",
         "DISTRO_NAME=buster",
@@ -42,9 +42,9 @@ RSpec.describe Donico::Images::Bake do
     end
   end
 
-  describe "#formatted_build_args" do
+  describe "#cli_build_args" do
     it "returns the docker CLI form" do
-      expect(image.formatted_build_args.first(2)).to eq ["--build-arg", "BAR_VERSION=Zm9vCg=="]
+      expect(image.cli_build_args.first(2)).to eq ["--build-arg", "BAR_VERSION=Zm9vCg=="]
     end
   end
 

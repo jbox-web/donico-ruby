@@ -5,7 +5,7 @@ module Donico
     class Docker < Base
 
       def build
-        cmd = ["docker", "build", "-f", image.dockerfile, "--pull", "--tag", image.build_tag, *image.build_args, "."]
+        cmd = ["docker", "build", "-f", image.dockerfile, "--pull", "--tag", image.build_tag, *image.cli_build_args, "."]
         Donico.exec(*cmd)
       end
 
