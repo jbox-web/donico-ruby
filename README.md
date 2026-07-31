@@ -458,6 +458,40 @@ matrix:
       - FOO=BAR
 ```
 
+## Modèle de sécurité
+
+Donico est un outil de build interne. Trois surfaces sont **assumées** par
+conception ; elles sont listées ici pour qu'elles soient connues, pas pour être
+contournées.
+
+1. **`donico.yml` est évalué comme un template ERB avant d'être parsé.**
+
+   C'est ce qui permet d'y écrire `<%= ENV.fetch('FOO') %>`. Corollaire : quiconque
+   peut modifier `donico.yml` peut exécuter du code arbitraire dans le runner CI,
+   lequel détient le token du registry et le socket Docker. `YAML.safe_load`
+   protège du YAML malveillant mais ne protège **pas** de l'ERB, qui s'exécute
+   avant lui.
+
+   → Traitez `donico.yml` comme du code : review obligatoire, `CODEOWNERS`.
+
+2. **Le socket Docker de l'hôte est monté dans le conteneur Inspec.**
+
+   Nécessaire pour tester une image depuis l'intérieur d'un conteneur (DinD).
+   Cela donne à tout code s'exécutant dans ce conteneur — y compris vos propres
+   contrôles Inspec — le contrôle du démon Docker de l'hôte, soit l'équivalent
+   d'un accès root sur le runner.
+
+   → Isolez les runners `dind` ; ne les partagez pas avec des projets non fiables.
+
+3. **Les images outils (`hadolint`, `commitlint`, `inspec`) sont référencées par
+   tag mutable et tirées avec `--pull always`.**
+
+   Les builds ne sont donc pas reproductibles dans le temps, et une image amont
+   modifiée s'exécute sans changement de commit.
+
+   → Les clés `commit_linter` et `docker_linter` permettent d'épingler vos propres
+   images par digest depuis `donico.yml`.
+
 ## Hooks
 
 * `before`

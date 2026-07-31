@@ -40,6 +40,13 @@ module Donico
     @config = Config.new(load_config_file(file))
   end
 
+  # SECURITY: donico.yml is evaluated as an ERB template BEFORE being parsed, which
+  # is what makes `<%= ENV.fetch('FOO') %>` work in a config. safe_load therefore
+  # guards against malicious YAML but not against the ERB running ahead of it:
+  # whoever can edit donico.yml runs arbitrary code in the CI runner holding the
+  # registry token. Deliberate and documented in the README; treat donico.yml as
+  # code (review, CODEOWNERS).
+  #
   # aliases: true because factoring a repetitive matrix with YAML anchors is the
   # natural reflex, and safe_load rejects them outright otherwise.
   def load_config_file(file)
