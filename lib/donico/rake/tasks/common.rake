@@ -6,10 +6,23 @@
 
 desc "Lint Dockerfile"
 task :"lint-dockerfile" do
+  results = []
+  logs    = []
+
   Donico.config.dockerfiles.each do |f|
-    Donico.run_cmd("docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico.config.docker_linter, "hadolint", f) do |success|
-      puts("Dockerfile is OK!") if success
-    end
+    success, log = Donico.run_cmd("docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico.config.docker_linter, "hadolint", f)
+    results << success
+    logs << log
+  end
+
+  # The linter result must drive the exit status, otherwise the CI job stays green
+  # whatever the Dockerfile contains and the lint stage is purely decorative.
+  if results.include?(false)
+    puts logs.compact.reject(&:empty?).join("\n")
+    Kernel.exit(1)
+  else
+    puts "Dockerfile is OK!"
+    Kernel.exit(0)
   end
 end
 
