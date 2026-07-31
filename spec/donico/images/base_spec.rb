@@ -30,6 +30,35 @@ RSpec.describe Donico::Images::Base do
     end
   end
 
+  describe ".build_options_for" do
+    # docker/minimal.yml declares a top-level image_name, which used to override the
+    # more specific per-matrix one because it was merged last.
+    it "prefers the per-matrix image_name over the top-level one" do
+      matrix = Donico::Matrix.new("image_name" => "bookworm", "version" => "1.0.0")
+
+      expect(described_class.build_options_for(matrix, "docker", "linux/amd64")[:name]).to eq "bookworm"
+    end
+
+    it "falls back to the top-level image_name when the matrix has none" do
+      matrix = Donico::Matrix.new("version" => "1.0.0")
+
+      expect(described_class.build_options_for(matrix, "docker", "linux/amd64")[:name]).to eq "foo"
+    end
+
+    it "swaps archs for a single arch on the docker backend" do
+      opts = described_class.build_options_for(Donico::Matrix.new, "docker", "linux/amd64")
+
+      expect(opts).to include(arch: "linux/amd64")
+      expect(opts).not_to have_key(:archs)
+    end
+
+    it "keeps the arch list on the bake backend" do
+      opts = described_class.build_options_for(Donico::Matrix.new, "bake")
+
+      expect(opts).to include(archs: ["linux/amd64"])
+    end
+  end
+
   describe "#secrets?" do
     it "is false when no secret is declared" do
       expect(image_named("foo").secrets?).to be false

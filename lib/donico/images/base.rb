@@ -11,7 +11,10 @@ module Donico
 
         def build_options_for(matrix, image_builder, arch = nil)
           opts = matrix.to_h.merge(default_options)
-          opts[:name] = matrix.image_name if opts[:name].nil?
+          # A per-matrix image_name is the more specific declaration and must win:
+          # merging default_options last used to silently discard it whenever a
+          # top-level image_name was also set.
+          opts[:name] = matrix.image_name || Donico.config.docker_image_name
           opts = opts.except(:archs).merge(arch: arch) if image_builder == "docker"
           opts
         end
