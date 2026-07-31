@@ -22,8 +22,9 @@ Two build backends are supported, selected via the `image_builder` config key
 
 ```sh
 mise dev:deps          # bundle install
-mise dev:test          # bin/rspec  (full suite)
+mise dev:test          # bin/rspec  (full suite, fails under 88% line coverage)
 mise dev:lint-project  # bin/rubocop
+mise dev:lint-shell    # shellcheck -x on bash/, exe/inspec, bin/push
 mise dev:lint-commits  # commitlint in a container (conventional commits)
 mise dev:build         # bin/rake build DONICO_RELEASE=true
 ```
@@ -68,9 +69,12 @@ donico.yml
                     (< Tasks::Base)                          commands run via Donico.exec
 ```
 
-- `Images::Base.build_image_from_matrix` picks the concrete class by
-  `image_builder.capitalize` and instantiates it via `Donico::Utils.constantize`
-  (a vendored ActiveSupport-style `constantize`, `lib/donico/utils.rb`).
+- `Images::Base.build_image_from_matrix` picks the concrete class from the
+  explicit `IMAGE_CLASSES` table (`lib/donico/images/base.rb`).
+- `Config` validates the whole file at load time and raises `Donico::ConfigError`
+  (`lib/donico/config_error.rb`) with a user-facing message: supported
+  `image_builder`, resolvable `image_name`, tag macros allowed for the backend,
+  well-formed secrets. `Matrix` refuses a `version` YAML coerced into a number.
 - The `*.rake` files are *generators*: they iterate `Donico.config.matrix` and
   dynamically declare namespaced Rake tasks (`arch → distro → version → action`).
   The task bodies just delegate to `Donico::Tasks::*`.
@@ -82,11 +86,16 @@ donico.yml
 ### Command execution helpers (in `lib/donico.rb`)
 
 - `Donico.exec` — replaces the process (`Kernel.exec`) with `unsetenv_others:
-  true`, restoring only `Bundler.original_env`. This deliberately scrubs
+  true`, restoring `Bundler.original_env` **then** merging the explicit `env` on
+  top so build args win over inherited shell variables. This deliberately scrubs
   `BUNDLER_*` env vars so nested Ruby tools (notably `bin/inspec`) don't inherit
   Donico's bundler context — see the long comment there before touching it.
-- `Donico.run_cmd` — captures output via `Open3.capture3`, returns
-  `[success, output]` (used when multiple commands run and results are aggregated).
+  Because it replaces the process, an `after` hook on an exec-based task never
+  runs (documented in `hooks.rb` and the README).
+- `Donico.run_cmd` — captures output via `Open3.capture3`, always returns
+  `[success, output]`, including on the rescue path (used when multiple commands
+  run and results are aggregated).
+- Command logging is silenced by `DONICO_QUIET`, not by detecting RSpec.
 - `Donico.with_exit_status` — `system` + `exit`.
 
 ### Hooks (`lib/donico/rake/hooks.rb`)
@@ -115,9 +124,15 @@ to `bin/inspec donico <build_tag> <test_args>`.
 
 ## Gotchas
 
-- The `README.md` is the user-facing doc for *consumers*. Task names, registry
-  host (`harbor.jbox-cloud.fr/jbox/base`) and CI templates were realigned with the
-  code; a few illustrative snippets may still lag behind exact flag output, so
-  trust the code for authoritative task names and defaults.
+- The `README.md` is the user-facing doc for *consumers*. It was realigned with
+  the code on 2026-07-31 (audit `AUDIT-2026-07-31.md`): the task listing is the
+  verbatim output of a real run and every `donico.yml` snippet loads through
+  `Donico.load_config`. Regenerate the listing rather than editing it by hand.
+- `version` must be quoted in `donico.yml`: YAML turns `3.10` into the Float 3.1.
+  `Matrix` now rejects a non-String version rather than silently mis-tagging.
+- `Donico.load_tasks` turns on `Rake::TaskManager.record_task_metadata`, which
+  Rake leaves off during a normal run. Without it every `desc` is dropped, which
+  is why `help` used to shell out to `rake -T` and why the hooks lost the
+  description of the task they wrap.
 - Bumping the version means editing `lib/donico/version.rb` only — the gemspec and
   everything else read `Donico::VERSION::STRING` from it.
