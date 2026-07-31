@@ -17,6 +17,8 @@ module Donico
 
       @commit_linter     = config.fetch("commit_linter", Donico.default_commit_linter)
       @docker_linter     = config.fetch("docker_linter", Donico.default_docker_linter)
+
+      warn_unsupported_secrets
     end
 
     # When running in CI, use CI_COMMIT_TIMESTAMP as a timestamp to name the build image.
@@ -50,6 +52,16 @@ module Donico
     end
 
     private
+
+    # Only the bake template consumes secret_envs / secret_files. The docker
+    # backend used to drop them without a word, so the build silently ran without
+    # the secret the Dockerfile was written for.
+    def warn_unsupported_secrets
+      return if image_builder == "bake"
+      return if matrix.none? { |m| m.secret_envs.any? || m.secret_files.any? }
+
+      warn "WARNING: secret_envs / secret_files are ignored by the docker backend. Use image_builder: bake to mount them."
+    end
 
     # Without this check a typo failed three different ways depending on which code
     # path ran first: LoadError from load_tasks, RuntimeError from Matrix#matrix_for

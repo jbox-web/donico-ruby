@@ -38,8 +38,8 @@ module Donico
       @dockerfile   = opts.fetch("dockerfile", "Dockerfile")
       @build_args   = opts.fetch("build_args", [])
       @test_args    = opts.fetch("test_args", [])
-      @secret_envs  = opts.fetch("secret_envs", [])
-      @secret_files = opts.fetch("secret_files", [])
+      @secret_envs  = validate_secrets!(opts.fetch("secret_envs", []), "secret_envs", %w[id])
+      @secret_files = validate_secrets!(opts.fetch("secret_files", []), "secret_files", %w[id src])
       @tags         = opts.fetch("tags", ["%<version>s-%<distro>s"])
     end
 
@@ -80,6 +80,19 @@ module Donico
       raise ConfigError,
             "\nInvalid version in donico.yml: #{version.inspect} (#{version.class}).\n" \
             "The version must be quoted so YAML keeps it verbatim: version: \"#{version}\"\n\n"
+    end
+
+    # A secret missing its id used to render as `id = ""` in the bakefile:
+    # syntactically valid HCL that silently mounts nothing.
+    def validate_secrets!(secrets, key, required_keys)
+      secrets.each do |secret|
+        missing = required_keys.reject { |k| secret.is_a?(Hash) && !secret[k].to_s.empty? }
+        next if missing.empty?
+
+        raise ConfigError,
+              "\nInvalid #{key} entry in donico.yml: #{secret.inspect}.\n" \
+              "Missing required #{missing.size > 1 ? 'keys' : 'key'}: #{missing.join(', ')}.\n\n"
+      end
     end
   end
 end
