@@ -64,6 +64,14 @@ task :version do
   puts Donico.gem_version
 end
 
+# Machine readable, for CI templates that must branch on the backend. Grepping
+# donico.yml for "bake" matched the string anywhere in the file (an image_name
+# like "bakery", a build arg, a comment) and silently took the wrong branch.
+desc "Print the configured image builder"
+task :"image-builder" do
+  puts Donico.config.image_builder
+end
+
 desc "Help"
 task :help do
   help = %x(rake -T)

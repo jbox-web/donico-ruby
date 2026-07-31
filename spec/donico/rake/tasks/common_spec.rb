@@ -55,6 +55,22 @@ RSpec.describe "common.rake", type: :task do
       end
     end
 
+    # The CI template used to pick its branch with `grep -q bake donico.yml`, which
+    # matches the string anywhere in the file: an image_name like "bakery" or a
+    # comment was enough to route a docker build through the bake code path.
+    describe "image-builder" do
+      before do
+        Donico.load_config(get_fixture_path("docker/minimal.yml"))
+        Donico.load_tasks
+      end
+
+      after { Rake::Task.clear }
+
+      it "prints the configured backend and nothing else" do
+        expect { Rake::Task["image-builder"].invoke }.to output("docker\n").to_stdout
+      end
+    end
+
     describe "lint-commits" do
       before do
         Donico.load_config(get_fixture_path("docker/minimal.yml"))

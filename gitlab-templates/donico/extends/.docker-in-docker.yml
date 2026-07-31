@@ -15,9 +15,14 @@
   # Build Debian images
   script: |
     # CI_JOB_NAME looks like : 'build: [buster]', here we only need the first part (before ':')
-    JOB_NAME=$(echo $CI_JOB_NAME | cut -d ':' -f 1)
+    JOB_NAME=$(echo "$CI_JOB_NAME" | cut -d ':' -f 1)
 
-    if grep -q bake donico.yml; then
+    # Ask Donico which backend is configured rather than grepping donico.yml for
+    # "bake", which matched the string anywhere in the file (an image_name like
+    # "bakery", a build arg, a comment) and silently took the wrong branch.
+    IMAGE_BUILDER=$(rake image-builder)
+
+    if [ "$IMAGE_BUILDER" = "bake" ]; then
       echo "Docker Bake build detected"
       echo "CMD: rake $DOCKER_DISTRO:$VERSION:$JOB_NAME"
 
@@ -37,7 +42,8 @@
       rake "$DOCKER_DISTRO:$VERSION:$JOB_NAME"
 
     else
-      # Job name that extends this job should match Makefile recipe name.
+      # The job name that extends this job must match a Donico rake action
+      # (build, test, tag, push, login, clean).
       if [ -z "${VERSION+x}" ]; then
         echo "No VERSION detected, running classic rake"
         echo "CMD: rake $DOCKER_ARCH:$DOCKER_DISTRO:$JOB_NAME"
