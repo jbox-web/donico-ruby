@@ -55,6 +55,17 @@ RSpec.describe Donico::Config do
         expect(config.image_builder).to eq "docker"
       end
     end
+
+    # An unvalidated value used to fail three different ways depending on the code
+    # path taken (LoadError, RuntimeError, NameError), and was interpolated into a
+    # file path passed to Kernel#load.
+    context "when value is not a supported backend" do
+      let(:config_file) { super().merge("image_builder" => "kaniko") }
+
+      it "raises an explicit error listing the supported backends" do
+        expect { config }.to raise_error(Donico::ConfigError, /kaniko.*docker.*bake/m)
+      end
+    end
   end
 
   describe "#matrix" do

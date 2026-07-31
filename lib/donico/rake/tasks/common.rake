@@ -43,12 +43,14 @@ task :"generate-files" do
   Donico::Matrix.generate(config: Donico.config)
   puts "GitlabCI Matrix file generated"
 
+  # image_builder is validated by Config, so the only other case is the docker
+  # backend, which legitimately has no bakefile to generate.
   case Donico.config.image_builder
   when "bake"
     Donico::Tasks::Bake.generate_bakefile
     puts "Bakefile generated"
   else
-    puts "Unknown file format"
+    puts "Docker backend: no Bakefile to generate"
   end
 end
 
