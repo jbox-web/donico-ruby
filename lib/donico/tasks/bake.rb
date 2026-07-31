@@ -25,6 +25,15 @@ module Donico
       end
 
 
+      # Tasks::Base exposes .tag for every backend, but bake builds and applies its
+      # tags itself when pushing (see the push target of docker-bake.hcl), so there
+      # is no separate tag step here. Say so instead of raising a bare NoMethodError.
+      def tag
+        raise NotImplementedError,
+              "The bake backend has no separate tag step: tags are applied by the push target of docker-bake.hcl."
+      end
+
+
       def push
         cmd = ["docker", "buildx", "bake", image.push_task]
         Donico.exec(*cmd, env: image.build_args_hash)

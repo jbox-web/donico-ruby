@@ -5,6 +5,18 @@ require "spec_helper"
 RSpec.describe Donico::Tasks::Bake do
   before { Donico.load_config(get_fixture_path(fixture_file)) }
 
+  # Tasks::Base exposes .tag for every backend, but bake produces its tags itself
+  # at push time. Inheriting it silently promised a method that did not exist.
+  describe ".tag" do
+    let(:fixture_file) { "bake/minimal.yml" }
+
+    it "states that the bake backend tags at push time" do
+      image = Donico::Images::Base.build_image_from_matrix(matrix: Donico.config.matrix.first)
+
+      expect { described_class.tag(image) }.to raise_error(NotImplementedError, /bake.*push/im)
+    end
+  end
+
   describe ".generate_bakefile" do
     let(:fixture_file) { "bake/custom.yml" }
 
