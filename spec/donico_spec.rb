@@ -33,6 +33,24 @@ RSpec.describe Donico do
     end
   end
 
+  describe ".exec" do
+    before { allow(Bundler).to receive(:original_env).and_return({ "FOO_VERSION" => "from-shell", "PATH" => "/usr/bin" }) }
+
+    it "restores the original bundler environment" do
+      expect(Kernel).to receive(:exec).with(hash_including("PATH" => "/usr/bin"), "true", { unsetenv_others: true })
+
+      described_class.exec("true")
+    end
+
+    # A build arg is an explicit instruction from donico.yml; an inherited shell
+    # variable of the same name (RUBY_VERSION, NODE_VERSION...) must not win over it.
+    it "gives the explicit env precedence over the inherited environment" do
+      expect(Kernel).to receive(:exec).with(hash_including("FOO_VERSION" => "from-build-arg"), "true", { unsetenv_others: true })
+
+      described_class.exec("true", env: { "FOO_VERSION" => "from-build-arg" })
+    end
+  end
+
   describe ".load_config" do
     before { ENV["FOO"] = "BAR" }
     after  { ENV.delete("FOO") }

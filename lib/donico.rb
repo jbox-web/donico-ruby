@@ -117,7 +117,11 @@ module Donico
   def exec(*args, env: {})
     log_args("exec", args)
 
-    env = env.merge(Bundler.original_env)
+    # The explicit env wins: it carries the build args declared in donico.yml.
+    # Merging the other way round let an inherited shell variable of the same name
+    # (RUBY_VERSION, NODE_VERSION set by chruby/rvm/direnv...) silently override
+    # them, building one version while tagging the image with another.
+    env = Bundler.original_env.merge(env)
     Kernel.exec(env, *args, unsetenv_others: true)
   end
 
