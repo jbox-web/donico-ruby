@@ -49,10 +49,14 @@ module Donico
     raise ConfigError, "\nEmpty or malformed donico.yml: expected a YAML mapping, got #{config.class}.\n\n"
   end
 
+  # INVARIANT: one process serves one project directory. Dir.pwd is captured on the
+  # first call and never revisited, so a later Dir.chdir is ignored.
   def config_file
     @config_file ||= File.expand_path(Pathname.new(Dir.pwd).join("donico.yml"))
   end
 
+  # INVARIANT: one process serves one config. The parallelism comes from the GitLab
+  # CI matrix (one job per process), never from several configs in flight here.
   def config
     @config
   end
