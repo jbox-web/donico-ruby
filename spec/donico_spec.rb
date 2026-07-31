@@ -51,6 +51,41 @@ RSpec.describe Donico do
     end
   end
 
+  describe ".run_cmd" do
+    let(:status) { instance_double(Process::Status) }
+
+    context "when the command succeeds" do
+      it "returns the success flag and stdout" do
+        allow(status).to receive(:success?).and_return(true)
+        allow(Open3).to receive(:capture3).and_return(["out", "err", status])
+
+        expect(described_class.run_cmd("true")).to eq [true, "out"]
+      end
+    end
+
+    context "when the command fails" do
+      it "returns the failure flag and stderr" do
+        allow(status).to receive(:success?).and_return(false)
+        allow(Open3).to receive(:capture3).and_return(["out", "err", status])
+
+        expect(described_class.run_cmd("false")).to eq [false, "err"]
+      end
+    end
+
+    # Returning a bare false here used to make the caller destructure log to nil,
+    # which blew up later on nil.empty? instead of reporting the missing binary.
+    context "when the command cannot be spawned" do
+      it "returns the failure flag and the exception message" do
+        allow(Open3).to receive(:capture3).and_raise(Errno::ENOENT, "docker")
+
+        success, log = described_class.run_cmd("docker")
+
+        expect(success).to be false
+        expect(log).to include("docker")
+      end
+    end
+  end
+
   describe ".load_config" do
     before { ENV["FOO"] = "BAR" }
     after  { ENV.delete("FOO") }

@@ -125,7 +125,6 @@ module Donico
     Kernel.exec(env, *args, unsetenv_others: true)
   end
 
-  # rubocop:disable Metrics/MethodLength
   def run_cmd(*args)
     log_args("run_cmd", args)
 
@@ -139,11 +138,12 @@ module Donico
 
       [success, out]
     rescue StandardError => e
-      puts e
-      false
+      # Always return the same shape as the nominal path: callers destructure the
+      # result, and a bare false left them with a nil log that blew up downstream
+      # on nil.empty?, hiding the real cause (a missing docker binary, typically).
+      [false, e.message]
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end
 
 # Load our hooks in Rake DSL
