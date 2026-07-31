@@ -14,6 +14,21 @@ RSpec.describe Donico::Images::Docker do
     end
   end
 
+  # bake sorted its tags while docker kept the donico.yml order, so migrating a
+  # repo from one backend to the other reshuffled the logs for no functional reason.
+  describe "#prod_tags" do
+    it "returns every configured tag, sorted" do
+      expect(image.prod_tags).to eq [
+        "registry.example.net/images/base/foo:1.0.0",
+        "registry.example.net/images/base/foo:1.0.0-#{timestamp}-buster",
+        "registry.example.net/images/base/foo:1.0.0-#{timestamp}-buster-amd64",
+        "registry.example.net/images/base/foo:1.0.0-buster",
+        "registry.example.net/images/base/foo:#{timestamp}-buster",
+        "registry.example.net/images/base/foo:latest",
+      ]
+    end
+  end
+
   describe "#prod_tag" do
     it "expands the tag macros against the registry" do
       expect(image.prod_tag("%<version>s-%<distro>s-%<arch>s")).to eq "registry.example.net/images/base/foo:1.0.0-buster-amd64"

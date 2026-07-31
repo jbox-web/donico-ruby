@@ -66,6 +66,14 @@ module Donico
       end
 
 
+      # Every configured tag expanded against the registry, sorted. Sorted here for
+      # both backends: bake used to sort while docker kept the donico.yml order, so
+      # migrating a repo between backends reshuffled the logs for no reason.
+      def prod_tags
+        tags.map { |t| prod_tag(t) }.sort
+      end
+
+
       # The declared build args plus the ones Donico always injects, as a sorted
       # list of "KEY=VALUE". This is the form bake and the HCL template consume.
       #

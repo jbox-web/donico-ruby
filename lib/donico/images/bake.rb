@@ -18,11 +18,6 @@ module Donico
       end
 
 
-      def prod_tags
-        tags.map { |t| prod_tag(t) }.sort
-      end
-
-
       def build_args_hash
         raw_build_args.to_h { |arg| arg.split("=", 2) }
       end

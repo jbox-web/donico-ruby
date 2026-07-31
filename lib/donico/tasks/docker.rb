@@ -17,15 +17,15 @@ module Donico
 
 
       def tag
-        run_cmd_with_tags(image.tags) do |tag|
-          ["docker", "tag", image.build_tag, image.prod_tag(tag)]
+        run_cmd_with_tags(image.prod_tags) do |prod_tag|
+          ["docker", "tag", image.build_tag, prod_tag]
         end
       end
 
 
       def push
-        run_cmd_with_tags(image.tags) do |tag|
-          ["docker", "push", image.prod_tag(tag)]
+        run_cmd_with_tags(image.prod_tags) do |prod_tag|
+          ["docker", "push", prod_tag]
         end
       end
 
