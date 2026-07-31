@@ -13,6 +13,10 @@ end
 
 require_relative "support/helper"
 
+# Keep the command logging out of the spec output. Donico used to detect RSpec
+# itself, which silently disabled logging for any consumer loading RSpec too.
+ENV["DONICO_QUIET"] = "true"
+
 # Configure RSpec
 RSpec.configure do |config|
   config.include Helper

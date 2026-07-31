@@ -91,8 +91,11 @@ module Donico
     config.matrix.map { |m| Donico::Images::Base.build_image_from_matrix(matrix: m) }
   end
 
+  # Silenced by DONICO_QUIET rather than by the presence of RSpec: a consuming repo
+  # whose Rakefile loads RSpec (to redefine the test task with a richer Inspec
+  # suite) used to lose all command logging without any way to get it back.
   def log_args(method, args)
-    puts "#{method}: #{args.join(' ')}" unless defined?(RSpec)
+    puts "#{method}: #{args.join(' ')}" unless ENV.key?("DONICO_QUIET")
   end
 
   def with_exit_status(*args)

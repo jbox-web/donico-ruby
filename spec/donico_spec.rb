@@ -33,6 +33,29 @@ RSpec.describe Donico do
     end
   end
 
+  # Branching on defined?(RSpec) meant a consuming repo whose Rakefile loads RSpec
+  # (to redefine the test task with a richer suite) silently lost all command
+  # logging. The switch belongs to the environment, not to the test framework.
+  describe ".log_args" do
+    around do |example|
+      previous = ENV.fetch("DONICO_QUIET", nil)
+      example.run
+      previous.nil? ? ENV.delete("DONICO_QUIET") : ENV["DONICO_QUIET"] = previous
+    end
+
+    it "logs the command by default" do
+      ENV.delete("DONICO_QUIET")
+
+      expect { described_class.log_args("exec", %w[docker build]) }.to output("exec: docker build\n").to_stdout
+    end
+
+    it "stays quiet when DONICO_QUIET is set" do
+      ENV["DONICO_QUIET"] = "true"
+
+      expect { described_class.log_args("exec", %w[docker build]) }.not_to output.to_stdout
+    end
+  end
+
   describe ".exec" do
     before { allow(Bundler).to receive(:original_env).and_return({ "FOO_VERSION" => "from-shell", "PATH" => "/usr/bin" }) }
 
