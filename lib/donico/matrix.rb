@@ -32,7 +32,7 @@ module Donico
 
     def initialize(opts = {})
       @image_name   = opts.fetch("image_name", nil)
-      @version      = opts.fetch("version", "latest").to_s
+      @version      = validate_version!(opts.fetch("version", "latest"))
       @distro       = opts.fetch("distro", "buster")
       @archs        = opts.fetch("archs", ["linux/amd64"])
       @dockerfile   = opts.fetch("dockerfile", "Dockerfile")
@@ -66,6 +66,20 @@ module Donico
         secret_files: secret_files,
         tags:         tags,
       }
+    end
+
+    private
+
+    # YAML coerces an unquoted `3.10` into the Float 3.1 and an unquoted `3` into
+    # the Integer 3. Calling #to_s on those silently drops the trailing zero, so the
+    # image would be built AND tagged with a version the user never wrote.
+    # The original text cannot be recovered, so refuse the config instead of guessing.
+    def validate_version!(version)
+      return version if version.is_a?(String)
+
+      raise ConfigError,
+            "\nInvalid version in donico.yml: #{version.inspect} (#{version.class}).\n" \
+            "The version must be quoted so YAML keeps it verbatim: version: \"#{version}\"\n\n"
     end
   end
 end
