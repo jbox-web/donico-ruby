@@ -4,7 +4,6 @@ require "spec_helper"
 
 RSpec.describe "docker.rake", type: :task do
   before do
-    ENV.delete("CI_COMMIT_TIMESTAMP")
     Donico.load_config(get_fixture_path(fixture_file))
     Donico.load_tasks
   end

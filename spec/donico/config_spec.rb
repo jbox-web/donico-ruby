@@ -190,8 +190,6 @@ RSpec.describe Donico::Config do
 
   describe "#timestamp" do
     context "when CI_COMMIT_TIMESTAMP is not set" do
-      before { ENV.delete("CI_COMMIT_TIMESTAMP") }
-
       it "returns a timestamp to name the image" do
         allow(Time).to receive(:now).and_return(Time.parse("2026-07-31T23:59:59Z"))
 
@@ -211,7 +209,6 @@ RSpec.describe Donico::Config do
 
     context "when CI_COMMIT_TIMESTAMP is set" do
       before { ENV["CI_COMMIT_TIMESTAMP"] = "2021-06-09T11:50:22Z" }
-      after  { ENV.delete("CI_COMMIT_TIMESTAMP") }
 
       it "returns a timestamp to name the image" do
         expect(config.timestamp).to eq "20210609115022"

@@ -21,6 +21,23 @@ ENV["DONICO_QUIET"] = "true"
 RSpec.configure do |config|
   config.include Helper
 
+  # CI_COMMIT_TIMESTAMP switches Config#timestamp between the dev format
+  # (%Y%m%d) and the CI one (%Y%m%d%H%M%S), so any example reading a build tag
+  # depends on it. Several examples used to delete or set it without restoring
+  # it, which under a random order made the outcome depend on the seed: the
+  # suite passed locally and failed in CI, where the variable is set.
+  #
+  # Neutralised and restored around every example. An example that needs the CI
+  # format sets it explicitly and gets it cleaned up here.
+  config.around do |example|
+    previous = ENV.fetch("CI_COMMIT_TIMESTAMP", nil)
+    ENV.delete("CI_COMMIT_TIMESTAMP")
+
+    example.run
+
+    previous.nil? ? ENV.delete("CI_COMMIT_TIMESTAMP") : ENV["CI_COMMIT_TIMESTAMP"] = previous
+  end
+
   config.color = true
   config.fail_fast = false
 

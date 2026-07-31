@@ -3,9 +3,16 @@
 require "spec_helper"
 
 RSpec.describe Donico::Images::Bake do
-  before { Donico.load_config(get_fixture_path("bake/custom.yml")) }
+  # A fixed CI_COMMIT_TIMESTAMP pins the expected tags: reading the clock instead
+  # made the expectation depend on the format Config picks, so these examples
+  # passed or failed according to whether the suite ran in CI. spec_helper
+  # restores the variable afterwards.
+  before do
+    ENV["CI_COMMIT_TIMESTAMP"] = "2026-07-31T20:59:35Z"
+    Donico.load_config(get_fixture_path("bake/custom.yml"))
+  end
 
-  let(:timestamp) { Time.now.strftime("%Y%m%d") }
+  let(:timestamp) { "20260731205935" }
   let(:image) { described_class.build_image_from_matrix(matrix: Donico.config.matrix.first) }
 
   describe "#build_tag" do
