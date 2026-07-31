@@ -49,11 +49,9 @@ build:
 push:
   extends: .default
   stage: push
-  before_script:
-    - |
-      mkdir -p ~/.gem
-      echo -e "---\n${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/rubygems: '${CI_JOB_TOKEN}'" > ~/.gem/credentials
-      chmod 600 ~/.gem/credentials
+  # No ~/.gem/credentials here: bin/push uploads to the generic package registry
+  # with a JOB-TOKEN header, it never calls `gem push`. Writing that file only
+  # dropped an unused secret in clear text on the runner.
   needs:
     - build
   # Run this job only when pushing a new tag
