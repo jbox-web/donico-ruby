@@ -6,9 +6,13 @@
   tags:
     - dind
 
+  # Tasks are namespaced dev:* so they can never be shadowed by a mise subcommand.
+  # A bare `mise deps` resolved to mise's own experimental `deps` subcommand,
+  # which reported "All dependencies are up to date" without running bundle
+  # install, and every job then died on Bundler::GemNotFound.
   script:
-    - mise deps
-    - mise $CI_JOB_NAME
+    - mise dev:deps
+    - mise dev:$CI_JOB_NAME
 
 stages:
   - lint
@@ -19,8 +23,9 @@ stages:
 lint-commits:
   extends: .default
   stage: lint
+  # Runs commitlint in its own container, so it needs no bundle
   script:
-    - mise $CI_JOB_NAME
+    - mise dev:$CI_JOB_NAME
 
 lint-project:
   extends: .default

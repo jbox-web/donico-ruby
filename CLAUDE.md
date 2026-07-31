@@ -21,12 +21,17 @@ Two build backends are supported, selected via the `image_builder` config key
 `mise.toml` defines the canonical dev tasks:
 
 ```sh
-mise deps          # bundle install
-mise test          # bin/rspec  (full suite)
-mise lint-project  # bin/rubocop
-mise lint-commits  # commitlint in a container (conventional commits)
-mise build         # bin/rake build DONICO_RELEASE=true
+mise dev:deps          # bundle install
+mise dev:test          # bin/rspec  (full suite)
+mise dev:lint-project  # bin/rubocop
+mise dev:lint-commits  # commitlint in a container (conventional commits)
+mise dev:build         # bin/rake build DONICO_RELEASE=true
 ```
+
+Tasks are namespaced `dev:*` on purpose: an unprefixed name can be shadowed by a
+mise subcommand. `mise deps` used to resolve to mise's own experimental `deps`
+subcommand instead of the project task, silently skipping `bundle install` and
+failing every CI job on `Bundler::GemNotFound`.
 
 Run a single spec / example:
 
