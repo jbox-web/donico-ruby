@@ -125,7 +125,7 @@ to `bin/inspec donico <build_tag> <test_args>`.
 ## Gotchas
 
 - The `README.md` is the user-facing doc for *consumers*. It was realigned with
-  the code on 2026-07-31 (audit `AUDIT-2026-07-31.md`): the task listing is the
+  the code on 2026-07-31 by a full audit: the task listing is the
   verbatim output of a real run and every `donico.yml` snippet loads through
   `Donico.load_config`. Regenerate the listing rather than editing it by hand.
 - `version` must be quoted in `donico.yml`: YAML turns `3.10` into the Float 3.1.

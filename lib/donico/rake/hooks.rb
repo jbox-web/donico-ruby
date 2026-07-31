@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 # Taken from: https://github.com/guillermo/rake-hooks
+#
+# All three hooks reach into Rake's private @tasks ivar to drop a task before
+# redefining it. That coupling is deliberate but not optional: as of Rake 13.3.1
+# the public API exposes only Rake::Task.clear, which wipes *every* task, so
+# there is no supported way to remove a single one. A Rake upgrade that renames
+# or encapsulates @tasks breaks before/after/redefine in every consuming repo at
+# once, which is why spec/donico/rake/hooks_spec.rb covers all three.
 
 module Donico
   module Rake
