@@ -1,8 +1,59 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "tmpdir"
 
 RSpec.describe Donico::Matrix do
+  describe ".generate" do
+    let(:generated) do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          described_class.generate(config: Donico.load_config(get_fixture_path(fixture_file)))
+          File.read(".gitlab-ci/extends/.matrix.yml")
+        end
+      end
+    end
+
+    context "with the docker backend" do
+      let(:fixture_file) { "docker/multiple_dockerfiles.yml" }
+
+      it "writes one parallel matrix entry per image, arch included" do
+        expect(YAML.safe_load(generated)).to eq(
+          ".matrix" => {
+            "parallel" => {
+              "matrix" => [
+                { "VERSION" => "3.1.3", "DOCKER_DISTRO" => "bullseye", "DOCKER_ARCH" => ["amd64"] },
+                { "VERSION" => "3.2.0", "DOCKER_DISTRO" => "bullseye", "DOCKER_ARCH" => ["amd64"] },
+              ],
+            },
+          }
+        )
+      end
+
+      # The header used to point at `bin/rake generate-matrix`, a task that does
+      # not exist: the only task is generate-files.
+      it "points the reader at the task that actually regenerates it" do
+        expect(generated).to include("bin/rake generate-files")
+        expect(generated).not_to include("generate-matrix")
+      end
+    end
+
+    context "with the bake backend" do
+      let(:fixture_file) { "bake/multiple_dockerfiles.yml" }
+
+      it "omits the arch dimension, which bake handles itself" do
+        entries = YAML.safe_load(generated).dig(".matrix", "parallel", "matrix")
+
+        expect(entries).to eq(
+          [
+            { "VERSION" => "3.2.0", "DOCKER_DISTRO" => "bullseye" },
+            { "VERSION" => "3.1.3", "DOCKER_DISTRO" => "buster" },
+          ]
+        )
+      end
+    end
+  end
+
   describe "#version" do
     context "when version is a quoted string" do
       it "keeps the version untouched" do

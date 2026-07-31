@@ -10,7 +10,7 @@ module Donico
 
       # rubocop:disable Metrics/MethodLength
       def write_matrix(matrix)
-        warning = "# !!! THIS IS A GENERATED FILE !!! DON'T EDIT ME MANUALLY !!!\n# Instead edit donico.yml and run bin/rake generate-matrix\n"
+        warning = "# !!! THIS IS A GENERATED FILE !!! DON'T EDIT ME MANUALLY !!!\n# Instead edit donico.yml and run bin/rake generate-files\n"
         config  = {
           ".matrix" => {
             "parallel" => {
