@@ -1,8 +1,64 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "tmpdir"
 
 RSpec.describe "common.rake", type: :task do
+  # generate-files writes into the working directory, so every example runs in a
+  # throwaway one rather than littering the repo.
+  def in_tmpdir(&)
+    Dir.mktmpdir { |dir| Dir.chdir(dir, &) }
+  end
+
+  describe "version" do
+    before do
+      Donico.load_config(get_fixture_path("docker/minimal.yml"))
+      Donico.load_tasks
+    end
+
+    after { Rake::Task.clear }
+
+    it "prints the gem version" do
+      expect { Rake::Task["version"].invoke }.to output("#{Donico.gem_version}\n").to_stdout
+    end
+  end
+
+  describe "generate-files" do
+    after { Rake::Task.clear }
+
+    context "with the docker backend" do
+      before do
+        Donico.load_config(get_fixture_path("docker/minimal.yml"))
+        Donico.load_tasks
+      end
+
+      it "writes the CI matrix and no bakefile" do
+        in_tmpdir do
+          expect { Rake::Task["generate-files"].invoke }.to output(/no Bakefile/i).to_stdout
+
+          expect(File).to exist(".gitlab-ci/extends/.matrix.yml")
+          expect(File).not_to exist("docker-bake.hcl")
+        end
+      end
+    end
+
+    context "with the bake backend" do
+      before do
+        Donico.load_config(get_fixture_path("bake/minimal.yml"))
+        Donico.load_tasks
+      end
+
+      it "writes both the CI matrix and the bakefile" do
+        in_tmpdir do
+          expect { Rake::Task["generate-files"].invoke }.to output(/Bakefile generated/).to_stdout
+
+          expect(File).to exist(".gitlab-ci/extends/.matrix.yml")
+          expect(File).to exist("docker-bake.hcl")
+        end
+      end
+    end
+  end
+
   context "when image_builder is docker" do
     context "when single Dockerfile is used" do
       before do
