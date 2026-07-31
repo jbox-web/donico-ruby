@@ -31,6 +31,10 @@ lint-project:
   extends: .default
   stage: lint
 
+lint-shell:
+  extends: .default
+  stage: lint
+
 test:
   extends: .default
   stage: test

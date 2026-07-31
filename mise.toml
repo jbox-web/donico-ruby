@@ -1,5 +1,6 @@
 [tools]
 ruby = "3.4.9"
+shellcheck = "0.11.0"
 
 [settings.ruby]
 compile = false
@@ -36,3 +37,8 @@ docker run --pull always --rm -v "${PWD}:/app" {{vars.COMMIT_LINTER}} bash -l -c
 [tasks."dev:lint-project"]
 description = "Lint project"
 run = "bin/rubocop"
+
+[tasks.lint-shell]
+description = "Lint shell scripts"
+# -x follows the sourced library so exe/inspec is checked against it
+run = "shellcheck -x bash/*.sh exe/inspec bin/push"
