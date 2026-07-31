@@ -1,3 +1,8 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+#
+# Library sourced by exe/inspec. Not meant to be executed directly.
+
 ##########
 # CONFIG #
 ##########
@@ -11,10 +16,17 @@ INSPEC_IMAGE=harbor.jbox-cloud.fr/jbox/base/inspec:latest
 # Run bash export on arguments passed to this function.
 # Arguments are a space separated list of key=value
 function load_env() {
-  for val in ${@}; do
-    key=$(echo ${val} | cut -d '=' -f 1)
-    value=$(echo ${val} | cut -d '=' -f 2)
-    export ${key}=${value}
+  local val key value
+
+  for val in "${@}"; do
+    # Split on the FIRST separator only: 'cut -f 2' truncated any value holding
+    # an '=' (base64 padding, JWTs, query strings).
+    key="${val%%=*}"
+    value="${val#*=}"
+
+    [ -z "${key}" ] && continue
+
+    export "${key}=${value}"
   done
 }
 
@@ -38,7 +50,9 @@ function container_spin() {
 }
 
 
-# This function is called on Linux signals: INT ERR EXIT
+# This function is called on the EXIT signal, which also covers INT and any
+# error exit under 'set -o errexit'. Trapping ERR as well made it run twice and
+# fire a second 'docker kill' against an already destroyed container.
 function container_clean() {
   # If <project>/bin/inspec-container-down script exists in project run it,
   # otherwise use our builtin function
@@ -58,7 +72,7 @@ function container_clean() {
 function container_up() {
   local image=${2}
 
-  docker run --rm -d ${image} /bin/bash -c "while true; do sleep 1; done"
+  docker run --rm -d "${image}" /bin/bash -c "while true; do sleep 1; done"
 }
 
 
@@ -66,7 +80,18 @@ function container_up() {
 function container_down() {
   local container_id=${1}
 
-  [ ! -z "${container_id+x}" ] && (echo "Cleanup docker containers" && docker kill ${container_id})
+  # -n on the value, not '${var+x}': the parameter is always *set* here (it is a
+  # positional argument), so the +x form was always true and ran 'docker kill'
+  # with an empty argument whenever the container failed to start.
+  #
+  # Must return 0 when there is nothing to clean: this runs from the EXIT trap and
+  # a non-zero status there overrides the exit status of the whole script.
+  if [ -n "${container_id}" ]; then
+    echo "Cleanup docker containers"
+    docker kill "${container_id}"
+  fi
+
+  return 0
 }
 
 
@@ -74,25 +99,24 @@ function container_down() {
 function pull_image() {
   local image=${1}
 
-  docker pull ${image}
+  docker pull "${image}"
 }
 
 
 # Prepare inputs arguments for Inspec
 function split_test_inputs() {
   # If no inputs are given we return ""
-  # ${var+x} is a parameter expansion which evaluates to nothing if var is unset, and substitutes the string x otherwise
-  # See: https://stackoverflow.com/a/13864829/616095
-  if [ -z "${@+x}" ]; then
+  if [ "${#}" -eq 0 ] || [ -z "${*}" ]; then
     echo ""
   else
-    out="--input"
+    local out="--input"
+    local val
 
-    for val in ${@}; do
+    for val in "${@}"; do
       out="${out} ${val}"
     done
 
-    echo ${out}
+    echo "${out}"
   fi
 }
 
@@ -101,7 +125,9 @@ function split_test_inputs() {
 function run_spec() {
   local test_mode=${1}
   local container_id=${2}
-  local test_inputs=$(split_test_inputs ${3})
+  local test_inputs
+  # shellcheck disable=SC2086 # the inputs are a space separated list to split
+  test_inputs=$(split_test_inputs ${3})
 
   local args="--chef-license accept-silent --no-create-lockfile --show-progress"
 
@@ -109,7 +135,9 @@ function run_spec() {
   inspec_args_override="$(pwd)/.inspecrc"
 
   if [ -f "${inspec_args_override}" ]; then
-    while read line; do
+    # -r keeps backslashes literal; the '|| [ -n "$line" ]' fallback keeps the
+    # last line of a file that does not end with a newline.
+    while IFS= read -r line || [ -n "${line}" ]; do
       args="${args} ${line}"
     done <"${inspec_args_override}"
   fi
@@ -121,12 +149,13 @@ function run_spec() {
       # We use Docker-in-Docker to run Inspec so mount the Docker socket
       # Mount the current app to test within Inspec container
       # Launch Inspec
+      # shellcheck disable=SC2086 # args and test_inputs are argument lists to split
       docker run \
         --rm \
         --mount type=bind,source="$(pwd)",target=/app \
         --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
         ${INSPEC_IMAGE} \
-        inspec exec ${dir} -t docker://${container_id} ${args} ${test_inputs}
+        inspec exec ${dir} -t "docker://${container_id}" ${args} ${test_inputs}
     ;;
 
     *)

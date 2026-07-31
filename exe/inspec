@@ -10,11 +10,19 @@ set -o pipefail
 ########
 
 # Load donico.sh lib
-ORIGIN="$( cd "$( echo "${BASH_SOURCE[0]%/*}" )" && pwd )"
-source ${ORIGIN}/../bash/donico.lib.sh
+ORIGIN="$( cd "${BASH_SOURCE[0]%/*}" && pwd )"
+# shellcheck source-path=SCRIPTDIR
+# shellcheck source=../bash/donico.lib.sh
+source "${ORIGIN}/../bash/donico.lib.sh"
 
-# Bind Linux signals to the cleanup function
-trap "container_clean" INT ERR EXIT
+# Initialised before the trap is armed: under 'set -o nounset' a failure occurring
+# before the container is spun made the cleanup handler die on an unbound
+# container_id, replacing the real error message with its own.
+container_id=""
+
+# EXIT alone: it already covers INT and any error exit under 'set -o errexit'.
+# Trapping ERR too ran the cleanup twice on failure.
+trap container_clean EXIT
 
 # test_mode is first arg
 test_mode="${1}"
@@ -26,13 +34,15 @@ shift
 
 # the rest are test inputs
 # See: https://docs.chef.io/inspec/inputs/
-test_inputs="${@}"
+test_inputs="${*}"
 
 # Display something
 echo "Running Inspec on ${image} (test_mode: '${test_mode}', pwd: '$(pwd)', test_inputs: '${test_inputs}')"
 
 # Load test_inputs key=value so we can access them if we need to (see php image)
-load_env "${test_inputs}"
+# Each remaining argument is one input, so pass them individually rather than as
+# a single space joined string.
+load_env "${@}"
 
 # Start container to run tests
 container_id=$(container_spin "${test_mode}" "${image}" "${test_inputs}")
