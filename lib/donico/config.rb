@@ -21,14 +21,16 @@ module Donico
 
     # When running in CI, use CI_COMMIT_TIMESTAMP as a timestamp to name the build image.
     # When running in dev, generate a timestamp from the current date to name the build image.
+    #
+    # Memoized so every image of a single run shares one build tag: recomputing
+    # Time.now per call let a run straddling midnight build under one tag and look
+    # for another at tag time.
     def timestamp
-      if ENV.key?("CI_COMMIT_TIMESTAMP")
-        date = Time.parse(ENV.fetch("CI_COMMIT_TIMESTAMP", nil))
-        date.strftime("%Y%m%d%H%M%S")
-      else
-        date = Time.now
-        date.strftime("%Y%m%d")
-      end
+      @timestamp ||= if ENV.key?("CI_COMMIT_TIMESTAMP")
+                       Time.parse(ENV.fetch("CI_COMMIT_TIMESTAMP", nil)).strftime("%Y%m%d%H%M%S")
+                     else
+                       Time.now.strftime("%Y%m%d")
+                     end
     end
 
     def dockerfiles

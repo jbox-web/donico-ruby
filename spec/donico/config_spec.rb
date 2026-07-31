@@ -152,7 +152,19 @@ RSpec.describe Donico::Config do
       before { ENV.delete("CI_COMMIT_TIMESTAMP") }
 
       it "returns a timestamp to name the image" do
-        expect(config.timestamp).to eq Time.now.strftime("%Y%m%d")
+        allow(Time).to receive(:now).and_return(Time.parse("2026-07-31T23:59:59Z"))
+
+        expect(config.timestamp).to eq "20260731"
+      end
+
+      # Recomputing Time.now on every call made the build tag change under the feet
+      # of a run straddling midnight: build wrote one tag, tag looked for another.
+      it "keeps the same timestamp across calls within a process" do
+        allow(Time).to receive(:now).and_return(Time.parse("2026-07-31T23:59:59Z"))
+        first = config.timestamp
+        allow(Time).to receive(:now).and_return(Time.parse("2026-08-01T00:00:01Z"))
+
+        expect(config.timestamp).to eq first
       end
     end
 
