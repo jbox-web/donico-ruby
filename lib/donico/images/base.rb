@@ -91,16 +91,13 @@ module Donico
       end
 
 
-      # rubocop:disable Style/RedundantBegin, Style/ParallelAssignment
+      # Tag macros are validated by Config at load time, so format can no longer be
+      # reached with an unknown macro or a stray '%'. The $VERBOSE muting that used
+      # to wrap this call is gone with it: verified under `ruby -w` that passing
+      # extra keys to format emits no warning at all.
       def format_tag(tag, opts = {})
-        begin
-          old_verbose, $VERBOSE = $VERBOSE, nil
-          format(tag, opts)
-        ensure
-          $VERBOSE = old_verbose
-        end
+        format(tag, opts)
       end
-      # rubocop:enable Style/RedundantBegin, Style/ParallelAssignment
 
 
       def base_args

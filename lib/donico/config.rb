@@ -6,6 +6,13 @@ module Donico
     # Kernel#load and in a constant name, so it can never be taken on trust.
     IMAGE_BUILDERS = %w[docker bake].freeze
 
+    # Macros usable in a tag, per backend. bake resolves the platform list itself,
+    # so no single arch exists when its tags are built.
+    TAG_MACROS = {
+      "docker" => %w[arch distro timestamp version].freeze,
+      "bake"   => %w[distro timestamp version].freeze,
+    }.freeze
+
     attr_reader :docker_image_name, :docker_registry, :docker_image_tag, :image_builder, :matrix, :commit_linter, :docker_linter
 
     def initialize(config)
@@ -18,8 +25,7 @@ module Donico
       @commit_linter     = config.fetch("commit_linter", Donico.default_commit_linter)
       @docker_linter     = config.fetch("docker_linter", Donico.default_docker_linter)
 
-      validate_image_names!
-      warn_unsupported_secrets
+      validate!
     end
 
     # When running in CI, use CI_COMMIT_TIMESTAMP as a timestamp to name the build image.
@@ -57,6 +63,14 @@ module Donico
 
     private
 
+    # Every check that needs the fully built config, run once at load time so a
+    # bad donico.yml is rejected before any docker command is spawned.
+    def validate!
+      validate_image_names!
+      validate_tags!
+      warn_unsupported_secrets
+    end
+
     # The name can come from the top level or from the matrix entry, but it has to
     # come from somewhere: a nil name used to render tags with an empty segment
     # ("/1.0.0/buster:20260731") and a version env var called "_VERSION".
@@ -66,6 +80,27 @@ module Donico
       raise ConfigError,
             "\nMissing image_name in donico.yml.\n" \
             "Set it at the top level, or on every matrix entry.\n\n"
+    end
+
+    # Tags go through Kernel#format, which fails in two very different ways:
+    # an unknown macro raises a bare KeyError at tag time naming nothing, and a
+    # stray '%' is silently swallowed, interpolating the option hash into the tag
+    # ("100%-slim" rendered as '100{version: "1.0.0"}lim'). Catch both at load time.
+    def validate_tags!
+      allowed = TAG_MACROS.fetch(image_builder)
+      pattern = /%<(#{Regexp.union(allowed)})>s/
+
+      matrix.flat_map(&:tags).each do |tag|
+        raise_invalid_tag(tag, allowed) if tag.gsub(pattern, "").include?("%")
+      end
+    end
+
+    def raise_invalid_tag(tag, allowed)
+      raise ConfigError,
+            "\nInvalid tag in donico.yml: #{tag.inspect}.\n" \
+            "Macros available with the #{image_builder} backend: " \
+            "#{allowed.map { |k| "%<#{k}>s" }.join(', ')}.\n" \
+            "A literal '%' is not supported.\n\n"
     end
 
     # Only the bake template consumes secret_envs / secret_files. The docker
