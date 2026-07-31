@@ -185,7 +185,7 @@ RSpec.describe "bake.rake", type: :task do
           "bin/inspec",
           "donico",
           "foo-bar/#{version}/buster:#{timestamp}",
-          "bar_version=zm9vcg==",
+          "bar_version=Zm9vCg==",
           "build_date=#{timestamp}",
           "distro_name=buster",
           "foo_bar_version=#{version}",

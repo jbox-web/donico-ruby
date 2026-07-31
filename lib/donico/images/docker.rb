@@ -33,7 +33,7 @@ module Donico
 
 
       def test_args
-        (@build_args + @test_args + base_args).sort.map(&:downcase)
+        to_inspec_inputs((@build_args + @test_args + base_args).sort)
       end
 
 

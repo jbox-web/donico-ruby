@@ -84,6 +84,18 @@ module Donico
         ["DISTRO_NAME=#{distro}", "BUILD_DATE=#{timestamp}", "#{version_env_var}=#{version}"]
       end
 
+
+      # Inspec input names are lowercase, their values are not. Downcasing the whole
+      # "KEY=VALUE" pair corrupted every case sensitive value (base64 payloads,
+      # tokens, paths) while the build received the correct one, so the test
+      # validated something the image never contained.
+      def to_inspec_inputs(args)
+        args.map do |arg|
+          name, value = arg.split("=", 2)
+          value.nil? ? name.downcase : "#{name.downcase}=#{value}"
+        end
+      end
+
     end
   end
 end
