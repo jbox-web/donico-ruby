@@ -35,13 +35,18 @@ module Donico
   # Load Donico config
   def load_config(file = config_file)
     # Check config file presence
-    raise "\nFile not found: donico.yml\nPlease create donico.yml at the project root.\n\n" unless File.exist?(file)
+    raise ConfigError, "\nFile not found: donico.yml\nPlease create donico.yml at the project root.\n\n" unless File.exist?(file)
 
     @config = Config.new(load_config_file(file))
   end
 
+  # aliases: true because factoring a repetitive matrix with YAML anchors is the
+  # natural reflex, and safe_load rejects them outright otherwise.
   def load_config_file(file)
-    YAML.safe_load(ERB.new(File.read(file)).result)
+    config = YAML.safe_load(ERB.new(File.read(file)).result, aliases: true)
+    return config if config.is_a?(Hash)
+
+    raise ConfigError, "\nEmpty or malformed donico.yml: expected a YAML mapping, got #{config.class}.\n\n"
   end
 
   def config_file

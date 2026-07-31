@@ -1,0 +1,11 @@
+---
+registry: registry.example.net/images/base
+image_name: foo
+.defaults: &defaults
+  distro: buster
+  archs: ["linux/amd64"]
+matrix:
+  - <<: *defaults
+    version: "1.0.0"
+  - <<: *defaults
+    version: "2.0.0"

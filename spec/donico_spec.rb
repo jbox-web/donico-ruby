@@ -131,5 +131,26 @@ RSpec.describe Donico do
     it "returns Donico config file path" do
       expect(described_class.load_config(get_fixture_path("docker/erb.yml")).to_h).to eq(config)
     end
+
+    # Factoring a repetitive matrix with YAML anchors is the natural reflex, and
+    # safe_load rejects them unless aliases are explicitly allowed.
+    it "supports YAML anchors and aliases" do
+      matrix = described_class.load_config(get_fixture_path("docker/aliases.yml")).matrix
+
+      expect(matrix.map(&:version)).to eq %w[1.0.0 2.0.0]
+      expect(matrix.map(&:distro)).to eq %w[buster buster]
+    end
+
+    it "rejects an empty config file with an explicit error" do
+      expect do
+        described_class.load_config(get_fixture_path("docker/empty.yml"))
+      end.to raise_error(Donico::ConfigError, /empty/i)
+    end
+
+    it "raises when the config file is missing" do
+      expect do
+        described_class.load_config(get_fixture_path("docker/does-not-exist.yml"))
+      end.to raise_error(Donico::ConfigError, /not found/i)
+    end
   end
 end
