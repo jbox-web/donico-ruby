@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Donico::VERSION::STRING
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Nicolas Rodriguez"]
-  s.email       = ["nicolas.rodriguez.externe@seetickets.fr"]
+  s.email       = ["nico@nicoladmin.fr"]
   s.homepage    = "https://gitlab.thetuxhouse.org/docker-image-factory/donico-cli"
   s.summary     = "A gem to easily build Docker Images"
   s.description = "A gem to easily build Docker Images (like Kaniko)"
