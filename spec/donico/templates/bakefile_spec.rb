@@ -36,6 +36,21 @@ RSpec.describe Donico::Templates::Bakefile do
       end
     end
 
+    # Build arg values are interpolated into quoted HCL strings. An unescaped quote
+    # or backslash produced a docker-bake.hcl that generate-files wrote and
+    # committed happily, and that only failed at the next build.
+    context "with values that need HCL escaping" do
+      let(:fixture_file) { "bake/escaping.yml" }
+
+      it "escapes double quotes" do
+        expect(described_class.new.render).to include('MOTD = "say \"hi\""')
+      end
+
+      it "escapes backslashes" do
+        expect(described_class.new.render).to include('WINPATH = "C:\\\\tmp"')
+      end
+    end
+
     context "with debian config file" do
       let(:fixture_file) { "bake/debian.yml" }
       let(:generated_file) { "generated/bakefile/debian.txt" }

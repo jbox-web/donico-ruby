@@ -21,7 +21,7 @@ target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-build" {
     <%- if name == "BUILD_DATE" -%>
     <%= name %> = "${<%= name %>}"
     <%- else -%>
-    <%= name %> = "<%= value %>"
+    <%= name %> = "<%= Donico::Templates::Hcl.escape(value) %>"
     <%- end -%>
     <%- end -%>
   }
@@ -30,14 +30,14 @@ target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-build" {
     <%- image.secret_envs.each do |secret| -%>
     {
       type = "env"
-      id = "<%= secret["id"] %>"
+      id = "<%= Donico::Templates::Hcl.escape(secret["id"]) %>"
     },
     <%- end -%>
     <%- image.secret_files.each do |secret| -%>
     {
       type = "file"
-      id = "<%= secret["id"] %>"
-      src = "<%= secret["src"] %>"
+      id = "<%= Donico::Templates::Hcl.escape(secret["id"]) %>"
+      src = "<%= Donico::Templates::Hcl.escape(secret["src"]) %>"
     },
     <%- end -%>
   ]
@@ -55,7 +55,7 @@ target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-push" {
     <%- if name == "BUILD_DATE" -%>
     <%= name %> = "${<%= name %>}"
     <%- else -%>
-    <%= name %> = "<%= value %>"
+    <%= name %> = "<%= Donico::Templates::Hcl.escape(value) %>"
     <%- end -%>
     <%- end -%>
   }
@@ -64,14 +64,14 @@ target "<%= image.distro %>-<%= image.version.gsub('.', '-') %>-push" {
     <%- image.secret_envs.each do |secret| -%>
     {
       type = "env"
-      id = "<%= secret["id"] %>"
+      id = "<%= Donico::Templates::Hcl.escape(secret["id"]) %>"
     },
     <%- end -%>
     <%- image.secret_files.each do |secret| -%>
     {
       type = "file"
-      id = "<%= secret["id"] %>"
-      src = "<%= secret["src"] %>"
+      id = "<%= Donico::Templates::Hcl.escape(secret["id"]) %>"
+      src = "<%= Donico::Templates::Hcl.escape(secret["src"]) %>"
     },
     <%- end -%>
   ]

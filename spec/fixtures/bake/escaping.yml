@@ -1,0 +1,13 @@
+---
+registry: registry.example.net/images/base
+image_name: foo
+image_builder: bake
+matrix:
+  - version: "1.0.0"
+    distro: buster
+    archs: ["linux/amd64"]
+    build_args:
+      - 'MOTD=say "hi"'
+      - 'WINPATH=C:\tmp'
+    tags:
+      - "%<version>s"
