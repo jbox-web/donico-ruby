@@ -59,10 +59,13 @@ module Donico
 
 
       # See: https://stackoverflow.com/a/1509939
+      # The replacement strings must stay single quoted: in a double quoted string
+      # "\1" is the 0x01 control byte, not a backreference, which produced env var
+      # names docker silently ignored.
       def underscore(string)
         string.gsub("::", "/")
-              .gsub(/([A-Z]+)([A-Z][a-z])/, "\1_\2")
-              .gsub(/([a-z\d])([A-Z])/, "\1_\2")
+              .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
+              .gsub(/([a-z\d])([A-Z])/, '\1_\2')
               .tr("-", "_")
               .downcase
       end
