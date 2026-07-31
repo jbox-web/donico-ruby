@@ -22,8 +22,13 @@
       echo "CMD: rake $DOCKER_DISTRO:$VERSION:$JOB_NAME"
 
       # Setup qemu for multiarch builds
+      # Pinned by digest: this runs --privileged on the runner, so a mutable tag
+      # would let an upstream re-tag execute arbitrary privileged code here.
+      # Digest of tonistiigi/binfmt:latest as of 2026-07-31.
       echo "Setup qemu for multiarch builds"
-      docker run --rm --privileged tonistiigi/binfmt --install all > /dev/null 2>&1 || true
+      BINFMT_IMAGE="tonistiigi/binfmt@sha256:400a4873b838d1b89194d982c45e5fb3cda4593fbfd7e08a02e76b03b21166f0"
+      docker run --rm --privileged "$BINFMT_IMAGE" --install all > /dev/null 2>&1 \
+        || echo "WARNING: qemu/binfmt setup failed, multiarch builds may not work"
 
       # Create Docker cache
       docker buildx create --use --bootstrap --name "donico-$DOCKER_DISTRO" || true
