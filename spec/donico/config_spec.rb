@@ -147,6 +147,36 @@ RSpec.describe Donico::Config do
     end
   end
 
+  describe "#dockerfiles" do
+    # `dockerfile` defaults to "Dockerfile", so a config with N distros used to run
+    # hadolint N times (N image pulls, N containers) on the very same file.
+    context "when several matrix entries share the same dockerfile" do
+      let(:config_file) do
+        super().merge("matrix" => [
+                        { "version" => "1.0.0", "distro" => "buster" },
+                        { "version" => "2.0.0", "distro" => "bullseye" },
+                      ])
+      end
+
+      it "returns each dockerfile once" do
+        expect(config.dockerfiles).to eq ["/app/Dockerfile"]
+      end
+    end
+
+    context "when matrix entries use distinct dockerfiles" do
+      let(:config_file) do
+        super().merge("matrix" => [
+                        { "version" => "1.0.0", "dockerfile" => "a/Dockerfile" },
+                        { "version" => "2.0.0", "dockerfile" => "b/Dockerfile" },
+                      ])
+      end
+
+      it "returns them all" do
+        expect(config.dockerfiles).to eq ["/app/a/Dockerfile", "/app/b/Dockerfile"]
+      end
+    end
+  end
+
   describe "#timestamp" do
     context "when CI_COMMIT_TIMESTAMP is not set" do
       before { ENV.delete("CI_COMMIT_TIMESTAMP") }

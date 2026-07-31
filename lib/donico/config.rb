@@ -35,8 +35,11 @@ module Donico
                      end
     end
 
+    # Deduplicated: `dockerfile` defaults to "Dockerfile", so a config with N distros
+    # otherwise runs hadolint N times (N image pulls, N containers) on one file.
+    # The /app prefix is where the linter container mounts the project.
     def dockerfiles
-      matrix.collect { |m| "/app/#{m.dockerfile}" }
+      matrix.map { |m| "/app/#{m.dockerfile}" }.uniq
     end
 
     def to_h
