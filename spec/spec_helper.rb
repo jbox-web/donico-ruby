@@ -9,6 +9,17 @@ SimpleCov.start do
   enable_coverage :branch
   formatter SimpleCov::Formatter::MultiFormatter.new([SimpleCov::Formatter::HTMLFormatter, SimpleCov::Formatter::JSONFormatter])
   skip "spec/"
+
+  # Ruby's Coverage only counts the FIRST load of a file (three consecutive loads
+  # of the same file leave its counters at 1). Donico.load_tasks re-loads the
+  # .rake files for every example, and the example order is random, so a task
+  # body counts as covered or not depending on the seed: the reported figure
+  # moved between 92.69% and 92.90% run to run, on identical code and tests.
+  #
+  # Excluded because the number was noise, not a gap: these bodies are one-line
+  # delegations to Donico::Tasks::*, and the specs do invoke them and assert on
+  # the docker commands they produce.
+  skip "lib/donico/rake/tasks/"
 end
 
 require_relative "support/helper"
