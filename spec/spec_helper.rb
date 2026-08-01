@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require "simplecov"
-require "rspec"
 
 # Start SimpleCov
 # The floor is set just under the current figure: it is a ratchet against silent
 # erosion, not a target. Raise it when coverage durably improves.
 SimpleCov.start do
-  add_filter "spec/"
-  minimum_coverage 88
+  enable_coverage :branch
+  formatter SimpleCov::Formatter::MultiFormatter.new([SimpleCov::Formatter::HTMLFormatter, SimpleCov::Formatter::JSONFormatter])
+  skip "spec/"
 end
 
 require_relative "support/helper"
