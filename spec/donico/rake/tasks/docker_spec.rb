@@ -95,6 +95,16 @@ RSpec.describe "docker.rake", type: :task do
           # run the test
           Rake::Task["amd64:buster:#{version}:tag"].invoke
         end
+
+        # The captured stderr is the only clue the user gets about why the tag
+        # failed, so it has to reach stdout rather than be swallowed.
+        it "prints what docker reported" do
+          allow(result).to receive(:success?).and_return(false)
+          allow(Open3).to receive(:capture3).with(*args).and_return(["", "No such image", result])
+          allow(Kernel).to receive(:exit).with(1)
+
+          expect { Rake::Task["amd64:buster:#{version}:tag"].invoke }.to output(/No such image/).to_stdout
+        end
       end
     end
 

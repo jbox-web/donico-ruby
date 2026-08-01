@@ -54,6 +54,26 @@ RSpec.describe Donico::Matrix do
     end
   end
 
+  describe "#matrix_for" do
+    let(:matrix) { described_class.new("version" => "1.0.0", "distro" => "buster", "archs" => ["linux/amd64"]) }
+
+    it "carries the arch dimension for the docker backend" do
+      expect(matrix.matrix_for("docker")).to eq(
+        "VERSION" => "1.0.0", "DOCKER_DISTRO" => "buster", "DOCKER_ARCH" => ["linux/amd64"]
+      )
+    end
+
+    it "drops the arch dimension for the bake backend" do
+      expect(matrix.matrix_for("bake")).to eq("VERSION" => "1.0.0", "DOCKER_DISTRO" => "buster")
+    end
+
+    # Config rejects an unsupported backend at load time, so this is a guard for a
+    # future backend added to Config but not here.
+    it "refuses an unsupported backend" do
+      expect { matrix.matrix_for("kaniko") }.to raise_error(RuntimeError, /kaniko/)
+    end
+  end
+
   describe "#version" do
     context "when version is a quoted string" do
       it "keeps the version untouched" do

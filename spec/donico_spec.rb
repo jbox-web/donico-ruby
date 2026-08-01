@@ -74,6 +74,35 @@ RSpec.describe Donico do
     end
   end
 
+  describe ".load!" do
+    it "loads the config then the tasks" do
+      expect(described_class).to receive(:load_config).ordered
+      expect(described_class).to receive(:load_tasks).ordered
+
+      described_class.load!
+    end
+  end
+
+  describe ".with_exit_status" do
+    context "when the command succeeds" do
+      it "exits successfully and yields the outcome" do
+        allow(described_class).to receive(:system).and_return(true)
+        expect(described_class).to receive(:exit).with(0)
+
+        expect { |b| described_class.with_exit_status("true", &b) }.to yield_with_args(true)
+      end
+    end
+
+    context "when the command fails" do
+      it "exits with a failure status" do
+        allow(described_class).to receive(:system).and_return(false)
+        expect(described_class).to receive(:exit).with(1)
+
+        described_class.with_exit_status("false")
+      end
+    end
+  end
+
   describe ".run_cmd" do
     let(:status) { instance_double(Process::Status) }
 
@@ -93,6 +122,13 @@ RSpec.describe Donico do
 
         expect(described_class.run_cmd("false")).to eq [false, "err"]
       end
+    end
+
+    it "yields the outcome when a block is given" do
+      allow(status).to receive(:success?).and_return(true)
+      allow(Open3).to receive(:capture3).and_return(["out", "err", status])
+
+      expect { |b| described_class.run_cmd("true", &b) }.to yield_with_args(true)
     end
 
     # Returning a bare false here used to make the caller destructure log to nil,

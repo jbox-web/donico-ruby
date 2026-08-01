@@ -59,6 +59,16 @@ RSpec.describe Donico::Images::Docker do
       expect(image.test_args).to include("distro_name=buster", "nodejs_version=14.17.3")
     end
 
+    # A build arg carrying no value at all must not gain a stray "=".
+    context "when a build arg has no value" do
+      let(:matrix) { Donico::Matrix.new("version" => "1.0.0", "build_args" => ["VERBOSE"]) }
+      let(:image) { described_class.build_image_from_matrix(matrix: matrix, arch: "linux/amd64") }
+
+      it "downcases the bare name" do
+        expect(image.test_args).to include("verbose")
+      end
+    end
+
     # Inspec input names are lowercase, their values are not: downcasing the whole
     # "KEY=VALUE" pair corrupts anything case sensitive (base64, tokens, paths).
     context "when a build arg holds a case sensitive value" do

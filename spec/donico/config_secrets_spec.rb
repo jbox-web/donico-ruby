@@ -28,6 +28,12 @@ RSpec.describe Donico::Config do
       end.to raise_error(Donico::ConfigError, /secret_files.*src/m)
     end
 
+    it "names both keys when a secret file declares neither" do
+      expect do
+        config_for("image_builder" => "bake", "matrix" => [{ "secret_files" => [{}] }])
+      end.to raise_error(Donico::ConfigError, /keys: id, src/)
+    end
+
     it "accepts a fully declared secret" do
       expect do
         config_for("image_builder" => "bake",
