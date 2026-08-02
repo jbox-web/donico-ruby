@@ -30,8 +30,28 @@ run = "bin/push"
 
 [tasks."dev:lint-commits"]
 description = "Lint commits"
+# The range is explicit. `commitlint /app` only ever worked by accident: the
+# positional argument is ignored, and up to commitlint 12 a bare invocation fell
+# back to linting the whole history. From v13 on it reads stdin instead — closed
+# in CI — so it lints the empty string and fails on every commit. The linter
+# image now ships 21.2.1, where the old form is rejected outright.
+#
+# The base follows the pipeline and is checked against the clone first: GitLab
+# names a commit without promising the runner has it, and after an amend or a
+# force-push that SHA is no longer on the branch. See Donico::CommitRange, which
+# this mirrors for the gem's own repository.
+#
+# MISE_IGNORED_CONFIG_PATHS replaces the `mise trust -y`: the linter image is
+# mise-based and would otherwise parse this very file, written for a newer mise
+# than it ships, and abort before commitlint runs.
 run = '''
-docker run --pull always --rm -v "${PWD}:/app" {{vars.COMMIT_LINTER}} bash -l -c 'mise trust -y && commitlint /app && echo "Commits are OK!"'
+base="${CI_MERGE_REQUEST_DIFF_BASE_SHA:-${CI_COMMIT_BEFORE_SHA:-}}"
+case "${base}" in "" | 0000000000000000000000000000000000000000) base="HEAD~1" ;; esac
+git cat-file -e "${base}^{commit}" 2>/dev/null || base="HEAD~1"
+docker run --pull always --rm \
+  -e MISE_IGNORED_CONFIG_PATHS=/app/mise.toml \
+  -v "${PWD}:/app" {{vars.COMMIT_LINTER}} \
+  commitlint --from "${base}" --to HEAD --verbose
 '''
 
 [tasks."dev:lint-project"]
