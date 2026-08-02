@@ -166,6 +166,12 @@ RSpec.describe "common.rake", type: :task do
          "commitlint", "--from", base, "--to", "HEAD", "--verbose",]
       end
 
+      # A real revision of this repository, because CommitRange checks the base
+      # against the clone before using it: a made-up SHA would be refused, and the
+      # examples below would assert the fallback while claiming to assert the
+      # range.
+      let(:existing_sha) { %x(git rev-parse HEAD).strip }
+
       context "when running outside CI" do
         let(:base) { "HEAD~1" }
 
@@ -181,7 +187,7 @@ RSpec.describe "common.rake", type: :task do
       # without that, this suite would pick up whatever GitLab exports while
       # linting donico itself, and the example above would fail in CI only.
       context "when GitLab runs a push pipeline" do
-        let(:base) { "bbb222" }
+        let(:base) { existing_sha }
 
         before { ENV["CI_COMMIT_BEFORE_SHA"] = base }
 
@@ -193,11 +199,27 @@ RSpec.describe "common.rake", type: :task do
       end
 
       context "when GitLab runs a merge request pipeline" do
-        let(:base) { "aaa111" }
+        let(:base) { existing_sha }
 
         before { ENV["CI_MERGE_REQUEST_DIFF_BASE_SHA"] = base }
 
         it "starts from the base of the merge request" do
+          expect(Donico).to receive(:with_exit_status).with(*args)
+
+          Rake::Task["lint-commits"].invoke
+        end
+      end
+
+      # What actually broke the donico image pipeline: an amend had rewritten the
+      # head, so the SHA GitLab reported was no longer on the branch and the
+      # shallow clone did not hold it. commitlint died on "Invalid revision
+      # range", failing the lint stage for a reason unrelated to any message.
+      context "when GitLab names a commit the clone does not have" do
+        let(:base) { "HEAD~1" }
+
+        before { ENV["CI_COMMIT_BEFORE_SHA"] = "afd4b44c8a8912b9d64bb1e2b169995d08e3bcdf" }
+
+        it "falls back to the last commit" do
           expect(Donico).to receive(:with_exit_status).with(*args)
 
           Rake::Task["lint-commits"].invoke

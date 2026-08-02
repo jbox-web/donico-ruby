@@ -19,22 +19,30 @@ module Donico
   # Both variables are set on a merge request pipeline, hence the order: the push
   # one points at the previous head of the source branch and would skip the very
   # commits the merge request adds.
+  #
+  # Every candidate is checked against the repository before being used. GitLab
+  # names a commit; it does not promise the runner has it. The clone is made with
+  # `git depth 50`, so anything older is absent, and an amend or a force-push is
+  # worse still: the reported SHA no longer belongs to the branch, so no depth
+  # would bring it back. Handing such a base to commitlint ends the job on
+  # "fatal: Invalid revision range <sha>..HEAD" — a lint failure that says nothing
+  # about the commit messages.
   class CommitRange
     # What GitLab reports instead of a parent on the first push of a branch.
-    # Handed to --from it names no revision, and commitlint aborts.
     NULL_SHA = ("0" * 40).freeze
 
     # Also what a developer gets locally, where neither variable exists.
     FALLBACK = "HEAD~1"
 
-    def self.base(env = ENV) = new(env).base
+    def self.base(env = ENV, **) = new(env, **).base
 
-    def initialize(env = ENV)
-      @env = env
+    def initialize(env = ENV, exists: nil)
+      @env    = env
+      @exists = exists || method(:reachable?)
     end
 
     def base
-      merge_request_base || push_base || FALLBACK
+      reachable(merge_request_base) || reachable(push_base) || FALLBACK
     end
 
     private
@@ -44,6 +52,15 @@ module Donico
     def push_base
       sha = presence("CI_COMMIT_BEFORE_SHA")
       sha unless sha == NULL_SHA
+    end
+
+    def reachable(sha)
+      sha if sha && @exists.call(sha)
+    end
+
+    # `^{commit}` so a SHA that happens to name a blob or a tree is rejected too.
+    def reachable?(sha)
+      system("git", "cat-file", "-e", "#{sha}^{commit}", out: File::NULL, err: File::NULL)
     end
 
     # A GitLab variable can be defined and empty, which is not a revision either.
