@@ -13,8 +13,7 @@ lint-commits:
   stage: lint
 
   script:
-    # The donico image ships its own toolchain: a mise.toml left in the project
-    # would try to provision a second one inside the job. -f because most consumer
-    # repos have no mise.toml at all, and a missing file must not fail the lint.
-    - rm -f mise.toml
+    # No `rm -f mise.toml` here anymore: the lint tasks now tell the linter
+    # container to ignore the project's mise config, so the file can stay.
+    # Deleting a tracked file just to run a lint was a workaround, not a fix.
     - rake $CI_JOB_NAME

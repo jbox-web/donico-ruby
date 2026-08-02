@@ -115,12 +115,33 @@ RSpec.describe Donico do
       end
     end
 
+    # Which stream carries the explanation depends on the command: docker reports
+    # errors on stderr, hadolint reports its findings on stdout. Worse, `docker
+    # run --pull always` writes its pull progress to stderr, so stderr is never
+    # empty and a stdout-only fallback would still hide the findings. Return both.
     context "when the command fails" do
-      it "returns the failure flag and stderr" do
+      it "returns stderr when stdout is empty" do
         allow(status).to receive(:success?).and_return(false)
-        allow(Open3).to receive(:capture3).and_return(["out", "err", status])
+        allow(Open3).to receive(:capture3).and_return(["", "err", status])
 
         expect(described_class.run_cmd("false")).to eq [false, "err"]
+      end
+
+      it "returns stdout when stderr is empty" do
+        allow(status).to receive(:success?).and_return(false)
+        allow(Open3).to receive(:capture3).and_return(["DL3006 always tag the version", "", status])
+
+        expect(described_class.run_cmd("hadolint")).to eq [false, "DL3006 always tag the version"]
+      end
+
+      it "returns both streams when both carry something" do
+        allow(status).to receive(:success?).and_return(false)
+        allow(Open3).to receive(:capture3).and_return(["DL3006 always tag the version", "Pulling from jbox/base", status])
+
+        success, log = described_class.run_cmd("hadolint")
+
+        expect(success).to be false
+        expect(log).to include("DL3006 always tag the version").and include("Pulling from jbox/base")
       end
     end
 

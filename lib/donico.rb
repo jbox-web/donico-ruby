@@ -151,6 +151,15 @@ module Donico
     Kernel.exec(env, *args, unsetenv_others: true)
   end
 
+  # Which stream carries the explanation depends on the command: docker reports
+  # errors on stderr, hadolint reports its findings on stdout. And `docker run
+  # --pull always` writes its pull progress to stderr, so stderr is never empty
+  # and returning it alone silently discarded the findings — the lint job failed
+  # without printing a single reason. Return everything that was captured.
+  def failure_output(stdout, stderr)
+    [stdout, stderr].reject(&:empty?).join("\n")
+  end
+
   def run_cmd(*args)
     log_args("run_cmd", args)
 
@@ -160,7 +169,7 @@ module Donico
 
       yield success if block_given?
 
-      out = success ? stdout : stderr
+      out = success ? stdout : failure_output(stdout, stderr)
 
       [success, out]
     rescue StandardError => e

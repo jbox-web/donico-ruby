@@ -4,13 +4,26 @@
 # LINT section #
 ################
 
+# The linter images are mise-based, and mise reads the config of the directory it
+# starts in. Mounting the project at /app made it parse the project's own
+# mise.toml, which is untrusted there and may use a syntax newer than the mise
+# shipped in the linter image: the container aborted before the linter ever ran.
+# Every image repository of the fleet carries a mise.toml, so every one was hit.
+#
+# Ignoring that file is the direct expression of what we want: the linter has no
+# business provisioning the project's toolchain.
+MISE_IGNORE = ["-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml"].freeze
+
 desc "Lint Dockerfile"
 task :"lint-dockerfile" do
   results = []
   logs    = []
 
   Donico.config.dockerfiles.each do |f|
-    success, log = Donico.run_cmd("docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico.config.docker_linter, "hadolint", f)
+    # -w / as a second guard, independent of the mise version: hadolint takes an
+    # absolute path, so it does not care about the working directory. commitlint
+    # does (it runs git from there), which is why it only gets the env var.
+    success, log = Donico.run_cmd("docker", "run", "--pull", "always", "--rm", *MISE_IGNORE, "-w", "/", "-v", "#{Dir.pwd}:/app", Donico.config.docker_linter, "hadolint", f)
     results << success
     logs << log
   end
@@ -28,7 +41,7 @@ end
 
 desc "Lint commits"
 task :"lint-commits" do
-  Donico.with_exit_status("docker", "run", "--pull", "always", "--rm", "-v", "#{Dir.pwd}:/app", Donico.config.commit_linter, "commitlint", "/app") do |success|
+  Donico.with_exit_status("docker", "run", "--pull", "always", "--rm", *MISE_IGNORE, "-v", "#{Dir.pwd}:/app", Donico.config.commit_linter, "commitlint", "/app") do |success|
     puts("Commits are OK!") if success
   end
 end
