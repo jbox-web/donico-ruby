@@ -69,7 +69,7 @@ RSpec.describe "common.rake", type: :task do
       after { Rake::Task.clear }
 
       describe "lint-dockerfile" do
-        let(:args) { ["docker", "run", "--pull", "always", "--rm", "-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml", "-w", "/", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_DOCKER_LINTER, "hadolint", "/app/Dockerfile"] }
+        let(:args) { ["docker", "run", "--pull", "always", "--rm", "-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_DOCKER_LINTER, "hadolint", "/app/Dockerfile"] }
 
         it "exits successfully when hadolint reports no violation" do
           allow(Donico).to receive(:run_cmd).with(*args).and_return([true, ""])
@@ -98,8 +98,8 @@ RSpec.describe "common.rake", type: :task do
       after { Rake::Task.clear }
 
       describe "lint-dockerfile" do
-        let(:args1) { ["docker", "run", "--pull", "always", "--rm", "-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml", "-w", "/", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_DOCKER_LINTER, "hadolint", "/app/dockerfiles/3.1/Dockerfile"] }
-        let(:args2) { ["docker", "run", "--pull", "always", "--rm", "-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml", "-w", "/", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_DOCKER_LINTER, "hadolint", "/app/dockerfiles/3.2/Dockerfile"] }
+        let(:args1) { ["docker", "run", "--pull", "always", "--rm", "-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_DOCKER_LINTER, "hadolint", "/app/dockerfiles/3.1/Dockerfile"] }
+        let(:args2) { ["docker", "run", "--pull", "always", "--rm", "-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_DOCKER_LINTER, "hadolint", "/app/dockerfiles/3.2/Dockerfile"] }
 
         it "lints every dockerfile and fails as soon as one is rejected" do
           allow(Donico).to receive(:run_cmd).with(*args1).and_return([true, ""])

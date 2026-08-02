@@ -11,7 +11,9 @@
 # Every image repository of the fleet carries a mise.toml, so every one was hit.
 #
 # Ignoring that file is the direct expression of what we want: the linter has no
-# business provisioning the project's toolchain.
+# business provisioning the project's toolchain. Moving the working directory out
+# of /app also silences mise, but it costs more than it fixes: the linters look
+# there for their own config (.hadolint.yaml) and commitlint runs git from it.
 MISE_IGNORE = ["-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml"].freeze
 
 desc "Lint Dockerfile"
@@ -20,10 +22,11 @@ task :"lint-dockerfile" do
   logs    = []
 
   Donico.config.dockerfiles.each do |f|
-    # -w / as a second guard, independent of the mise version: hadolint takes an
-    # absolute path, so it does not care about the working directory. commitlint
-    # does (it runs git from there), which is why it only gets the env var.
-    success, log = Donico.run_cmd("docker", "run", "--pull", "always", "--rm", *MISE_IGNORE, "-w", "/", "-v", "#{Dir.pwd}:/app", Donico.config.docker_linter, "hadolint", f)
+    # The working directory stays inside /app on purpose: hadolint discovers the
+    # project's .hadolint.yaml there. Running with -w / silenced mise too, but it
+    # also hid that config, so the lint reported rules the project had
+    # deliberately waived.
+    success, log = Donico.run_cmd("docker", "run", "--pull", "always", "--rm", *MISE_IGNORE, "-v", "#{Dir.pwd}:/app", Donico.config.docker_linter, "hadolint", f)
     results << success
     logs << log
   end
