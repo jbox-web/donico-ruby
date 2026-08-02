@@ -161,7 +161,7 @@ scindé en `raw_build_args` (liste `CLÉ=VALEUR`) et `cli_build_args` (forme
 source 'https://rubygems.org'
 
 # When in CI use the installed gem, otherwise use latest stable version
-opts = ENV.key?('CI') ? {} : { git: 'ssh://git@gitlab.thetuxhouse.org/docker-image-factory/donico-cli.git', tag: 'v2.0.3' }
+opts = ENV.key?('CI') ? {} : { git: 'ssh://git@gitlab.thetuxhouse.org/docker-image-factory/donico-cli.git', tag: 'v2.0.4' }
 gem 'donico', opts
 ```
 
