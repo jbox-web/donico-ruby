@@ -124,6 +124,32 @@ Donico ajoute également des commandes utilitaires :
 * `rake help` : la tâche par défaut, qui liste tout ce qui précède
 
 
+## Migration 1.x → 2.0
+
+La 2.0 refuse au chargement des configurations que la 1.x acceptait en produisant
+silencieusement une image fausse. Le passage échoue donc **au démarrage**, avec un
+message nommant la clé fautive, plutôt qu'à la publication.
+
+| Ce qui échoue désormais | Pourquoi | Correctif |
+|---|---|---|
+| `version: 3.4` (non quotée) | YAML la convertit en flottant ; `3.10` devenait `3.1`, et l'image était construite **et taguée** en 3.1 | Quoter : `version: "3.4"` |
+| Aucun `image_name` | Le nom valait `nil` : tags à segment vide (`/1.0.0/buster:…`), variable `_VERSION` | Déclarer `image_name` au top-level ou sur chaque entrée de matrice |
+| `image_builder` inconnu | La valeur partait dans un chemin de fichier chargé par `load` | Utiliser `docker` ou `bake` |
+| `%<arch>s` en backend `bake` | bake résout lui-même la liste des plateformes : aucune architecture unique au moment du tag | Retirer la macro, ou passer au backend `docker` |
+| `%` littéral dans un tag | Il était absorbé silencieusement : `100%-slim` produisait `100{version: "1.0.0"}lim` | Retirer le `%` |
+| `secret_envs` / `secret_files` incomplets | Un secret sans `id` produisait du HCL valide qui ne montait rien | Renseigner `id`, et `src` pour les fichiers |
+
+Deux changements de comportement, sans erreur au chargement :
+
+* **Les valeurs des inputs Inspec ne sont plus minusculisées** — seule la clé l'est.
+  Un test qui attendait `bar_version=zm9vcg==` doit attendre `bar_version=Zm9vCg==`.
+* **Les build-args de `donico.yml` priment sur l'environnement.** Une variable
+  `RUBY_VERSION` exportée par votre shell n'écrase plus la version déclarée.
+
+Enfin, si votre `Rakefile` manipule un objet image via un hook, `build_args` a été
+scindé en `raw_build_args` (liste `CLÉ=VALEUR`) et `cli_build_args` (forme
+`--build-arg …`).
+
 ## Installation
 
 1. Ajoutez un fichier `Gemfile` dans le dépôt de votre image Docker avec le contenu suivant
@@ -135,7 +161,7 @@ Donico ajoute également des commandes utilitaires :
 source 'https://rubygems.org'
 
 # When in CI use the installed gem, otherwise use latest stable version
-opts = ENV.key?('CI') ? {} : { git: 'ssh://git@gitlab.thetuxhouse.org/docker-image-factory/donico-cli.git', tag: 'v1.14.0' }
+opts = ENV.key?('CI') ? {} : { git: 'ssh://git@gitlab.thetuxhouse.org/docker-image-factory/donico-cli.git', tag: 'v2.0.0' }
 gem 'donico', opts
 ```
 
