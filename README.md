@@ -409,6 +409,21 @@ matrix:
         src: "${HOME}/.aws/credentials"
 ```
 
+Un `secret_envs` suppose que la variable soit **exportée** dans l'environnement du
+build :
+
+```sh
+export GITHUB_TOKEN=…
+bin/rake bookworm:3.4:build
+```
+
+Donico le vérifie avant d'appeler `docker` et s'arrête en nommant la variable
+manquante. Sans ce contrôle, buildx retombe sur une lecture de *fichier* portant
+le nom de l'`id` et signale `failed to stat GITHUB_TOKEN: no such file or
+directory` — un fichier que personne n'a jamais mentionné. Même contrôle sur le
+`src` d'un `secret_files`, sauf s'il contient une référence HCL (`${HOME}/…`),
+que bake résout lui-même.
+
 ### Déclarer la liste des tags à produire
 
 Il suffit de déclarer une liste de tags via la clé `tags` :
