@@ -151,6 +151,12 @@ RSpec.describe "bake.rake", type: :task do
     let(:version) { "1.0.0" }
     let(:fixture_file) { "bake/custom.yml" }
 
+    # This fixture declares GITHUB_TOKEN as a secret_env, and the bake tasks
+    # refuse to build or push when a declared secret is missing. Setting it here
+    # makes that dependency explicit instead of relying on the developer having
+    # one exported: spec_helper clears it, so CI and a local shell agree.
+    before { ENV["GITHUB_TOKEN"] = "spec-token" }
+
     describe "buster:1.0.0:build" do
       let(:args) do
         [

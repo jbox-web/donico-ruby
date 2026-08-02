@@ -32,21 +32,29 @@ ENV["DONICO_QUIET"] = "true"
 RSpec.configure do |config|
   config.include Helper
 
-  # CI_COMMIT_TIMESTAMP switches Config#timestamp between the dev format
-  # (%Y%m%d) and the CI one (%Y%m%d%H%M%S), so any example reading a build tag
-  # depends on it. Several examples used to delete or set it without restoring
-  # it, which under a random order made the outcome depend on the seed: the
-  # suite passed locally and failed in CI, where the variable is set.
+  # Variables the suite must never inherit, because Donico changes behaviour on
+  # them and the developer's shell rarely matches CI:
   #
-  # Neutralised and restored around every example. An example that needs the CI
-  # format sets it explicitly and gets it cleaned up here.
+  # * CI_COMMIT_TIMESTAMP switches Config#timestamp between the dev format
+  #   (%Y%m%d) and the CI one (%Y%m%d%H%M%S), so any example reading a build tag
+  #   depends on it.
+  # * GITHUB_TOKEN is declared as a secret_env by the bake fixtures, and the bake
+  #   tasks refuse to build when a declared secret is missing.
+  #
+  # Both have already produced a green local suite and a red CI one. Inheriting
+  # them means the machine, not the code, decides the outcome — so the whole
+  # environment is snapshotted and restored around every example, and these two
+  # are cleared. An example that needs one sets it explicitly and gets it
+  # cleaned up here.
+  volatile_env = %w[CI_COMMIT_TIMESTAMP GITHUB_TOKEN].freeze
+
   config.around do |example|
-    previous = ENV.fetch("CI_COMMIT_TIMESTAMP", nil)
-    ENV.delete("CI_COMMIT_TIMESTAMP")
+    snapshot = ENV.to_h
+    volatile_env.each { |key| ENV.delete(key) }
 
     example.run
 
-    previous.nil? ? ENV.delete("CI_COMMIT_TIMESTAMP") : ENV["CI_COMMIT_TIMESTAMP"] = previous
+    ENV.replace(snapshot)
   end
 
   config.color = true
