@@ -117,8 +117,8 @@ Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`, `
 Donico ajoute également des commandes utilitaires :
 
 * `rake generate-files` : pour générer les fichiers de configuration pour Docker Bake et GitlabCI (voir plus bas [Intégration avec GitlabCI](#intégration-avec-gitlabci))
-* `rake lint-commits` : pour linter les commits
-* `rake lint-dockerfile` : pour linter le `Dockerfile` (sort en erreur si hadolint remonte une violation)
+* `rake lint-commits` : pour linter les messages de commit (voir [Périmètre du lint des commits](#périmètre-du-lint-des-commits))
+* `rake lint-dockerfile` : pour linter le `Dockerfile` (sort en erreur si hadolint remonte une violation, et respecte le `.hadolint.yaml` du projet)
 * `rake image-builder` : pour afficher le backend configuré (`docker` ou `bake`) ; c'est ce qu'utilisent les templates GitlabCI pour choisir leur branche
 * `rake version` : pour afficher la version de Donico
 * `rake help` : la tâche par défaut, qui liste tout ce qui précède
@@ -367,6 +367,36 @@ clean:
 Les jobs `lint-commits` et `lint-dockerfile` sont fournis clés en main par les templates `stages/lint/*` inclus ci-dessus.
 
 Le template `.docker-in-docker` détecte automatiquement le backend (`docker` ou `bake`) et configure QEMU/buildx pour les builds multi-architecture en mode `bake`.
+
+### Périmètre du lint des commits
+
+`rake lint-commits` n'analyse pas tout l'historique : il passe à commitlint une
+plage explicite, dont la borne de départ dépend du pipeline.
+
+| Contexte | Point de départ | Variable GitLab |
+|---|---|---|
+| Merge request | La base de la MR | `CI_MERGE_REQUEST_DIFF_BASE_SHA` |
+| Poussée sur une branche | L'état de la branche avant la poussée | `CI_COMMIT_BEFORE_SHA` |
+| En local, ou première poussée d'une branche | `HEAD~1` | *aucune* |
+
+Ces variables sont posées par GitlabCI, il n'y a rien à configurer. En local, seul
+le dernier commit est vérifié.
+
+> L'invocation historique `commitlint /app` ne fonctionnait que par accident :
+> l'argument positionnel est ignoré, et commitlint retombait sur « tout
+> l'historique ». Ce repli a disparu en version 13 — la commande lit alors
+> l'entrée standard, fermée en CI, et échoue donc sur **chaque** commit. D'où la
+> plage explicite.
+
+### Le linter et le `mise.toml` du projet
+
+Les deux tâches de lint disent à leur conteneur d'ignorer le `mise.toml` du
+projet monté. Les images de linters étant basées sur mise, et mise lisant la
+configuration du répertoire où il démarre, il tentait de provisionner la chaîne
+d'outils du projet et abandonnait avant que le linter ne s'exécute.
+
+Le répertoire de travail reste dans `/app` : hadolint y cherche le
+`.hadolint.yaml` du projet, et commitlint y lance `git`.
 
 ## Configuration
 

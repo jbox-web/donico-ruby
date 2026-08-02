@@ -42,9 +42,18 @@ task :"lint-dockerfile" do
   end
 end
 
+# The range is explicit because `commitlint /app` only ever worked by accident:
+# the positional argument is ignored, and up to commitlint 12 a bare invocation
+# fell back to linting the whole history. From v13 on it reads stdin instead,
+# closed in CI, so it lints the empty string and fails on every commit. See
+# Donico::CommitRange for how the base is chosen.
+#
+# --verbose because commitlint has printed nothing on success since v7, which
+# left the job log with no trace that anything had been checked.
 desc "Lint commits"
 task :"lint-commits" do
-  Donico.with_exit_status("docker", "run", "--pull", "always", "--rm", *MISE_IGNORE, "-v", "#{Dir.pwd}:/app", Donico.config.commit_linter, "commitlint", "/app") do |success|
+  Donico.with_exit_status("docker", "run", "--pull", "always", "--rm", *MISE_IGNORE, "-v", "#{Dir.pwd}:/app", Donico.config.commit_linter,
+                          "commitlint", "--from", Donico::CommitRange.base, "--to", "HEAD", "--verbose") do |success|
     puts("Commits are OK!") if success
   end
 end

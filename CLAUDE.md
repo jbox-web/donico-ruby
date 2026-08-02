@@ -79,7 +79,17 @@ donico.yml
   dynamically declare namespaced Rake tasks (`arch → distro → version → action`).
   The task bodies just delegate to `Donico::Tasks::*`.
 - `common.rake` holds backend-agnostic tasks: `lint-dockerfile`, `lint-commits`,
-  `generate-files`, `version`, `help` (the default task).
+  `generate-files`, `version`, `image-builder`, `help` (the default task).
+- Both lint tasks pass `MISE_IGNORED_CONFIG_PATHS=/app/mise.toml` to their
+  container (`MISE_IGNORE` in `common.rake`). The linter images are mise-based
+  and mise reads the config of the directory it starts in, so the mounted
+  project's own `mise.toml` aborted them before the linter ran — every image
+  repository carries one. The working directory stays inside `/app`: hadolint
+  looks for `.hadolint.yaml` there and commitlint runs `git` from it.
+- `lint-commits` passes an explicit `--from`/`--to` range, chosen by
+  `Donico::CommitRange` (`lib/donico/commit_range.rb`). `commitlint /app` only
+  ever worked by accident — the positional argument is ignored, and the
+  whole-history fallback it relied on is gone from commitlint 13 on.
 - `Templates::Bakefile` renders `lib/donico/data/templates/bakefile.erb` into
   `docker-bake.hcl` for the bake backend.
 

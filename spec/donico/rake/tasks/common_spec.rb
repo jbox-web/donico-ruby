@@ -161,12 +161,47 @@ RSpec.describe "common.rake", type: :task do
 
       after { Rake::Task.clear }
 
-      let(:args) { ["docker", "run", "--pull", "always", "--rm", "-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_COMMIT_LINTER, "commitlint", "/app"] }
+      let(:args) do
+        ["docker", "run", "--pull", "always", "--rm", "-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_COMMIT_LINTER,
+         "commitlint", "--from", base, "--to", "HEAD", "--verbose",]
+      end
 
-      it "lint commits" do
-        expect(Donico).to receive(:with_exit_status).with(*args)
+      context "when running outside CI" do
+        let(:base) { "HEAD~1" }
 
-        Rake::Task["lint-commits"].invoke
+        it "lint commits" do
+          expect(Donico).to receive(:with_exit_status).with(*args)
+
+          Rake::Task["lint-commits"].invoke
+        end
+      end
+
+      # The task reads the real environment, so the range follows the pipeline it
+      # runs in. Both variables are cleared by spec_helper's volatile_env list:
+      # without that, this suite would pick up whatever GitLab exports while
+      # linting donico itself, and the example above would fail in CI only.
+      context "when GitLab runs a push pipeline" do
+        let(:base) { "bbb222" }
+
+        before { ENV["CI_COMMIT_BEFORE_SHA"] = base }
+
+        it "starts from the commit the branch was on before the push" do
+          expect(Donico).to receive(:with_exit_status).with(*args)
+
+          Rake::Task["lint-commits"].invoke
+        end
+      end
+
+      context "when GitLab runs a merge request pipeline" do
+        let(:base) { "aaa111" }
+
+        before { ENV["CI_MERGE_REQUEST_DIFF_BASE_SHA"] = base }
+
+        it "starts from the base of the merge request" do
+          expect(Donico).to receive(:with_exit_status).with(*args)
+
+          Rake::Task["lint-commits"].invoke
+        end
       end
     end
   end

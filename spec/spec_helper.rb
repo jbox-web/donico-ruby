@@ -40,13 +40,18 @@ RSpec.configure do |config|
   #   depends on it.
   # * GITHUB_TOKEN is declared as a secret_env by the bake fixtures, and the bake
   #   tasks refuse to build when a declared secret is missing.
+  # * CI_MERGE_REQUEST_DIFF_BASE_SHA and CI_COMMIT_BEFORE_SHA pick the base of the
+  #   range lint-commits hands to commitlint (see Donico::CommitRange). GitLab
+  #   exports the second on every push pipeline, including the one that lints
+  #   donico itself, so leaving them in place would make the lint-commits
+  #   examples pass locally and fail in CI.
   #
-  # Both have already produced a green local suite and a red CI one. Inheriting
+  # All have already produced a green local suite and a red CI one. Inheriting
   # them means the machine, not the code, decides the outcome — so the whole
-  # environment is snapshotted and restored around every example, and these two
-  # are cleared. An example that needs one sets it explicitly and gets it
-  # cleaned up here.
-  volatile_env = %w[CI_COMMIT_TIMESTAMP GITHUB_TOKEN].freeze
+  # environment is snapshotted and restored around every example, and these are
+  # cleared. An example that needs one sets it explicitly and gets it cleaned up
+  # here.
+  volatile_env = %w[CI_COMMIT_TIMESTAMP GITHUB_TOKEN CI_MERGE_REQUEST_DIFF_BASE_SHA CI_COMMIT_BEFORE_SHA].freeze
 
   config.around do |example|
     snapshot = ENV.to_h
