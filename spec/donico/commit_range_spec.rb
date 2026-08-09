@@ -48,12 +48,14 @@ RSpec.describe Donico::CommitRange do
   context "when the base is missing from the clone" do
     let(:absent) { ->(_sha) { false } }
 
+    let(:absent_but_parent) { ->(sha) { sha == "HEAD~1" } }
+
     it "falls back to the last commit rather than naming an unknown revision" do
-      expect(base({ "CI_COMMIT_BEFORE_SHA" => "bbb222" }, exists: absent)).to eq "HEAD~1"
+      expect(base({ "CI_COMMIT_BEFORE_SHA" => "bbb222" }, exists: absent_but_parent)).to eq "HEAD~1"
     end
 
     it "falls back for a merge request base too" do
-      expect(base({ "CI_MERGE_REQUEST_DIFF_BASE_SHA" => "aaa111" }, exists: absent)).to eq "HEAD~1"
+      expect(base({ "CI_MERGE_REQUEST_DIFF_BASE_SHA" => "aaa111" }, exists: absent_but_parent)).to eq "HEAD~1"
     end
 
     # A merge request pipeline sets both. If the base of the merge request is out
@@ -73,7 +75,7 @@ RSpec.describe Donico::CommitRange do
       expect(base({})).to eq "HEAD~1"
     end
 
-    it "does not ask git about anything when there is no candidate" do
+    it "asks git about the fallback alone when there is no candidate" do
       asked = []
 
       base({}, exists: lambda { |sha|
@@ -81,11 +83,26 @@ RSpec.describe Donico::CommitRange do
         true
       })
 
-      expect(asked).to be_empty
+      expect(asked).to eq ["HEAD~1"]
+    end
+  end
+
+  # A squashed repository, or a fresh one: HEAD is the root commit, so HEAD~1 is
+  # not a revision either and the range dies with "ambiguous argument
+  # 'HEAD~1..HEAD'". There is no base at all then — only one commit to lint.
+  context "when HEAD is the root commit" do
+    let(:nothing) { ->(_sha) { false } }
+
+    it "reports no base rather than an unresolvable fallback" do
+      expect(base({}, exists: nothing)).to be_nil
+    end
+
+    it "reports no base even when the environment named one" do
+      expect(base({ "CI_COMMIT_BEFORE_SHA" => "bbb222" }, exists: nothing)).to be_nil
     end
   end
 
   it "reads the real environment and the real repository by default" do
-    expect(described_class.new.base).to be_a String
+    expect(described_class.new.base).to be_a(String).or be_nil
   end
 end

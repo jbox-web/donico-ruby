@@ -225,6 +225,25 @@ RSpec.describe "common.rake", type: :task do
           Rake::Task["lint-commits"].invoke
         end
       end
+
+      # What broke the cronaute image pipeline, job 216279: the repository holds a
+      # single commit, so HEAD~1 is not a revision either and commitlint aborted
+      # on "ambiguous argument 'HEAD~1..HEAD'". There is no range to lint then,
+      # only the one commit, which --last names without naming a parent.
+      context "when HEAD is the root commit" do
+        let(:args) do
+          ["docker", "run", "--pull", "always", "--rm", "-e", "MISE_IGNORED_CONFIG_PATHS=/app/mise.toml", "-v", "#{Dir.pwd}:/app", Donico::DEFAULT_COMMIT_LINTER,
+           "commitlint", "--last", "--verbose",]
+        end
+
+        before { allow(Donico::CommitRange).to receive(:base).and_return(nil) }
+
+        it "lints the single commit instead of a range" do
+          expect(Donico).to receive(:with_exit_status).with(*args)
+
+          Rake::Task["lint-commits"].invoke
+        end
+      end
     end
   end
 end

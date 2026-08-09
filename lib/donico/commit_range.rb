@@ -41,8 +41,12 @@ module Donico
       @exists = exists || method(:reachable?)
     end
 
+    # nil when even the fallback is out of reach, which means HEAD is the root
+    # commit — a squashed or a brand new repository. There is no range to lint
+    # then, only the one commit, and the caller has to say so differently:
+    # HEAD~1..HEAD ends the job on "ambiguous argument 'HEAD~1..HEAD'".
     def base
-      reachable(merge_request_base) || reachable(push_base) || FALLBACK
+      reachable(merge_request_base) || reachable(push_base) || reachable(FALLBACK)
     end
 
     private

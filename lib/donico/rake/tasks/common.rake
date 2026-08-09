@@ -52,8 +52,15 @@ end
 # left the job log with no trace that anything had been checked.
 desc "Lint commits"
 task :"lint-commits" do
+  # No base means HEAD is the root commit — a squashed or a brand new repository
+  # — so there is no range: --last names the single commit there is to lint,
+  # where --from HEAD~1 would end the job on "ambiguous argument
+  # 'HEAD~1..HEAD'".
+  base  = Donico::CommitRange.base
+  range = base ? ["--from", base, "--to", "HEAD"] : ["--last"]
+
   Donico.with_exit_status("docker", "run", "--pull", "always", "--rm", *MISE_IGNORE, "-v", "#{Dir.pwd}:/app", Donico.config.commit_linter,
-                          "commitlint", "--from", Donico::CommitRange.base, "--to", "HEAD", "--verbose") do |success|
+                          "commitlint", *range, "--verbose") do |success|
     puts("Commits are OK!") if success
   end
 end
