@@ -24,8 +24,8 @@ require_relative "donico/version"
 module Donico
   module_function
 
-  DEFAULT_COMMIT_LINTER = "harbor.jbox-cloud.fr/jbox/base/commitlint:latest"
-  DEFAULT_DOCKER_LINTER = "harbor.jbox-cloud.fr/jbox/base/hadolint:latest"
+  DEFAULT_COMMIT_LINTER = "harbor.thetuxhouse.org/jbox/base/commitlint:latest"
+  DEFAULT_DOCKER_LINTER = "harbor.thetuxhouse.org/jbox/base/hadolint:latest"
 
   def load!
     load_config

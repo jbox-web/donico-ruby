@@ -10,7 +10,7 @@ compile = false
 GITLAB_PACKAGE_REGISTRY = "https://gitlab.thetuxhouse.org/api/v4/projects/63/packages/rubygems"
 
 # Dev tools config
-COMMIT_LINTER = "harbor.jbox-cloud.fr/jbox/base/commitlint:latest"
+COMMIT_LINTER = "harbor.thetuxhouse.org/jbox/base/commitlint:latest"
 
 [tasks."dev:deps"]
 description = "Install dependencies"

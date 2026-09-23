@@ -1,7 +1,7 @@
 ---
 .docker-in-docker:
   # Use custom Docker image with Docker installed inside
-  image: harbor.jbox-cloud.fr/jbox/base/donico:latest
+  image: harbor.thetuxhouse.org/jbox/base/donico:latest
 
   # Only use Gitlab runners with "dind" (Docker in Docker) tag
   tags:

@@ -7,7 +7,7 @@
 # CONFIG #
 ##########
 
-INSPEC_IMAGE=harbor.jbox-cloud.fr/jbox/base/inspec:latest
+INSPEC_IMAGE=harbor.thetuxhouse.org/jbox/base/inspec:latest
 
 #############
 # FUNCTIONS #

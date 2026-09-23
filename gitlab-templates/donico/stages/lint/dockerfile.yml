@@ -4,7 +4,7 @@ lint-dockerfile:
   # the GitlabCI matrix is not loaded
   # Anyway we don't care since it's just about mounting the current dir
   # inside hadolint container and run hadolint
-  image: harbor.jbox-cloud.fr/jbox/base/donico:latest
+  image: harbor.thetuxhouse.org/jbox/base/donico:latest
 
   # Only use Gitlab runners with "dind" (Docker in Docker) tag
   tags:

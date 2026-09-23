@@ -28,7 +28,7 @@ Ainsi, le fichier de configuration Donico suivant :
 
 ```yaml
 ---
-registry: harbor.jbox-cloud.fr/jbox/base
+registry: harbor.thetuxhouse.org/jbox/base
 image_name: foo
 matrix:
   - version: "3.0.1"
@@ -109,8 +109,8 @@ Les actions prédéfinies par Donico (`build`, `test`, `tag`, `push`, `login`, `
 |-------------------------------------|------------|
 | `rake amd64:bullseye:3.0.1:build`   | `docker build -f Dockerfile --tag amd64/bullseye/foo-3.0.1:20210603 --build-arg ARCH=amd64 --build-arg DISTRO_NAME=bullseye --build-arg FOO_VERSION=3.0.1 .`
 | `rake amd64:bullseye:3.0.1:test`    | `bin/inspec donico amd64/bullseye/foo-3.0.1:20210603 arch=amd64 build_date=20210603 distro_name=bullseye foo_version=3.0.1`
-| `rake amd64:bullseye:3.0.1:tag`     | `docker tag amd64/bullseye/foo-3.0.1:20210603 harbor.jbox-cloud.fr/jbox/base/foo:3.0.1-bullseye`
-| `rake amd64:bullseye:3.0.1:push`    | `docker push harbor.jbox-cloud.fr/jbox/base/foo:3.0.1-bullseye`
+| `rake amd64:bullseye:3.0.1:tag`     | `docker tag amd64/bullseye/foo-3.0.1:20210603 harbor.thetuxhouse.org/jbox/base/foo:3.0.1-bullseye`
+| `rake amd64:bullseye:3.0.1:push`    | `docker push harbor.thetuxhouse.org/jbox/base/foo:3.0.1-bullseye`
 | `rake amd64:bullseye:3.0.1:login`   | `docker run -it --rm amd64/bullseye/foo-3.0.1:20210603 /bin/bash`
 | `rake amd64:bullseye:3.0.1:clean`   | `docker rmi amd64/bullseye/foo-3.0.1:20210603`
 
@@ -187,7 +187,7 @@ Donico.load!
 
 ```yaml
 ---
-registry: harbor.jbox-cloud.fr/jbox/base
+registry: harbor.thetuxhouse.org/jbox/base
 image_name: skeleton
 ```
 
