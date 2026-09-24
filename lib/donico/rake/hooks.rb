@@ -29,7 +29,7 @@ module Donico
       # clean, login, and push on the bake backend). Kernel.exec replaces the current
       # process, so control never returns here and the block is silently skipped.
       # Use `before` or `redefine` for those tasks.
-      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Style/RescueStandardError
+      # rubocop:disable-next Metrics/AbcSize, Metrics/MethodLength, Style/RescueStandardError
       def after(*task_names, &new_task)
         options = task_names.last.is_a?(Hash) ? task_names.pop : {}
         ignore_exceptions = options.delete(:ignore_exceptions) || false
@@ -48,7 +48,6 @@ module Donico
           end
         end
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Style/RescueStandardError
 
       def redefine(*task_names, &new_task)
         task_names.each do |task_name|

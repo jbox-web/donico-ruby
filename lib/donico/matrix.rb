@@ -8,7 +8,7 @@ module Donico
         write_matrix(matrix)
       end
 
-      # rubocop:disable Metrics/MethodLength
+      # rubocop:disable-next Metrics/MethodLength
       def write_matrix(matrix)
         warning = "# !!! THIS IS A GENERATED FILE !!! DON'T EDIT ME MANUALLY !!!\n# Instead edit donico.yml and run bin/rake generate-files\n"
         config  = {
@@ -25,7 +25,6 @@ module Donico
           f.write YAML.dump(config)
         end
       end
-      # rubocop:enable Metrics/MethodLength
     end
 
     attr_reader :image_name, :version, :distro, :archs, :dockerfile, :build_args, :test_args, :secret_envs, :secret_files, :tags

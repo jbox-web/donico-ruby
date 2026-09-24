@@ -37,7 +37,7 @@ module Donico
 
       attr_reader :name, :registry, :distro, :version, :timestamp, :tags, :dockerfile, :secret_envs, :secret_files
 
-      # rubocop:disable Metrics/ParameterLists
+      # rubocop:disable-next Metrics/ParameterLists
       def initialize(name:, registry:, distro:, version:, timestamp:, tags:, dockerfile:, build_args:, test_args:, secret_envs:, secret_files:) # rubocop:disable Metrics/MethodLength
         @name         = name
         @registry     = registry
@@ -51,7 +51,6 @@ module Donico
         @secret_envs  = secret_envs
         @secret_files = secret_files
       end
-      # rubocop:enable Metrics/ParameterLists
 
 
       # Convert docker-in-docker to DOCKER_IN_DOCKER_VERSION
