@@ -1,3 +1,7 @@
+# Per-task `timeout` keys are only enforced reliably from mise 2026.10.2 on:
+# an older mise must refuse to run instead of leaving those tasks unbounded.
+min_version = "2026.10.2"
+
 [tools]
 ruby = "3.4.10"
 shellcheck = "0.11.0"
@@ -18,6 +22,7 @@ run = "bundle install"
 
 [tasks."dev:test"]
 description = "Run RSpec"
+timeout = "600s"
 run = "bin/rspec"
 
 [tasks."dev:build"]
@@ -56,9 +61,11 @@ docker run --pull always --rm \
 
 [tasks."dev:lint-project"]
 description = "Lint project"
+timeout = "180s"
 run = "bin/rubocop"
 
 [tasks."dev:lint-shell"]
 description = "Lint shell scripts"
 # -x follows the sourced library so exe/inspec is checked against it
+timeout = "120s"
 run = "shellcheck -x bash/*.sh exe/inspec bin/push"
